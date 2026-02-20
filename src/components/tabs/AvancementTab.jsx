@@ -1,42 +1,9 @@
 import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
-import { computeDetailedProgress, computeProjectProgress, computeExpectedProgress } from "../../lib/computations";
+import { computeDetailedProgress, computeProjectProgress } from "../../lib/computations";
+import { formatMontant } from "../../lib/format";
 import ProgressBar from "../ui/ProgressBar";
 import ProgressCard from "../ui/ProgressCard";
-
-function EcartBadge({ ecart }) {
-  if (ecart === null) return <span className="ecart-na">N/A</span>;
-  const isNeg = ecart < 0;
-  return (
-    <span className={`ecart-badge ${isNeg ? "ecart-neg" : "ecart-pos"}`}>
-      {isNeg ? "" : "+"}{ecart.toFixed(1)}%
-    </span>
-  );
-}
-
-function EcartBanner({ label, real, expected }) {
-  const ecart = expected !== null ? real - expected : null;
-  const isNeg = ecart !== null && ecart < 0;
-  return (
-    <div className={`ecart-banner ${isNeg ? "ecart-banner-neg" : ""}`}>
-      <div className="ecart-banner-label">{label}</div>
-      <div className="ecart-banner-values">
-        <div className="ecart-banner-item">
-          <span className="ecart-banner-num">{real.toFixed(1)}%</span>
-          <span className="ecart-banner-sub">Réel</span>
-        </div>
-        <div className="ecart-banner-item">
-          <span className="ecart-banner-num">{expected !== null ? expected.toFixed(1) + "%" : "N/A"}</span>
-          <span className="ecart-banner-sub">Théorique</span>
-        </div>
-        <div className="ecart-banner-item">
-          <EcartBadge ecart={ecart} />
-          <span className="ecart-banner-sub">Écart</span>
-        </div>
-      </div>
-    </div>
-  );
-}
 
 export default function AvancementTab({ project }) {
   const { lotProgressInt, lotProgressExt, batimentProgress } = useMemo(
@@ -45,17 +12,6 @@ export default function AvancementTab({ project }) {
   );
 
   const globalProgress = useMemo(() => computeProjectProgress(project), [project]);
-  const { expectedInt, expectedExt, expectedGlobal } = useMemo(
-    () => computeExpectedProgress(project),
-    [project]
-  );
-
-  const realInt = lotProgressInt.length > 0
-    ? lotProgressInt.reduce((s, lp) => s + lp.progress, 0) / lotProgressInt.length
-    : 0;
-  const realExt = lotProgressExt.length > 0
-    ? lotProgressExt.reduce((s, lp) => s + lp.progress, 0) / lotProgressExt.length
-    : 0;
 
   const lotProgress = useMemo(() => {
     const lots = project.lots || [];
@@ -74,9 +30,10 @@ export default function AvancementTab({ project }) {
         ...intDecomps.map((d) => ({ ...d, type: "INT" })),
       ];
 
-      if (allDecomps.length === 0) return { lot: `${lot.numero} - ${lot.nom}`, progress: 0 };
+      if (allDecomps.length === 0) return { lot: `${lot.numero} - ${lot.nom}`, progress: 0, tooltip: "Aucune décomposition" };
 
       let progress = 0;
+      const tooltipParts = [];
       const lotMontantMarche = lot.montantMarche || 0;
       for (const decomp of allDecomps) {
         const isExt = decomp.type === "EXT";
@@ -96,41 +53,54 @@ export default function AvancementTab({ project }) {
         const decompAv = tpw > 0 ? Math.min((dw / tpw) * 100, 100) : 0;
         const decompMontant = decomp.montant || 0;
         const pctDuLot = lotMontantMarche > 0 ? decompMontant / lotMontantMarche : 0;
-        progress += pctDuLot * decompAv;
+        const contribution = pctDuLot * decompAv;
+        progress += contribution;
+
+        const label = decomp.nomDecomp || decomp.nom || decomp.type;
+        tooltipParts.push(`${label} (${decomp.type}): ${decompAv.toFixed(1)}% × ${(pctDuLot * 100).toFixed(1)}% = ${contribution.toFixed(2)}%`);
       }
-      return { lot: `${lot.numero} - ${lot.nom}`, progress };
+
+      const tooltip = `Montant: ${formatMontant(lotMontantMarche)}\n${tooltipParts.join("\n")}\n= ${progress.toFixed(2)}%`;
+      return { lot: `${lot.numero} - ${lot.nom}`, progress, tooltip };
     });
   }, [project]);
 
+  const avgProgress = lotProgress.length > 0
+    ? lotProgress.reduce((s, lp) => s + lp.progress, 0) / lotProgress.length
+    : 0;
+
   return (
     <div className="avancement-content" style={{ animation: "slideInUp 0.4s ease both" }}>
-      <div className="ecart-banners">
-        <EcartBanner label="Global" real={globalProgress} expected={expectedGlobal} />
-        <EcartBanner label="Intérieur" real={realInt} expected={expectedInt} />
-        <EcartBanner label="Extérieur" real={realExt} expected={expectedExt} />
-      </div>
-
       <div className="progress-card" style={{ marginBottom: 24 }}>
         <div className="progress-card-header">
           <h4>Avancement par Lot</h4>
+          <span
+            className="progress-card-total"
+            data-tooltip={`Σ(montant_decomp / montant_total × av_decomp)\n= ${globalProgress.toFixed(2)}%`}
+          >
+            {globalProgress.toFixed(1)}%
+          </span>
         </div>
         <div className="config-table-wrap">
           <table className="config-table">
             <thead>
               <tr>
                 <th>Lot</th>
-                <th style={{ width: 140, textAlign: "right" }}>Avancement</th>
+                <th style={{ width: 160, textAlign: "right" }}>Avancement</th>
               </tr>
             </thead>
             <tbody>
-              {lotProgress.map((lp) => (
-                <tr key={lp.lot}>
-                  <td style={{ fontSize: 13 }}>{lp.lot}</td>
-                  <td className="cell-right" style={{ padding: "4px 8px" }}>
-                    <ProgressBar value={lp.progress} height={5} />
-                  </td>
-                </tr>
-              ))}
+              {lotProgress.map((lp) => {
+                const isLow = lp.progress < avgProgress * 0.5 && avgProgress > 0;
+                return (
+                  <tr key={lp.lot} className={isLow ? "row-retard" : ""}>
+                    <td style={{ fontSize: 13 }}>{lp.lot}</td>
+                    <td className="cell-right" style={{ padding: "4px 8px" }} data-tooltip={lp.tooltip}>
+                      <ProgressBar value={lp.progress} height={5} />
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
@@ -150,21 +120,19 @@ export default function AvancementTab({ project }) {
         ) : (
           <div className="batiment-progress-grid">
             {batimentProgress.map((bp) => {
-              const ecart = expectedGlobal !== null ? bp.total - expectedGlobal : null;
-              const isRetard = ecart !== null && ecart < 0;
+              const isRetard = bp.total < avgProgress * 0.5 && avgProgress > 0;
               return (
-                <div key={bp.name} className={`batiment-progress-card ${isRetard ? "batiment-retard" : ""}`}>
+                <div
+                  key={bp.name}
+                  className={`batiment-progress-card ${isRetard ? "batiment-retard" : ""}`}
+                  data-tooltip={`INT: ${bp.int.toFixed(1)}% (moy. pond. logements)\nEXT: ${bp.ext.toFixed(1)}% (moy. pond. bâtiment)\nTotal: (INT + EXT) / 2 = ${bp.total.toFixed(1)}%`}
+                >
                   <h5>{bp.name}</h5>
                   <ProgressBar value={bp.total} />
                   <div className="batiment-progress-detail">
-                    <span>INT {bp.int.toFixed(1)}%</span>
-                    <span>EXT {bp.ext.toFixed(1)}%</span>
+                    <span className={bp.int < 20 ? "val-retard" : ""}>INT {bp.int.toFixed(1)}%</span>
+                    <span className={bp.ext < 20 ? "val-retard" : ""}>EXT {bp.ext.toFixed(1)}%</span>
                   </div>
-                  {ecart !== null && (
-                    <div className="batiment-ecart">
-                      <EcartBadge ecart={ecart} />
-                    </div>
-                  )}
                 </div>
               );
             })}

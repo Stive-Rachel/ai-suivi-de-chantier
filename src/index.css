@@ -1321,51 +1321,8 @@ body {
   font-size: 9px;
 }
 
-/* ─── Écarts / Retards ─── */
-.ecart-badge {
-  display: inline-block;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 12px;
-  font-weight: 600;
-  font-family: var(--font-mono);
-}
-.ecart-neg { background: #fde8e8; color: #c0392b; }
-.ecart-pos { background: #e8f8e8; color: #27ae60; }
-.ecart-na { color: var(--text-tertiary); font-size: 12px; }
-
-.ecart-cell-neg { color: #c0392b !important; font-weight: 600; }
-.ecart-cell-pos { color: #27ae60 !important; font-weight: 500; }
-
-.ecart-banners {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 12px;
-  margin-bottom: 20px;
-}
-.ecart-banner {
-  background: var(--bg-card);
-  border: 1px solid var(--border-light);
-  border-radius: 12px;
-  padding: 16px;
-}
-.ecart-banner-neg { border-color: #e6a19a; background: linear-gradient(135deg, var(--bg-card), #fef5f4); }
-.ecart-banner-label {
-  font-size: 11px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: var(--text-tertiary);
-  margin-bottom: 10px;
-}
-.ecart-banner-values { display: flex; justify-content: space-between; gap: 8px; }
-.ecart-banner-item { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.ecart-banner-num { font-size: 18px; font-weight: 700; font-family: var(--font-mono); color: var(--text-primary); }
-.ecart-banner-sub { font-size: 10px; color: var(--text-tertiary); text-transform: uppercase; letter-spacing: 0.3px; }
-
+/* ─── Retards & Tooltips ─── */
+.row-retard { background: #fef5f4 !important; }
+.row-retard td:first-child { border-left: 3px solid #c0392b; padding-left: 8px; }
+.val-retard { color: #c0392b !important; font-weight: 600; }
 .batiment-retard { border-color: #e6a19a !important; background: linear-gradient(135deg, var(--bg-card), #fef5f4) !important; }
-.batiment-ecart { margin-top: 6px; text-align: center; }
-
-@media (max-width: 768px) {
-  .ecart-banners { grid-template-columns: 1fr; }
-}

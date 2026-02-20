@@ -1,13 +1,8 @@
 import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
-import { computeExpectedProgress } from "../../lib/computations";
+import { formatMontant } from "../../lib/format";
 
 export default function RecapAvancementTab({ project }) {
-  const { expectedInt, expectedExt } = useMemo(
-    () => computeExpectedProgress(project),
-    [project]
-  );
-
   const data = useMemo(() => {
     const lots = project.lots || [];
     const trackInt = project.tracking?.logements || {};
@@ -35,14 +30,18 @@ export default function RecapAvancementTab({ project }) {
         const allEntities = batEntitiesGrouped.flatMap((bg) => isExt ? bg.extEntities : bg.intEntities);
         let totalPondWeighted = 0;
         let doneWeighted = 0;
-        if (allEntities.length > 0) {
+        const nbEntities = allEntities.length;
+        let nbDecomps = 0;
+
+        if (nbEntities > 0) {
           for (const step of decomp.decompositions) {
             const key = `${decomp.trackPrefix || decomp.numero}-${step}`;
             const pond = tracking[key]?._ponderation || 1;
-            totalPondWeighted += pond * allEntities.length;
+            totalPondWeighted += pond * nbEntities;
             for (const eId of allEntities) {
               if (tracking[key]?.[eId]?.status === "X") doneWeighted += pond;
             }
+            nbDecomps++;
           }
         }
         const avancement = totalPondWeighted > 0
@@ -53,8 +52,8 @@ export default function RecapAvancementTab({ project }) {
         const pctDuLot = lot.montantMarche > 0 ? (montant / lot.montantMarche) * 100 : 0;
         const avParMontant = (pctDuLot / 100) * avancement;
 
-        const expected = isExt ? expectedExt : expectedInt;
-        const ecart = expected !== null ? avancement - expected : null;
+        const tooltipAv = `${doneWeighted.toFixed(0)} / ${totalPondWeighted.toFixed(0)} (pondéré)\n${nbDecomps} tâches × ${nbEntities} ${isExt ? "bâtiments" : "logements"}\n= ${avancement.toFixed(2)}%`;
+        const tooltipAvMontant = `${formatMontant(montant)} / ${formatMontant(lot.montantMarche)}\n= ${pctDuLot.toFixed(2)}% du lot\n× ${avancement.toFixed(2)}% avancement\n= ${avParMontant.toFixed(2)}%`;
 
         const decompLabel = decomp.nomDecomp || decomp.nom || "";
         rows.push({
@@ -65,18 +64,20 @@ export default function RecapAvancementTab({ project }) {
           avParMontant,
           avInt: decomp.type === "INT" ? avParMontant : 0,
           avExt: decomp.type === "EXT" ? avParMontant : 0,
-          ecart,
+          tooltipAv,
+          tooltipAvMontant,
         });
       }
     }
 
     return rows;
-  }, [project, expectedInt, expectedExt]);
+  }, [project]);
 
   const pct = (v) => v.toFixed(2) + "%";
   const totalAv = data.reduce((s, r) => s + r.avParMontant, 0);
   const totalInt = data.reduce((s, r) => s + r.avInt, 0);
   const totalExt = data.reduce((s, r) => s + r.avExt, 0);
+  const avgAv = data.length > 0 ? data.reduce((s, r) => s + r.avancement, 0) / data.length : 0;
 
   return (
     <div className="setup-content-wide" style={{ animation: "slideInUp 0.4s ease both" }}>
@@ -84,7 +85,7 @@ export default function RecapAvancementTab({ project }) {
         <div className="section-header">
           <div>
             <h3>Récap Avancement</h3>
-            <p>{data.length} lot(s) décomposé(s)</p>
+            <p>{data.length} lot(s) décomposé(s) — avancement global : <strong data-tooltip={`Σ av. par montant de chaque décomposition`}>{pct(totalAv)}</strong></p>
           </div>
         </div>
 
@@ -94,27 +95,33 @@ export default function RecapAvancementTab({ project }) {
               <tr>
                 <th>Lot décomposé</th>
                 <th style={{ width: 100, textAlign: "right" }}>Avancement</th>
-                <th style={{ width: 80, textAlign: "right" }}>Écart</th>
                 <th style={{ width: 140, textAlign: "right" }}>Av. (par montant)</th>
-                <th style={{ width: 140, textAlign: "right" }}>Av. INT (par montant)</th>
-                <th style={{ width: 140, textAlign: "right" }}>Av. EXT (par montant)</th>
+                <th style={{ width: 140, textAlign: "right" }}>Av. INT</th>
+                <th style={{ width: 140, textAlign: "right" }}>Av. EXT</th>
               </tr>
             </thead>
             <tbody>
               {data.map((r, i) => {
-                const isRetard = r.ecart !== null && r.ecart < 0;
+                const isLow = r.avancement < avgAv * 0.5 && avgAv > 0 && r.avancement < 100;
                 return (
-                  <tr key={i}>
+                  <tr key={i} className={isLow ? "row-retard" : ""}>
                     <td style={{ fontSize: 12 }}>{r.label}</td>
-                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avancement)}</td>
-                    <td className={`cell-right cell-mono ${isRetard ? "ecart-cell-neg" : "ecart-cell-pos"}`} style={{ fontSize: 12 }}>
-                      {r.ecart !== null ? (
-                        <>{r.ecart < 0 ? "" : "+"}{r.ecart.toFixed(1)}%</>
-                      ) : "—"}
+                    <td
+                      className={`cell-right cell-mono ${isLow ? "val-retard" : ""}`}
+                      style={{ fontSize: 12 }}
+                      data-tooltip={r.tooltipAv}
+                    >
+                      {pct(r.avancement)}
                     </td>
-                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avParMontant)}</td>
-                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avInt)}</td>
-                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avExt)}</td>
+                    <td
+                      className="cell-right cell-mono"
+                      style={{ fontSize: 12 }}
+                      data-tooltip={r.tooltipAvMontant}
+                    >
+                      {pct(r.avParMontant)}
+                    </td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{r.avInt > 0 ? pct(r.avInt) : "—"}</td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{r.avExt > 0 ? pct(r.avExt) : "—"}</td>
                   </tr>
                 );
               })}
@@ -123,8 +130,7 @@ export default function RecapAvancementTab({ project }) {
               <tr>
                 <td className="cell-bold">TOTAL</td>
                 <td></td>
-                <td></td>
-                <td className="cell-right cell-bold cell-mono">{pct(totalAv)}</td>
+                <td className="cell-right cell-bold cell-mono" data-tooltip="Somme de tous les Av. par montant">{pct(totalAv)}</td>
                 <td className="cell-right cell-bold cell-mono">{pct(totalInt)}</td>
                 <td className="cell-right cell-bold cell-mono">{pct(totalExt)}</td>
               </tr>
