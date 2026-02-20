@@ -77,6 +77,24 @@ export function computeDetailedProgress(project) {
   return { lotProgressInt, lotProgressExt, batimentProgress };
 }
 
+export function computeExpectedProgress(project) {
+  const now = new Date();
+  const calc = (dateDebut, dureeMois) => {
+    if (!dateDebut || !dureeMois) return null;
+    const start = new Date(dateDebut);
+    if (isNaN(start.getTime())) return null;
+    const elapsed = (now - start) / (1000 * 60 * 60 * 24 * 30.44);
+    if (elapsed <= 0) return 0;
+    return Math.min((elapsed / dureeMois) * 100, 100);
+  };
+
+  const expectedInt = calc(project.dateDebutInt, project.dureeInt);
+  const expectedExt = calc(project.dateDebutExt, project.dureeExt);
+  const expectedGlobal = calc(project.dateDebutChantier, project.dureeTotale);
+
+  return { expectedInt, expectedExt, expectedGlobal };
+}
+
 export function calcEntityProgress(lots, trackType, entityIds, tracking) {
   const t = tracking?.[trackType] || {};
   if (entityIds.length === 0) return 0;

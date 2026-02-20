@@ -1,7 +1,13 @@
 import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
+import { computeExpectedProgress } from "../../lib/computations";
 
 export default function RecapAvancementTab({ project }) {
+  const { expectedInt, expectedExt } = useMemo(
+    () => computeExpectedProgress(project),
+    [project]
+  );
+
   const data = useMemo(() => {
     const lots = project.lots || [];
     const trackInt = project.tracking?.logements || {};
@@ -47,6 +53,9 @@ export default function RecapAvancementTab({ project }) {
         const pctDuLot = lot.montantMarche > 0 ? (montant / lot.montantMarche) * 100 : 0;
         const avParMontant = (pctDuLot / 100) * avancement;
 
+        const expected = isExt ? expectedExt : expectedInt;
+        const ecart = expected !== null ? avancement - expected : null;
+
         const decompLabel = decomp.nomDecomp || decomp.nom || "";
         rows.push({
           label: decompLabel
@@ -56,12 +65,13 @@ export default function RecapAvancementTab({ project }) {
           avParMontant,
           avInt: decomp.type === "INT" ? avParMontant : 0,
           avExt: decomp.type === "EXT" ? avParMontant : 0,
+          ecart,
         });
       }
     }
 
     return rows;
-  }, [project]);
+  }, [project, expectedInt, expectedExt]);
 
   const pct = (v) => v.toFixed(2) + "%";
   const totalAv = data.reduce((s, r) => s + r.avParMontant, 0);
@@ -84,25 +94,35 @@ export default function RecapAvancementTab({ project }) {
               <tr>
                 <th>Lot décomposé</th>
                 <th style={{ width: 100, textAlign: "right" }}>Avancement</th>
+                <th style={{ width: 80, textAlign: "right" }}>Écart</th>
                 <th style={{ width: 140, textAlign: "right" }}>Av. (par montant)</th>
                 <th style={{ width: 140, textAlign: "right" }}>Av. INT (par montant)</th>
                 <th style={{ width: 140, textAlign: "right" }}>Av. EXT (par montant)</th>
               </tr>
             </thead>
             <tbody>
-              {data.map((r, i) => (
-                <tr key={i}>
-                  <td style={{ fontSize: 12 }}>{r.label}</td>
-                  <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avancement)}</td>
-                  <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avParMontant)}</td>
-                  <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avInt)}</td>
-                  <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avExt)}</td>
-                </tr>
-              ))}
+              {data.map((r, i) => {
+                const isRetard = r.ecart !== null && r.ecart < 0;
+                return (
+                  <tr key={i}>
+                    <td style={{ fontSize: 12 }}>{r.label}</td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avancement)}</td>
+                    <td className={`cell-right cell-mono ${isRetard ? "ecart-cell-neg" : "ecart-cell-pos"}`} style={{ fontSize: 12 }}>
+                      {r.ecart !== null ? (
+                        <>{r.ecart < 0 ? "" : "+"}{r.ecart.toFixed(1)}%</>
+                      ) : "—"}
+                    </td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avParMontant)}</td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avInt)}</td>
+                    <td className="cell-right cell-mono" style={{ fontSize: 12 }}>{pct(r.avExt)}</td>
+                  </tr>
+                );
+              })}
             </tbody>
             <tfoot>
               <tr>
                 <td className="cell-bold">TOTAL</td>
+                <td></td>
                 <td></td>
                 <td className="cell-right cell-bold cell-mono">{pct(totalAv)}</td>
                 <td className="cell-right cell-bold cell-mono">{pct(totalInt)}</td>

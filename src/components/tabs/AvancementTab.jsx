@@ -1,14 +1,61 @@
 import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
-import { computeDetailedProgress } from "../../lib/computations";
+import { computeDetailedProgress, computeProjectProgress, computeExpectedProgress } from "../../lib/computations";
 import ProgressBar from "../ui/ProgressBar";
 import ProgressCard from "../ui/ProgressCard";
+
+function EcartBadge({ ecart }) {
+  if (ecart === null) return <span className="ecart-na">N/A</span>;
+  const isNeg = ecart < 0;
+  return (
+    <span className={`ecart-badge ${isNeg ? "ecart-neg" : "ecart-pos"}`}>
+      {isNeg ? "" : "+"}{ecart.toFixed(1)}%
+    </span>
+  );
+}
+
+function EcartBanner({ label, real, expected }) {
+  const ecart = expected !== null ? real - expected : null;
+  const isNeg = ecart !== null && ecart < 0;
+  return (
+    <div className={`ecart-banner ${isNeg ? "ecart-banner-neg" : ""}`}>
+      <div className="ecart-banner-label">{label}</div>
+      <div className="ecart-banner-values">
+        <div className="ecart-banner-item">
+          <span className="ecart-banner-num">{real.toFixed(1)}%</span>
+          <span className="ecart-banner-sub">Réel</span>
+        </div>
+        <div className="ecart-banner-item">
+          <span className="ecart-banner-num">{expected !== null ? expected.toFixed(1) + "%" : "N/A"}</span>
+          <span className="ecart-banner-sub">Théorique</span>
+        </div>
+        <div className="ecart-banner-item">
+          <EcartBadge ecart={ecart} />
+          <span className="ecart-banner-sub">Écart</span>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function AvancementTab({ project }) {
   const { lotProgressInt, lotProgressExt, batimentProgress } = useMemo(
     () => computeDetailedProgress(project),
     [project]
   );
+
+  const globalProgress = useMemo(() => computeProjectProgress(project), [project]);
+  const { expectedInt, expectedExt, expectedGlobal } = useMemo(
+    () => computeExpectedProgress(project),
+    [project]
+  );
+
+  const realInt = lotProgressInt.length > 0
+    ? lotProgressInt.reduce((s, lp) => s + lp.progress, 0) / lotProgressInt.length
+    : 0;
+  const realExt = lotProgressExt.length > 0
+    ? lotProgressExt.reduce((s, lp) => s + lp.progress, 0) / lotProgressExt.length
+    : 0;
 
   const lotProgress = useMemo(() => {
     const lots = project.lots || [];
@@ -57,6 +104,12 @@ export default function AvancementTab({ project }) {
 
   return (
     <div className="avancement-content" style={{ animation: "slideInUp 0.4s ease both" }}>
+      <div className="ecart-banners">
+        <EcartBanner label="Global" real={globalProgress} expected={expectedGlobal} />
+        <EcartBanner label="Intérieur" real={realInt} expected={expectedInt} />
+        <EcartBanner label="Extérieur" real={realExt} expected={expectedExt} />
+      </div>
+
       <div className="progress-card" style={{ marginBottom: 24 }}>
         <div className="progress-card-header">
           <h4>Avancement par Lot</h4>
@@ -96,16 +149,25 @@ export default function AvancementTab({ project }) {
           <p style={{ color: "var(--text-tertiary)", fontSize: 13 }}>Aucun bâtiment configuré</p>
         ) : (
           <div className="batiment-progress-grid">
-            {batimentProgress.map((bp) => (
-              <div key={bp.name} className="batiment-progress-card">
-                <h5>{bp.name}</h5>
-                <ProgressBar value={bp.total} />
-                <div className="batiment-progress-detail">
-                  <span>INT {bp.int.toFixed(1)}%</span>
-                  <span>EXT {bp.ext.toFixed(1)}%</span>
+            {batimentProgress.map((bp) => {
+              const ecart = expectedGlobal !== null ? bp.total - expectedGlobal : null;
+              const isRetard = ecart !== null && ecart < 0;
+              return (
+                <div key={bp.name} className={`batiment-progress-card ${isRetard ? "batiment-retard" : ""}`}>
+                  <h5>{bp.name}</h5>
+                  <ProgressBar value={bp.total} />
+                  <div className="batiment-progress-detail">
+                    <span>INT {bp.int.toFixed(1)}%</span>
+                    <span>EXT {bp.ext.toFixed(1)}%</span>
+                  </div>
+                  {ecart !== null && (
+                    <div className="batiment-ecart">
+                      <EcartBadge ecart={ecart} />
+                    </div>
+                  )}
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
