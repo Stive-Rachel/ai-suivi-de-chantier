@@ -15,6 +15,7 @@ export default function RecapAvancementTab({ project }) {
       intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
     }));
 
+    const totalMontantGlobal = lots.reduce((s, l) => s + (l.montantMarche || 0), 0);
     const rows = [];
 
     for (const lot of lots) {
@@ -52,10 +53,11 @@ export default function RecapAvancementTab({ project }) {
 
         const montant = decomp.montant || 0;
         const pctDuLot = lot.montantMarche > 0 ? (montant / lot.montantMarche) * 100 : 0;
-        const avParMontant = (pctDuLot / 100) * avancement;
+        const pctDuGlobal = totalMontantGlobal > 0 ? (montant / totalMontantGlobal) * 100 : 0;
+        const avParMontant = (pctDuGlobal / 100) * avancement;
 
         const tooltipAv = `${doneWeighted.toFixed(0)} / ${totalPondWeighted.toFixed(0)} (pondéré)\n${nbDecomps} tâches × ${nbEntities} ${isExt ? "bâtiments" : "logements"}\n= ${avancement.toFixed(2)}%`;
-        const tooltipAvMontant = `${formatMontant(montant)} / ${formatMontant(lot.montantMarche)}\n= ${pctDuLot.toFixed(2)}% du lot\n× ${avancement.toFixed(2)}% avancement\n= ${avParMontant.toFixed(2)}%`;
+        const tooltipAvMontant = `${formatMontant(montant)} / ${formatMontant(totalMontantGlobal)}\n= ${pctDuGlobal.toFixed(2)}% du total\n× ${avancement.toFixed(2)}% avancement\n= ${avParMontant.toFixed(2)}%`;
 
         const decompLabel = decomp.nomDecomp || decomp.nom || "";
         rows.push({

@@ -121,7 +121,8 @@ export default function RecapTab({ project }) {
 
   let globalAvParMontant = 0;
   for (const lot of rows) {
-    globalAvParMontant += lot.avParMontant;
+    const weight = totalMontantGlobal > 0 ? lot.montant / totalMontantGlobal : 0;
+    globalAvParMontant += weight * lot.avParMontant;
   }
 
   const f = (v) => formatMontant(v);
