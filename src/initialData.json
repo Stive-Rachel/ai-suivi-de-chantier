@@ -1,0 +1,4573 @@
+{
+  "projects": [
+    {
+      "id": "bergevin_001",
+      "name": "Chantier BERGEVIN",
+      "location": "Guadeloupe",
+      "client": "",
+      "montantTotal": 5379534.16,
+      "montantExt": 1884948.15,
+      "montantInt": 3494586.01,
+      "dateDebutChantier": "2025-08-14",
+      "dureeTotale": 17,
+      "dureeExt": 17,
+      "dureeInt": 17,
+      "dateDebutInt": "2026-02-20",
+      "dateDebutExt": "2026-02-20",
+      "createdAt": "2026-02-13T08:13:17.896Z",
+      "batiments": [
+        {
+          "id": "bat_1",
+          "name": "Bâtiment 1",
+          "nbLogements": 4,
+          "logements": [
+            101,
+            102,
+            111,
+            112
+          ]
+        },
+        {
+          "id": "bat_2",
+          "name": "Bâtiment 2",
+          "nbLogements": 4,
+          "logements": [
+            201,
+            202,
+            211,
+            212
+          ]
+        },
+        {
+          "id": "bat_3",
+          "name": "Bâtiment 3",
+          "nbLogements": 4,
+          "logements": [
+            301,
+            302,
+            311,
+            312
+          ]
+        },
+        {
+          "id": "bat_4",
+          "name": "Bâtiment 4",
+          "nbLogements": 6,
+          "logements": [
+            401,
+            402,
+            411,
+            412,
+            421,
+            422
+          ]
+        },
+        {
+          "id": "bat_5",
+          "name": "Bâtiment 5",
+          "nbLogements": 6,
+          "logements": [
+            501,
+            502,
+            511,
+            512,
+            521,
+            522
+          ]
+        },
+        {
+          "id": "bat_6",
+          "name": "Bâtiment 6",
+          "nbLogements": 6,
+          "logements": [
+            601,
+            602,
+            611,
+            612,
+            621,
+            622
+          ]
+        },
+        {
+          "id": "bat_7",
+          "name": "Bâtiment 7",
+          "nbLogements": 6,
+          "logements": [
+            701,
+            702,
+            711,
+            712,
+            721,
+            722
+          ]
+        },
+        {
+          "id": "bat_8",
+          "name": "Bâtiment 8",
+          "nbLogements": 4,
+          "logements": [
+            801,
+            802,
+            811,
+            812
+          ]
+        },
+        {
+          "id": "bat_9",
+          "name": "Bâtiment 9",
+          "nbLogements": 4,
+          "logements": [
+            901,
+            902,
+            911,
+            912
+          ]
+        },
+        {
+          "id": "bat_10",
+          "name": "Bâtiment 10",
+          "nbLogements": 4,
+          "logements": [
+            1001,
+            1002,
+            1011,
+            1012
+          ]
+        },
+        {
+          "id": "bat_11",
+          "name": "Bâtiment 11",
+          "nbLogements": 6,
+          "logements": [
+            1101,
+            1102,
+            1111,
+            1112,
+            1121,
+            1122
+          ]
+        },
+        {
+          "id": "bat_12",
+          "name": "Bâtiment 12",
+          "nbLogements": 6,
+          "logements": [
+            1201,
+            1202,
+            1211,
+            1212,
+            1221,
+            1222
+          ]
+        },
+        {
+          "id": "bat_13",
+          "name": "Bâtiment 13",
+          "nbLogements": 6,
+          "logements": [
+            1301,
+            1302,
+            1311,
+            1312,
+            1321,
+            1322
+          ]
+        },
+        {
+          "id": "bat_14",
+          "name": "Bâtiment 14",
+          "nbLogements": 6,
+          "logements": [
+            1401,
+            1402,
+            1411,
+            1412,
+            1421,
+            1422
+          ]
+        },
+        {
+          "id": "bat_15",
+          "name": "Bâtiment 15",
+          "nbLogements": 6,
+          "logements": [
+            1501,
+            1502,
+            1511,
+            1512,
+            1521,
+            1522
+          ]
+        },
+        {
+          "id": "bat_15bis",
+          "name": "Bâtiment 15bis",
+          "nbLogements": 3,
+          "logements": [
+            1503,
+            1513,
+            1523
+          ]
+        },
+        {
+          "id": "bat_16",
+          "name": "Bâtiment 16",
+          "nbLogements": 6,
+          "logements": [
+            1601,
+            1602,
+            1611,
+            1612,
+            1621,
+            1622
+          ]
+        },
+        {
+          "id": "bat_17",
+          "name": "Bâtiment 17",
+          "nbLogements": 6,
+          "logements": [
+            1701,
+            1702,
+            1711,
+            1712,
+            1721,
+            1722
+          ]
+        },
+        {
+          "id": "bat_18",
+          "name": "Bâtiment 18",
+          "nbLogements": 6,
+          "logements": [
+            1801,
+            1802,
+            1811,
+            1812,
+            1821,
+            1822
+          ]
+        },
+        {
+          "id": "bat_19",
+          "name": "Bâtiment 19",
+          "nbLogements": 6,
+          "logements": [
+            1901,
+            1902,
+            1911,
+            1912,
+            1921,
+            1922
+          ]
+        },
+        {
+          "id": "bat_20",
+          "name": "Bâtiment 20",
+          "nbLogements": 6,
+          "logements": [
+            2001,
+            2002,
+            2011,
+            2012,
+            2021,
+            2022
+          ]
+        }
+      ],
+      "lots": [
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS",
+          "montantMarche": 1127001.91,
+          "montantExt": 714608.3,
+          "montantInt": 412393.61000000004
+        },
+        {
+          "numero": "3",
+          "nom": "CHARPENTE  -  COUVERTURE",
+          "montantMarche": 308477.54,
+          "montantExt": 308477.54000000004,
+          "montantInt": 0
+        },
+        {
+          "numero": "4",
+          "nom": "ETANCHEITE  -  REVETEMENT DE SOLS ET MURS - CLOISONS",
+          "montantMarche": 830461.82,
+          "montantExt": 576751.3999999999,
+          "montantInt": 253710.42
+        },
+        {
+          "numero": "5",
+          "nom": "MENUISERIES EXTERIEURES",
+          "montantMarche": 568754.29,
+          "montantExt": 0,
+          "montantInt": 568754.29
+        },
+        {
+          "numero": "6",
+          "nom": "MENUISERIES INTERIEURES",
+          "montantMarche": 517261.5,
+          "montantExt": 0,
+          "montantInt": 517261.5
+        },
+        {
+          "numero": "7",
+          "nom": "SERRURERIE BOITES AUX LETTRES",
+          "montantMarche": 16540.11,
+          "montantExt": 16540.11,
+          "montantInt": 0
+        },
+        {
+          "numero": "8",
+          "nom": "VRD",
+          "montantMarche": 268570.8,
+          "montantExt": 268570.8,
+          "montantInt": 0
+        },
+        {
+          "numero": "9",
+          "nom": "PLOMBERIE SANITAIRES",
+          "montantMarche": 992276.86,
+          "montantExt": 0,
+          "montantInt": 992276.86
+        },
+        {
+          "numero": "10",
+          "nom": "ELECTRICITE",
+          "montantMarche": 750189.33,
+          "montantExt": 0,
+          "montantInt": 750189.33
+        }
+      ],
+      "lotsInt": [
+        {
+          "numero": "5",
+          "nom": "MENUISERIES EXTERIEURES",
+          "trackPrefix": "5:d0",
+          "decompositions": [
+            "01 - Dépose et pose menuiserie"
+          ],
+          "montant": 568754.29
+        },
+        {
+          "numero": "9",
+          "nom": "PLOMBERIE SANITAIRES",
+          "trackPrefix": "9:d1",
+          "decompositions": [
+            "02 - Dépose baignoire/Douche/réseaux SDB",
+            "03 - Dépose provisoire WC",
+            "06 - Passage réseau",
+            "08 - Pose provisoire WC",
+            "12 - Pose Bac à douche",
+            "13 - Finitions SDB",
+            "15 - Pose définitive WC",
+            "19 - Dépose évier et réseaux",
+            "21 - Pose réseaux et évier"
+          ],
+          "montant": 992276.86
+        },
+        {
+          "numero": "4",
+          "nom": "ETANCHEITE  -  REVETEMENT DE SOLS ET MURS - CLOISONS - INTÉRIEUR",
+          "trackPrefix": "4:d2",
+          "decompositions": [
+            "04 - Démolition carrelage et faënces SDB",
+            "05 - Démolition carrelage WC",
+            "07 - Réalisation chape SDB et WC",
+            "10 - Dépose Sol et faiënces cuisine",
+            "11 - Pose étanchéité SDB",
+            "14 - Pose carrelage sol SDB et WC",
+            "17 - Pose faïence et plinthes SDB",
+            "18 - Finitions SDB et WC"
+          ],
+          "montant": 253710.42,
+          "nomDecomp": "intérieur"
+        },
+        {
+          "numero": "10",
+          "nom": "ELECTRICITE",
+          "trackPrefix": "10:d3",
+          "decompositions": [
+            "09 - Dépose et pose câcles / Appareillages",
+            "16 - Dépose et pose câcles / Appareillages",
+            "24 - Dépose et pose câcles / Appareillages",
+            "27 - Dépose et pose câcles / Appareillages"
+          ],
+          "montant": 750189.33
+        },
+        {
+          "numero": "6",
+          "nom": "MENUISERIES INTERIEURES",
+          "trackPrefix": "6:d4",
+          "decompositions": [
+            "20 - Dépose et pose Plan de travail",
+            "22 - Dépose et pose des portes intérieurs",
+            "23 - Dépose et pose de la  porte palière",
+            "26 - Dépose et pose des portes intérieurs",
+            "29 - Finitions"
+          ],
+          "montant": 517261.5
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - RESTUCTURATION BÉTON INTÉRIEURE",
+          "trackPrefix": "1&2:d5",
+          "decompositions": [
+            "25 - Préparation des supports",
+            "28 - Préparation des supports"
+          ],
+          "montant": 9146.4,
+          "nomDecomp": "Restucturation béton intérieure"
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - PEINTURE INTÉRIEURE",
+          "trackPrefix": "1&2:d6",
+          "decompositions": [
+            "30 - Finitions"
+          ],
+          "montant": 403247.21,
+          "nomDecomp": "Peinture intérieure"
+        }
+      ],
+      "lotsExt": [
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - RAVALEMENT DE FAÇADE",
+          "trackPrefix": "1&2:d0",
+          "decompositions": [
+            "Préparation des Peintures Lessivage",
+            "Première couche",
+            "2ème et 3ème Couche",
+            "Peinture loggia",
+            "Bandes de Renforts",
+            "Finitions",
+            "Peintures soubassements",
+            "Finitions et Retouches éventuelles",
+            "Nettoyage"
+          ],
+          "montant": 388561.75,
+          "nomDecomp": "ravalement de façade"
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - DALLES",
+          "trackPrefix": "1&2:d1",
+          "decompositions": [
+            "Installation Balisage de la zone d'intervention  (J-1)",
+            "Clôtures de Protection    (J-1)",
+            "Moyens de Levages",
+            "Sécurisation de la dalle avant sciages et positionnement Grue Mobile (flèche de 35m à 40m), Pose coffrage, étaiements et gardes corps (dalles et acrotères)    (J-1)",
+            "Dépose partielle étanchéité    (J-1)",
+            "Réalisation de 4 carrotages afin de mettre en place les élingues et ainsi tenir la dalle avec la Grue",
+            "Sciages dalles et acrotères",
+            "Enlèvements dalles et acrotères",
+            "Finition démolition dalles",
+            "Réalisation Complément d'acrotère, ragréages, finitions… (J+1)",
+            "Nettoyage"
+          ],
+          "montant": 95628.83,
+          "nomDecomp": "dalles"
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - ANTI-TERMITES",
+          "trackPrefix": "1&2:d2",
+          "decompositions": [
+            "Traitement antitermites"
+          ],
+          "montant": 22050,
+          "nomDecomp": "anti-termites"
+        },
+        {
+          "numero": "3",
+          "nom": "CHARPENTE  -  COUVERTURE - BÂTIMENT",
+          "trackPrefix": "3:d3",
+          "decompositions": [
+            "Sécurisation avant Remplacement Couverture - pose des garde-corps",
+            "Manutention Grue Mobile ou Camion avec Grue",
+            "Remplacement des couverture"
+          ],
+          "montant": 165256.65,
+          "nomDecomp": "bâtiment"
+        },
+        {
+          "numero": "3",
+          "nom": "CHARPENTE  -  COUVERTURE - AUVENT",
+          "trackPrefix": "3:d4",
+          "decompositions": [
+            "Assemblage des auvents",
+            "Levage et Pose des auvents",
+            "Finitions"
+          ],
+          "montant": 143220.89,
+          "nomDecomp": "auvent"
+        },
+        {
+          "numero": "4",
+          "nom": "ETANCHEITE  -  REVETEMENT DE SOLS ET MURS - CLOISONS - TOITURE",
+          "trackPrefix": "4:d5",
+          "decompositions": [
+            "Sécurisation avant pose étanchéité",
+            "Manutention Grue Mobile ou Camion avec Grue",
+            "Dépose  étanchéité",
+            "Pose étanchéité",
+            "Pose des relevés",
+            "Finitions",
+            "Nettoyage",
+            "Pose des Garde Corps provisoires",
+            "Manutention - Approvisionnement Grue Mobile ou camion Grue",
+            "Pose des Garde Corps",
+            "Finitions",
+            "Nettoyage"
+          ],
+          "montant": 305464.22,
+          "nomDecomp": "toiture"
+        },
+        {
+          "numero": "4",
+          "nom": "ETANCHEITE  -  REVETEMENT DE SOLS ET MURS - CLOISONS - ESCALIER",
+          "trackPrefix": "4:d6",
+          "decompositions": [
+            "Démolition plinthes",
+            "Ponçage surface escalier",
+            "Nettoyage et dépoussiérage des escaliers avant primaire d’étanchéité",
+            "Primaire d’étanchéité",
+            "1ère Couche d’étanchéité + Equerre",
+            "2ème Couche d’étanchéité",
+            "Pose Carrelage sol",
+            "Pose des Plinthes et Finitions"
+          ],
+          "montant": 271287.18,
+          "nomDecomp": "escalier"
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - MUR DE SOUTÈNEMENT",
+          "trackPrefix": "1&2:d7",
+          "decompositions": [
+            "Sécurisation avant sciages et démolition BRH - Pose gardes corps (dalles trumeaux)",
+            "Sciages dalles et démolition BRH",
+            "Fouilles",
+            "Fondations",
+            "Voiles",
+            "Reconstitution dalle",
+            "Nettoyage"
+          ],
+          "montant": 106075.84,
+          "nomDecomp": "mur de soutènement"
+        },
+        {
+          "numero": "8",
+          "nom": "VRD - DÉVOIEMENT",
+          "trackPrefix": "8:d8",
+          "decompositions": [
+            "Dévoiement des réseaux VRD"
+          ],
+          "montant": 204000,
+          "nomDecomp": "Dévoiement"
+        },
+        {
+          "numero": "8",
+          "nom": "VRD - PARKING",
+          "trackPrefix": "8:d9",
+          "decompositions": [],
+          "montant": 64570.80,
+          "nomDecomp": "Parking"
+        },
+        {
+          "numero": "1&2",
+          "nom": "GROS ŒUVRE  -  SECURITE ET DIVERS - RESTRUCTURATION BÉTON EXTÉRIEUR",
+          "trackPrefix": "1&2:d9",
+          "decompositions": [
+            "Vérification des supports",
+            "Décroutage des bétons abimés",
+            "Réparation et traitements des aciers",
+            "Réparation des Béons",
+            "Finitions"
+          ],
+          "montant": 102291.88,
+          "nomDecomp": "restructuration béton extérieur"
+        }
+      ],
+      "tracking": {
+        "logements": {
+          "5:d0-01 - Dépose et pose menuiserie": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_1_log_112": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_2_log_211": {
+              "status": "X"
+            },
+            "bat_2_log_212": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_3_log_312": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_701": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_7_log_712": {
+              "status": "X"
+            },
+            "bat_8_log_802": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_9_log_912": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "bat_10_log_1002": {
+              "status": "X"
+            },
+            "bat_10_log_1011": {
+              "status": "X"
+            },
+            "bat_11_log_1111": {
+              "status": "X"
+            },
+            "bat_12_log_1201": {
+              "status": "X"
+            },
+            "bat_12_log_1202": {
+              "status": "X"
+            },
+            "bat_12_log_1211": {
+              "status": "X"
+            },
+            "bat_13_log_1302": {
+              "status": "X"
+            },
+            "bat_13_log_1311": {
+              "status": "X"
+            },
+            "_tache": "01 - Dépose et pose menuiserie",
+            "_ponderation": 1
+          },
+          "9:d1-02 - Dépose baignoire/Douche/réseaux SDB": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "02 - Dépose baignoire/Douche/réseaux SDB",
+            "_ponderation": 1
+          },
+          "9:d1-03 - Dépose provisoire WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "03 - Dépose provisoire WC",
+            "_ponderation": 1
+          },
+          "4:d2-04 - Démolition carrelage et faënces SDB": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "04 - Démolition carrelage et faënces SDB",
+            "_ponderation": 1
+          },
+          "4:d2-05 - Démolition carrelage WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "05 - Démolition carrelage WC",
+            "_ponderation": 1
+          },
+          "9:d1-06 - Passage réseau": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "06 - Passage réseau",
+            "_ponderation": 1
+          },
+          "4:d2-07 - Réalisation chape SDB et WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "07 - Réalisation chape SDB et WC",
+            "_ponderation": 2
+          },
+          "9:d1-08 - Pose provisoire WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "08 - Pose provisoire WC",
+            "_ponderation": 1
+          },
+          "10:d3-09 - Dépose et pose câcles / Appareillages": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "09 - Dépose et pose câcles / Appareillages",
+            "_ponderation": 1
+          },
+          "4:d2-10 - Dépose Sol et faiënces cuisine": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "10 - Dépose Sol et faiënces cuisine",
+            "_ponderation": 1
+          },
+          "4:d2-11 - Pose étanchéité SDB": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "11 - Pose étanchéité SDB",
+            "_ponderation": 1
+          },
+          "9:d1-12 - Pose Bac à douche": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "12 - Pose Bac à douche",
+            "_ponderation": 2
+          },
+          "9:d1-13 - Finitions SDB": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "13 - Finitions SDB",
+            "_ponderation": 1
+          },
+          "4:d2-14 - Pose carrelage sol SDB et WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "14 - Pose carrelage sol SDB et WC",
+            "_ponderation": 2
+          },
+          "9:d1-15 - Pose définitive WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "15 - Pose définitive WC",
+            "_ponderation": 1
+          },
+          "10:d3-16 - Dépose et pose câcles / Appareillages": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "16 - Dépose et pose câcles / Appareillages",
+            "_ponderation": 1
+          },
+          "4:d2-17 - Pose faïence et plinthes SDB": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "17 - Pose faïence et plinthes SDB",
+            "_ponderation": 2
+          },
+          "4:d2-18 - Finitions SDB et WC": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "18 - Finitions SDB et WC",
+            "_ponderation": 1
+          },
+          "9:d1-19 - Dépose évier et réseaux": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "19 - Dépose évier et réseaux",
+            "_ponderation": 1
+          },
+          "6:d4-20 - Dépose et pose Plan de travail": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_3_log_312": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "20 - Dépose et pose Plan de travail",
+            "_ponderation": 1
+          },
+          "9:d1-21 - Pose réseaux et évier": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "21 - Pose réseaux et évier",
+            "_ponderation": 1
+          },
+          "6:d4-22 - Dépose et pose des portes intérieurs": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_1_log_112": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_2_log_211": {
+              "status": "X"
+            },
+            "bat_2_log_212": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_3_log_312": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_701": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_8_log_802": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "bat_12_log_1201": {
+              "status": "X"
+            },
+            "bat_12_log_1202": {
+              "status": "X"
+            },
+            "bat_12_log_1211": {
+              "status": "X"
+            },
+            "_tache": "22 - Dépose et pose des portes intérieurs",
+            "_ponderation": 1
+          },
+          "6:d4-23 - Dépose et pose de la  porte palière": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_8_log_802": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "23 - Dépose et pose de la  porte palière",
+            "_ponderation": 1
+          },
+          "10:d3-24 - Dépose et pose câcles / Appareillages": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "_tache": "24 - Dépose et pose câcles / Appareillages",
+            "_ponderation": 1
+          },
+          "1&2:d5-25 - Préparation des supports": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "25 - Préparation des supports",
+            "_ponderation": 1
+          },
+          "6:d4-26 - Dépose et pose des portes intérieurs": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_1_log_112": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_2_log_211": {
+              "status": "X"
+            },
+            "bat_2_log_212": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_3_log_312": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_701": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_8_log_802": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "bat_12_log_1201": {
+              "status": "X"
+            },
+            "bat_12_log_1202": {
+              "status": "X"
+            },
+            "bat_12_log_1211": {
+              "status": "X"
+            },
+            "_tache": "26 - Dépose et pose des portes intérieurs",
+            "_ponderation": 1
+          },
+          "10:d3-27 - Dépose et pose câcles / Appareillages": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_602": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_901": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "27 - Dépose et pose câcles / Appareillages",
+            "_ponderation": 1
+          },
+          "1&2:d5-28 - Préparation des supports": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "28 - Préparation des supports",
+            "_ponderation": 1
+          },
+          "6:d4-29 - Finitions": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "29 - Finitions",
+            "_ponderation": 1
+          },
+          "1&2:d6-30 - Finitions": {
+            "bat_1_log_101": {
+              "status": "X"
+            },
+            "bat_1_log_102": {
+              "status": "X"
+            },
+            "bat_1_log_111": {
+              "status": "X"
+            },
+            "bat_2_log_201": {
+              "status": "X"
+            },
+            "bat_2_log_202": {
+              "status": "X"
+            },
+            "bat_3_log_301": {
+              "status": "X"
+            },
+            "bat_3_log_302": {
+              "status": "X"
+            },
+            "bat_3_log_311": {
+              "status": "X"
+            },
+            "bat_4_log_402": {
+              "status": "X"
+            },
+            "bat_4_log_411": {
+              "status": "X"
+            },
+            "bat_4_log_412": {
+              "status": "X"
+            },
+            "bat_5_log_501": {
+              "status": "X"
+            },
+            "bat_5_log_502": {
+              "status": "X"
+            },
+            "bat_5_log_511": {
+              "status": "X"
+            },
+            "bat_5_log_512": {
+              "status": "X"
+            },
+            "bat_6_log_601": {
+              "status": "X"
+            },
+            "bat_6_log_612": {
+              "status": "X"
+            },
+            "bat_7_log_702": {
+              "status": "X"
+            },
+            "bat_9_log_902": {
+              "status": "X"
+            },
+            "bat_10_log_1001": {
+              "status": "X"
+            },
+            "_tache": "30 - Finitions",
+            "_ponderation": 2
+          }
+        },
+        "batiments": {
+          "1&2:d0-Préparation des Peintures Lessivage": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "_tache": "Préparation des Peintures Lessivage",
+            "_ponderation": 1
+          },
+          "1&2:d0-Première couche": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "_tache": "Première couche",
+            "_ponderation": 1
+          },
+          "1&2:d0-2ème et 3ème Couche": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "_tache": "2ème et 3ème Couche",
+            "_ponderation": 2
+          },
+          "1&2:d0-Peinture loggia": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "_tache": "Peinture loggia",
+            "_ponderation": 2
+          },
+          "1&2:d0-Bandes de Renforts": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "_tache": "Bandes de Renforts",
+            "_ponderation": 1
+          },
+          "1&2:d0-Finitions": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "_tache": "Finitions",
+            "_ponderation": 1
+          },
+          "1&2:d0-Peintures soubassements": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "_tache": "Peintures soubassements",
+            "_ponderation": 1
+          },
+          "1&2:d0-Finitions et Retouches éventuelles": {
+            "_tache": "Finitions et Retouches éventuelles",
+            "_ponderation": 1
+          },
+          "1&2:d0-Nettoyage": {
+            "_tache": "Nettoyage",
+            "_ponderation": 1
+          },
+          "1&2:d1-Installation Balisage de la zone d'intervention  (J-1)": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Installation Balisage de la zone d'intervention  (J-1)",
+            "_ponderation": 1
+          },
+          "1&2:d1-Clôtures de Protection    (J-1)": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Clôtures de Protection    (J-1)",
+            "_ponderation": 1
+          },
+          "1&2:d1-Moyens de Levages": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Moyens de Levages",
+            "_ponderation": 1
+          },
+          "1&2:d1-Sécurisation de la dalle avant sciages et positionnement Grue Mobile (flèche de 35m à 40m), Pose coffrage, étaiements et gardes corps (dalles et acrotères)    (J-1)": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sécurisation de la dalle avant sciages et positionnement Grue Mobile (flèche de 35m à 40m), Pose coffrage, étaiements et gardes corps (dalles et acrotères)    (J-1)",
+            "_ponderation": 10
+          },
+          "1&2:d1-Dépose partielle étanchéité    (J-1)": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Dépose partielle étanchéité    (J-1)",
+            "_ponderation": 2
+          },
+          "1&2:d1-Réalisation de 4 carrotages afin de mettre en place les élingues et ainsi tenir la dalle avec la Grue": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Réalisation de 4 carrotages afin de mettre en place les élingues et ainsi tenir la dalle avec la Grue",
+            "_ponderation": 8
+          },
+          "1&2:d1-Sciages dalles et acrotères": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sciages dalles et acrotères",
+            "_ponderation": 2
+          },
+          "1&2:d1-Enlèvements dalles et acrotères": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Enlèvements dalles et acrotères",
+            "_ponderation": 2
+          },
+          "1&2:d1-Finition démolition dalles": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Finition démolition dalles",
+            "_ponderation": 2
+          },
+          "1&2:d1-Réalisation Complément d'acrotère, ragréages, finitions… (J+1)": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Réalisation Complément d'acrotère, ragréages, finitions… (J+1)",
+            "_ponderation": 2
+          },
+          "1&2:d1-Nettoyage": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Nettoyage",
+            "_ponderation": 1
+          },
+          "1&2:d2-Traitement antitermites": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Traitement antitermites",
+            "_ponderation": 1
+          },
+          "3:d3-Sécurisation avant Remplacement Couverture - pose des garde-corps": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sécurisation avant Remplacement Couverture - pose des garde-corps",
+            "_ponderation": 2
+          },
+          "3:d3-Manutention Grue Mobile ou Camion avec Grue": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Manutention Grue Mobile ou Camion avec Grue",
+            "_ponderation": 1
+          },
+          "3:d3-Remplacement des couverture": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Remplacement des couverture",
+            "_ponderation": 5
+          },
+          "3:d4-Assemblage des auvents": {
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Assemblage des auvents",
+            "_ponderation": 2
+          },
+          "3:d4-Levage et Pose des auvents": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Levage et Pose des auvents",
+            "_ponderation": 1
+          },
+          "3:d4-Finitions": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Finitions",
+            "_ponderation": 1
+          },
+          "4:d5-Sécurisation avant pose étanchéité": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sécurisation avant pose étanchéité",
+            "_ponderation": 2
+          },
+          "4:d5-Manutention Grue Mobile ou Camion avec Grue": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Manutention Grue Mobile ou Camion avec Grue",
+            "_ponderation": 1
+          },
+          "4:d5-Dépose  étanchéité": {
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Dépose  étanchéité",
+            "_ponderation": 3
+          },
+          "4:d5-Pose étanchéité": {
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Pose étanchéité",
+            "_ponderation": 10
+          },
+          "4:d5-Pose des relevés": {
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Pose des relevés",
+            "_ponderation": 5
+          },
+          "4:d5-Finitions": {
+            "_tache": "Finitions",
+            "_ponderation": 5
+          },
+          "4:d5-Nettoyage": {
+            "_tache": "Nettoyage",
+            "_ponderation": 1
+          },
+          "4:d5-Pose des Garde Corps provisoires": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Pose des Garde Corps provisoires",
+            "_ponderation": 1
+          },
+          "4:d5-Manutention - Approvisionnement Grue Mobile ou camion Grue": {
+            "_tache": "Manutention - Approvisionnement Grue Mobile ou camion Grue",
+            "_ponderation": 1
+          },
+          "4:d5-Pose des Garde Corps": {
+            "_tache": "Pose des Garde Corps",
+            "_ponderation": 5
+          },
+          "4:d6-Démolition plinthes": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "_tache": "Démolition plinthes",
+            "_ponderation": 2
+          },
+          "4:d6-Ponçage surface escalier": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "_tache": "Ponçage surface escalier",
+            "_ponderation": 2
+          },
+          "4:d6-Nettoyage et dépoussiérage des escaliers avant primaire d’étanchéité": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "_tache": "Nettoyage et dépoussiérage des escaliers avant primaire d’étanchéité",
+            "_ponderation": 1
+          },
+          "4:d6-Primaire d’étanchéité": {
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "_tache": "Primaire d’étanchéité",
+            "_ponderation": 6
+          },
+          "4:d6-1ère Couche d’étanchéité + Equerre": {
+            "_tache": "1ère Couche d’étanchéité + Equerre",
+            "_ponderation": 3
+          },
+          "4:d6-2ème Couche d’étanchéité": {
+            "_tache": "2ème Couche d’étanchéité",
+            "_ponderation": 3
+          },
+          "4:d6-Pose Carrelage sol": {
+            "_tache": "Pose Carrelage sol",
+            "_ponderation": 5
+          },
+          "4:d6-Pose des Plinthes et Finitions": {
+            "_tache": "Pose des Plinthes et Finitions",
+            "_ponderation": 3
+          },
+          "1&2:d7-Sécurisation avant sciages et démolition BRH - Pose gardes corps (dalles trumeaux)": {
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sécurisation avant sciages et démolition BRH - Pose gardes corps (dalles trumeaux)",
+            "_ponderation": 1
+          },
+          "1&2:d7-Sciages dalles et démolition BRH": {
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Sciages dalles et démolition BRH",
+            "_ponderation": 2
+          },
+          "1&2:d7-Fouilles": {
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Fouilles",
+            "_ponderation": 2
+          },
+          "8:d8-Dévoiement des réseaux VRD": {
+            "_tache": "Dévoiement des réseaux VRD",
+            "_ponderation": 1
+          },
+          "1&2:d7-Fondations": {
+            "_tache": "Fondations",
+            "_ponderation": 3
+          },
+          "1&2:d7-Voiles": {
+            "_tache": "Voiles",
+            "_ponderation": 4
+          },
+          "1&2:d7-Reconstitution dalle": {
+            "_tache": "Reconstitution dalle",
+            "_ponderation": 2
+          },
+          "1&2:d7-Nettoyage": {
+            "_tache": "Nettoyage",
+            "_ponderation": 1
+          },
+          "1&2:d9-Vérification des supports": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Vérification des supports",
+            "_ponderation": 1
+          },
+          "1&2:d9-Décroutage des bétons abimés": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Décroutage des bétons abimés",
+            "_ponderation": 2
+          },
+          "1&2:d9-Réparation et traitements des aciers": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Réparation et traitements des aciers",
+            "_ponderation": 4
+          },
+          "1&2:d9-Réparation des Béons": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Réparation des Béons",
+            "_ponderation": 6
+          },
+          "1&2:d9-Finitions": {
+            "bat_1": {
+              "status": "X"
+            },
+            "bat_2": {
+              "status": "X"
+            },
+            "bat_3": {
+              "status": "X"
+            },
+            "bat_4": {
+              "status": "X"
+            },
+            "bat_5": {
+              "status": "X"
+            },
+            "bat_6": {
+              "status": "X"
+            },
+            "bat_7": {
+              "status": "X"
+            },
+            "bat_8": {
+              "status": "X"
+            },
+            "bat_9": {
+              "status": "X"
+            },
+            "bat_10": {
+              "status": "X"
+            },
+            "bat_11": {
+              "status": "X"
+            },
+            "bat_12": {
+              "status": "X"
+            },
+            "bat_13": {
+              "status": "X"
+            },
+            "bat_14": {
+              "status": "X"
+            },
+            "bat_15": {
+              "status": "X"
+            },
+            "bat_15bis": {
+              "status": "X"
+            },
+            "bat_16": {
+              "status": "X"
+            },
+            "bat_17": {
+              "status": "X"
+            },
+            "bat_18": {
+              "status": "X"
+            },
+            "bat_19": {
+              "status": "X"
+            },
+            "bat_20": {
+              "status": "X"
+            },
+            "_tache": "Finitions",
+            "_ponderation": 2
+          }
+        }
+      }
+    }
+  ],
+  "activeProjectId": null
+}
