@@ -1281,6 +1281,115 @@ body {
   .params-grid { gap: 6px; }
 }
 
+/* ═══════ TRI, FILTRE, RESIZE ═══════ */
+
+.sortable-header {
+  cursor: pointer;
+  user-select: none;
+  transition: color 0.15s ease;
+}
+.sortable-header:hover { color: var(--accent) !important; }
+.sortable-header.sort-active { color: var(--accent) !important; }
+.sortable-header-content {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+.sort-indicator {
+  font-size: 8px;
+  opacity: 0.35;
+  transition: opacity 0.15s ease;
+}
+.sort-active .sort-indicator {
+  opacity: 1;
+  color: var(--accent);
+}
+
+.col-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  bottom: 0;
+  width: 5px;
+  cursor: col-resize;
+  background: transparent;
+  transition: background 0.15s ease;
+  z-index: 4;
+}
+.col-resize-handle:hover,
+.col-resize-handle:active {
+  background: var(--accent);
+  opacity: 0.4;
+}
+
+.filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+.filter-select {
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  outline: none;
+  cursor: pointer;
+  transition: border-color 0.15s ease;
+}
+.filter-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.filter-search {
+  padding: 6px 10px;
+  background: var(--bg-input);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 12px;
+  outline: none;
+  flex: 1;
+  min-width: 140px;
+  transition: border-color 0.15s ease;
+}
+.filter-search:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+.filter-search::placeholder { color: var(--text-tertiary); }
+.filter-clear {
+  color: var(--accent) !important;
+  font-size: 11px;
+  font-weight: 600;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 6px 10px;
+  border-radius: var(--radius-sm);
+  transition: background 0.15s ease;
+}
+.filter-clear:hover { background: var(--accent-bg); }
+.filter-count {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin-left: auto;
+}
+
+@media (max-width: 768px) {
+  .filter-bar { flex-direction: column; align-items: stretch; }
+  .filter-select { width: 100%; }
+}
+
 /* ─── Tooltips ─── */
 [data-tooltip] {
   position: relative;

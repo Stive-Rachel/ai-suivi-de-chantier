@@ -1,6 +1,8 @@
 import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
 import { formatMontant } from "../../lib/format";
+import { useTableSort } from "../../lib/useTableSort";
+import SortableHeader from "../ui/SortableHeader";
 
 export default function RecapAvancementTab({ project }) {
   const data = useMemo(() => {
@@ -73,6 +75,8 @@ export default function RecapAvancementTab({ project }) {
     return rows;
   }, [project]);
 
+  const { sortConfig, toggleSort, sortedData } = useTableSort(data);
+
   const pct = (v) => v.toFixed(2) + "%";
   const totalAv = data.reduce((s, r) => s + r.avParMontant, 0);
   const totalInt = data.reduce((s, r) => s + r.avInt, 0);
@@ -93,15 +97,25 @@ export default function RecapAvancementTab({ project }) {
           <table className="config-table">
             <thead>
               <tr>
-                <th>Lot décomposé</th>
-                <th style={{ width: 100, textAlign: "right" }}>Avancement</th>
-                <th style={{ width: 140, textAlign: "right" }}>Av. (par montant)</th>
-                <th style={{ width: 140, textAlign: "right" }}>Av. INT</th>
-                <th style={{ width: 140, textAlign: "right" }}>Av. EXT</th>
+                <SortableHeader sortKey="label" sortConfig={sortConfig} onSort={toggleSort}>
+                  Lot décomposé
+                </SortableHeader>
+                <SortableHeader sortKey="avancement" sortConfig={sortConfig} onSort={toggleSort} style={{ width: 100, textAlign: "right" }}>
+                  Avancement
+                </SortableHeader>
+                <SortableHeader sortKey="avParMontant" sortConfig={sortConfig} onSort={toggleSort} style={{ width: 140, textAlign: "right" }}>
+                  Av. (par montant)
+                </SortableHeader>
+                <SortableHeader sortKey="avInt" sortConfig={sortConfig} onSort={toggleSort} style={{ width: 140, textAlign: "right" }}>
+                  Av. INT
+                </SortableHeader>
+                <SortableHeader sortKey="avExt" sortConfig={sortConfig} onSort={toggleSort} style={{ width: 140, textAlign: "right" }}>
+                  Av. EXT
+                </SortableHeader>
               </tr>
             </thead>
             <tbody>
-              {data.map((r, i) => {
+              {sortedData.map((r, i) => {
                 const isLow = r.avancement < avgAv * 0.5 && avgAv > 0 && r.avancement < 100;
                 return (
                   <tr key={i} className={isLow ? "row-retard" : ""}>

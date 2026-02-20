@@ -2,8 +2,10 @@ import { useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
 import { computeDetailedProgress, computeProjectProgress } from "../../lib/computations";
 import { formatMontant } from "../../lib/format";
+import { useTableSort } from "../../lib/useTableSort";
 import ProgressBar from "../ui/ProgressBar";
 import ProgressCard from "../ui/ProgressCard";
+import SortableHeader from "../ui/SortableHeader";
 
 export default function AvancementTab({ project }) {
   const { lotProgressInt, lotProgressExt, batimentProgress } = useMemo(
@@ -65,6 +67,8 @@ export default function AvancementTab({ project }) {
     });
   }, [project]);
 
+  const { sortConfig, toggleSort, sortedData: sortedLotProgress } = useTableSort(lotProgress);
+
   const avgProgress = lotProgress.length > 0
     ? lotProgress.reduce((s, lp) => s + lp.progress, 0) / lotProgress.length
     : 0;
@@ -85,12 +89,16 @@ export default function AvancementTab({ project }) {
           <table className="config-table">
             <thead>
               <tr>
-                <th>Lot</th>
-                <th style={{ width: 160, textAlign: "right" }}>Avancement</th>
+                <SortableHeader sortKey="lot" sortConfig={sortConfig} onSort={toggleSort}>
+                  Lot
+                </SortableHeader>
+                <SortableHeader sortKey="progress" sortConfig={sortConfig} onSort={toggleSort} style={{ width: 160, textAlign: "right" }}>
+                  Avancement
+                </SortableHeader>
               </tr>
             </thead>
             <tbody>
-              {lotProgress.map((lp) => {
+              {sortedLotProgress.map((lp) => {
                 const isLow = lp.progress < avgProgress * 0.5 && avgProgress > 0;
                 return (
                   <tr key={lp.lot} className={isLow ? "row-retard" : ""}>

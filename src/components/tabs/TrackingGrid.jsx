@@ -1,12 +1,29 @@
-import { useMemo, Fragment } from "react";
+import { useState, useMemo, Fragment } from "react";
 import { getLogementNums } from "../../lib/db";
 import { STATUS_BADGE_STYLES } from "../../lib/constants";
+import { useColumnResize } from "../../lib/useColumnResize";
 import Icon from "../ui/Icon";
 import StatusCell from "../ui/StatusCell";
+import SortableHeader from "../ui/SortableHeader";
+import FilterBar from "../ui/FilterBar";
 
 export default function TrackingGrid({ project, updateProject, type }) {
   const isLogements = type === "logements";
   const lots = isLogements ? project.lotsInt : project.lotsExt;
+
+  const [filters, setFilters] = useState({ lotNumero: "", statusFilter: "all", searchText: "" });
+  const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const { colWidths, getResizeProps } = useColumnResize({});
+
+  const toggleSort = (key) => {
+    setSortConfig((prev) => {
+      if (prev.key === key) {
+        if (prev.direction === "asc") return { key, direction: "desc" };
+        return { key: null, direction: "asc" };
+      }
+      return { key, direction: "asc" };
+    });
+  };
 
   const entities = useMemo(() => {
     if (isLogements) {
@@ -61,6 +78,84 @@ export default function TrackingGrid({ project, updateProject, type }) {
     });
   };
 
+  // Group rows by lot
+  const lotGroups = useMemo(() => {
+    const g = {};
+    rows.forEach((r) => {
+      if (!g[r.lotNumero]) g[r.lotNumero] = { nom: r.lotNom, rows: [] };
+      g[r.lotNumero].rows.push(r);
+    });
+    return g;
+  }, [rows]);
+
+  // Filter
+  const filteredLotGroups = useMemo(() => {
+    const result = {};
+    for (const [lotNum, lotGroup] of Object.entries(lotGroups)) {
+      if (filters.lotNumero && lotNum !== filters.lotNumero) continue;
+
+      const filteredRows = lotGroup.rows.filter((row) => {
+        if (filters.searchText) {
+          const search = filters.searchText.toLowerCase();
+          if (!row.decomposition.toLowerCase().includes(search)) return false;
+        }
+        if (filters.statusFilter !== "all") {
+          const statuses = entities.map((e) => getValue(row.key, e.id));
+          switch (filters.statusFilter) {
+            case "incomplete":
+              if (statuses.every((s) => s === "X")) return false;
+              break;
+            case "complete":
+              if (!statuses.every((s) => s === "X")) return false;
+              break;
+            case "alert":
+              if (!statuses.some((s) => s === "!")) return false;
+              break;
+            case "nok":
+              if (!statuses.some((s) => s === "NOK")) return false;
+              break;
+          }
+        }
+        return true;
+      });
+
+      if (filteredRows.length > 0) {
+        result[lotNum] = { nom: lotGroup.nom, rows: filteredRows };
+      }
+    }
+    return result;
+  }, [lotGroups, filters, entities, tracking]);
+
+  // Sort within lot groups
+  const sortedLotGroups = useMemo(() => {
+    if (!sortConfig.key) return filteredLotGroups;
+    const result = {};
+    for (const [lotNum, lotGroup] of Object.entries(filteredLotGroups)) {
+      const sorted = [...lotGroup.rows].sort((a, b) => {
+        let aVal, bVal;
+        if (sortConfig.key === "decomposition") {
+          aVal = a.decomposition;
+          bVal = b.decomposition;
+        } else if (sortConfig.key === "ponderation") {
+          aVal = getPonderation(a.key);
+          bVal = getPonderation(b.key);
+        } else {
+          aVal = getValue(a.key, sortConfig.key) || "";
+          bVal = getValue(b.key, sortConfig.key) || "";
+        }
+        if (typeof aVal === "number" && typeof bVal === "number") {
+          return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+        }
+        const cmp = String(aVal).localeCompare(String(bVal), "fr");
+        return sortConfig.direction === "asc" ? cmp : -cmp;
+      });
+      result[lotNum] = { nom: lotGroup.nom, rows: sorted };
+    }
+    return result;
+  }, [filteredLotGroups, sortConfig, tracking]);
+
+  const visibleRowCount = Object.values(sortedLotGroups).reduce((s, g) => s + g.rows.length, 0);
+
   if (project.batiments.length === 0) {
     return (
       <div className="empty-state">
@@ -80,12 +175,6 @@ export default function TrackingGrid({ project, updateProject, type }) {
     groups[g].push(e);
   });
 
-  const lotGroups = {};
-  rows.forEach((r) => {
-    if (!lotGroups[r.lotNumero]) lotGroups[r.lotNumero] = { nom: r.lotNom, rows: [] };
-    lotGroups[r.lotNumero].rows.push(r);
-  });
-
   return (
     <div style={{ animation: "slideInUp 0.4s ease both" }}>
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
@@ -101,6 +190,18 @@ export default function TrackingGrid({ project, updateProject, type }) {
         </div>
       </div>
 
+      <FilterBar
+        lots={lots.map((l) => ({ numero: l.numero, nom: l.nom }))}
+        filters={filters}
+        onFilterChange={setFilters}
+      />
+
+      {visibleRowCount !== rows.length && (
+        <div className="filter-count" style={{ marginBottom: 8 }}>
+          {visibleRowCount} / {rows.length} tâches affichées
+        </div>
+      )}
+
       <div style={{ overflowX: "auto", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
         <table className="tracking-table">
           <thead>
@@ -115,16 +216,34 @@ export default function TrackingGrid({ project, updateProject, type }) {
               </tr>
             )}
             <tr>
-              <th className="sticky-col" style={{ minWidth: 200 }}>
+              <SortableHeader
+                className="sticky-col"
+                style={{ minWidth: 200 }}
+                sortKey="decomposition"
+                sortConfig={sortConfig}
+                onSort={toggleSort}
+              >
                 Lot — Décomposition
-              </th>
+              </SortableHeader>
               <th style={{ minWidth: 120 }}>Tâches</th>
-              <th style={{ width: 55, textAlign: "center" }}>Pond.</th>
+              <SortableHeader
+                style={{ width: 55, textAlign: "center" }}
+                sortKey="ponderation"
+                sortConfig={sortConfig}
+                onSort={toggleSort}
+              >
+                Pond.
+              </SortableHeader>
               {entities.map((e) => (
-                <th
+                <SortableHeader
                   key={e.id}
+                  sortKey={e.id}
+                  sortConfig={sortConfig}
+                  onSort={toggleSort}
+                  resizeProps={getResizeProps(e.id)}
                   style={{
                     textAlign: "center",
+                    width: colWidths[e.id] || undefined,
                     minWidth: 42,
                     fontSize: 10,
                     writingMode: entities.length > 12 ? "vertical-lr" : undefined,
@@ -132,12 +251,12 @@ export default function TrackingGrid({ project, updateProject, type }) {
                   }}
                 >
                   {e.label}
-                </th>
+                </SortableHeader>
               ))}
             </tr>
           </thead>
           <tbody>
-            {Object.entries(lotGroups).map(([lotNum, lotGroup]) => (
+            {Object.entries(sortedLotGroups).map(([lotNum, lotGroup]) => (
               <Fragment key={lotNum}>
                 <tr className="lot-separator">
                   <td colSpan={3 + entities.length}>
@@ -177,7 +296,14 @@ export default function TrackingGrid({ project, updateProject, type }) {
                       </select>
                     </td>
                     {entities.map((e) => (
-                      <td key={e.id} style={{ textAlign: "center", padding: 2 }}>
+                      <td
+                        key={e.id}
+                        style={{
+                          textAlign: "center",
+                          padding: 2,
+                          width: colWidths[e.id] || undefined,
+                        }}
+                      >
                         <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
                       </td>
                     ))}
@@ -194,7 +320,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
                 {rows.reduce((s, r) => s + getPonderation(r.key), 0)}
               </td>
               {entities.map((e) => (
-                <td key={e.id} style={{ textAlign: "center", fontSize: 10 }}>
+                <td key={e.id} style={{ textAlign: "center", fontSize: 10, width: colWidths[e.id] || undefined }}>
                   {(() => {
                     let done = 0, total = 0;
                     for (const r of rows) {
