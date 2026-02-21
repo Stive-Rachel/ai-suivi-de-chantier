@@ -28,7 +28,8 @@ export function useDataLayer(userId) {
             // Keep localStorage in sync as backup
             saveDB({ projects });
           }
-        } else if (mode === "local") {
+        } else {
+          // Fallback: localStorage (mode local, or supabase without userId yet)
           if (!cancelled) setDb(loadDB());
         }
       } catch (err) {
