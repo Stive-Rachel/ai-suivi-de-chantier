@@ -2,18 +2,14 @@ import { getLogementNums } from "./db";
 
 export function computeProjectProgress(project) {
   const { lotProgressInt, lotProgressExt } = computeDetailedProgress(project);
-  const allLotsInt = project.lotsInt || [];
-  const allLotsExt = project.lotsExt || [];
   const totalMontant = (project.lots || []).reduce((s, l) => s + (l.montantMarche || 0), 0);
   if (totalMontant === 0) return 0;
   let progress = 0;
-  for (let i = 0; i < lotProgressExt.length; i++) {
-    const montant = allLotsExt[i]?.montant || 0;
-    progress += (montant / totalMontant) * lotProgressExt[i].progress;
+  for (const lp of lotProgressExt) {
+    progress += (lp.montant / totalMontant) * lp.progress;
   }
-  for (let i = 0; i < lotProgressInt.length; i++) {
-    const montant = allLotsInt[i]?.montant || 0;
-    progress += (montant / totalMontant) * lotProgressInt[i].progress;
+  for (const lp of lotProgressInt) {
+    progress += (lp.montant / totalMontant) * lp.progress;
   }
   return progress;
 }
@@ -54,6 +50,7 @@ export function computeDetailedProgress(project) {
       return {
         lot: `${lot.numero} - ${lot.nom}`,
         shortLot: lot.nomDecomp ? `${lot.numero} - ${lot.nomDecomp}` : `${lot.numero} - ${lot.nom}`,
+        montant: lot.montant || 0,
         progress,
       };
     });
