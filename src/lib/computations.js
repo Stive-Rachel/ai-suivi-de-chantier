@@ -53,6 +53,7 @@ export function computeDetailedProgress(project) {
 
       return {
         lot: `${lot.numero} - ${lot.nom}`,
+        shortLot: lot.nomDecomp ? `${lot.numero} - ${lot.nomDecomp}` : `${lot.numero} - ${lot.nom}`,
         progress,
       };
     });
