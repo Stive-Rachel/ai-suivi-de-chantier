@@ -21,7 +21,7 @@ function TabLoader() {
 }
 
 export default function ProjectView({ project, db, setDb, mode, userId, onBack }) {
-  const [activeTab, setActiveTab] = useState("dashboard");
+  const [activeTab, setActiveTab] = useState("setup");
 
   const updateProject = useCallback(
     (updater) => {
@@ -58,7 +58,6 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
   const currentProject = db.projects.find((p) => p.id === project.id) || project;
 
   const tabs = [
-    { key: "dashboard", label: "Tableau de bord", icon: "chart" },
     { key: "setup", label: "Configuration", icon: "settings" },
     { key: "batiments-config", label: "Bâtiments", icon: "building" },
     { key: "lots", label: "Lots", icon: "folder" },
@@ -68,6 +67,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
     { key: "recap-av", label: "Récap Av.", icon: "chart" },
     { key: "avancement", label: "Avancement", icon: "chart" },
     { key: "export", label: "Export", icon: "download" },
+    { key: "dashboard", label: "Tableau de bord", icon: "chart" },
   ];
 
   return (
