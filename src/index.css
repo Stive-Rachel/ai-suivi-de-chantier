@@ -1398,23 +1398,26 @@ body {
 [data-tooltip]::after {
   content: attr(data-tooltip);
   position: absolute;
-  bottom: calc(100% + 4px);
+  bottom: calc(100% + 8px);
   left: 50%;
   transform: translateX(-50%);
-  background: var(--text-primary);
-  color: var(--bg-main);
-  padding: 6px 10px;
-  border-radius: 6px;
-  font-size: 11px;
+  background: #FFFFFF;
+  color: var(--text-primary);
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
   font-family: var(--font-mono);
   white-space: pre-line;
-  max-width: 320px;
+  max-width: 380px;
   width: max-content;
   z-index: 1100;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.15s;
-  line-height: 1.4;
+  transition: opacity 0.18s ease;
+  line-height: 1.6;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15), 0 1px 4px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--border-default);
+  letter-spacing: 0.01em;
 }
 [data-tooltip]:hover::after {
   opacity: 1;
@@ -1432,20 +1435,26 @@ body {
 
 /* ─── Écarts Récap Excel ─── */
 .cell-ecart {
-  color: #e67e22 !important;
+  color: #c87a1a !important;
   font-weight: 600;
+  background: rgba(200, 141, 26, 0.08);
+  border-radius: 4px;
+  padding: 2px 4px;
 }
 .cell-ecart::before {
   content: "△ ";
-  font-size: 8px;
+  font-size: 9px;
 }
 .cell-ecart-footer {
-  color: #e67e22 !important;
+  color: #c87a1a !important;
   font-weight: 700;
+  background: rgba(200, 141, 26, 0.10);
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 .cell-ecart-footer::before {
   content: "△ ";
-  font-size: 9px;
+  font-size: 10px;
 }
 
 /* ─── Retards & Tooltips ─── */
