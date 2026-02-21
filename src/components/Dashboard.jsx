@@ -10,6 +10,8 @@ import Button from "./ui/Button";
 import Input from "./ui/Input";
 import Modal from "./ui/Modal";
 import ProgressBar from "./ui/ProgressBar";
+import DonutChart, { MultiDonut } from "./ui/DonutChart";
+import { HorizontalBarChart, VerticalBarChart } from "./ui/BarChart";
 
 function KpiCard({ icon, label, value, sub, color }) {
   return (
@@ -22,6 +24,134 @@ function KpiCard({ icon, label, value, sub, color }) {
         <span className="kpi-label">{label}</span>
         {sub && <span className="kpi-sub">{sub}</span>}
       </div>
+    </div>
+  );
+}
+
+function ProjectCharts({ project }) {
+  const { lotProgressInt, lotProgressExt, batimentProgress } = useMemo(
+    () => computeDetailedProgress(project),
+    [project]
+  );
+
+  const avgProgress = computeProjectProgress(project);
+
+  // Status distribution
+  const statusStats = useMemo(() => {
+    let done = 0, alerts = 0, noks = 0, empty = 0;
+    for (const trackType of ["logements", "batiments"]) {
+      const t = project.tracking?.[trackType] || {};
+      for (const rowKey of Object.keys(t)) {
+        if (rowKey.startsWith("_")) continue;
+        for (const [entityId, cell] of Object.entries(t[rowKey])) {
+          if (entityId.startsWith("_")) continue;
+          const s = cell?.status;
+          if (s === "X") done++;
+          else if (s === "!") alerts++;
+          else if (s === "NOK") noks++;
+          else empty++;
+        }
+      }
+    }
+    return { done, alerts, noks, empty, total: done + alerts + noks + empty };
+  }, [project.tracking]);
+
+  // INT lots bar data
+  const intBars = lotProgressInt.map((lp) => ({
+    label: lp.shortLot || lp.lot,
+    value: lp.progress,
+    color: lp.progress >= 75 ? "var(--success)" : lp.progress >= 40 ? "var(--warning)" : "var(--danger)",
+  }));
+
+  // EXT lots bar data
+  const extBars = lotProgressExt.map((lp) => ({
+    label: lp.shortLot || lp.lot,
+    value: lp.progress,
+    color: lp.progress >= 75 ? "var(--success)" : lp.progress >= 40 ? "var(--warning)" : "var(--danger)",
+  }));
+
+  // Building bars data
+  const buildingBars = batimentProgress.map((bp) => ({
+    label: bp.name.replace("Bâtiment ", "Bât "),
+    values: [
+      { value: bp.int, color: "var(--accent)", label: "INT" },
+      { value: bp.ext, color: "var(--info)", label: "EXT" },
+    ],
+  }));
+
+  const donutColor = avgProgress >= 75 ? "var(--success)" : avgProgress >= 40 ? "var(--warning)" : "var(--danger)";
+
+  return (
+    <div className="project-charts">
+      {/* Row 1: Donut + Status donut */}
+      <div className="charts-row charts-row-donuts">
+        <div className="chart-card">
+          <h4 className="chart-card-title">Avancement global</h4>
+          <div className="chart-card-body chart-center">
+            <DonutChart
+              value={avgProgress}
+              size={130}
+              strokeWidth={12}
+              color={donutColor}
+              label="Avancement"
+            />
+          </div>
+        </div>
+
+        <div className="chart-card">
+          <h4 className="chart-card-title">Répartition statuts</h4>
+          <div className="chart-card-body chart-center">
+            <MultiDonut
+              size={130}
+              strokeWidth={12}
+              segments={[
+                { value: statusStats.done, color: "var(--success)", label: "Fait" },
+                { value: statusStats.alerts, color: "var(--warning)", label: "Alerte" },
+                { value: statusStats.noks, color: "var(--danger)", label: "NOK" },
+                { value: statusStats.empty, color: "var(--border-default)", label: "Vide" },
+              ].filter((s) => s.value > 0)}
+            >
+              <span className="donut-chart-value">{statusStats.total}</span>
+              <span className="donut-chart-label">cellules</span>
+            </MultiDonut>
+            <div className="chart-legend">
+              {statusStats.done > 0 && <span className="chart-legend-item"><span className="chart-legend-dot" style={{ background: "var(--success)" }} />{statusStats.done} fait</span>}
+              {statusStats.alerts > 0 && <span className="chart-legend-item"><span className="chart-legend-dot" style={{ background: "var(--warning)" }} />{statusStats.alerts} alertes</span>}
+              {statusStats.noks > 0 && <span className="chart-legend-item"><span className="chart-legend-dot" style={{ background: "var(--danger)" }} />{statusStats.noks} NOK</span>}
+              {statusStats.empty > 0 && <span className="chart-legend-item"><span className="chart-legend-dot" style={{ background: "var(--border-default)" }} />{statusStats.empty} vide</span>}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Row 2: Horizontal bars — lots INT & EXT */}
+      {intBars.length > 0 && (
+        <div className="chart-card">
+          <h4 className="chart-card-title">Avancement par lot — Intérieur</h4>
+          <div className="chart-card-body">
+            <HorizontalBarChart data={intBars} height={16} />
+          </div>
+        </div>
+      )}
+
+      {extBars.length > 0 && (
+        <div className="chart-card">
+          <h4 className="chart-card-title">Avancement par lot — Extérieur</h4>
+          <div className="chart-card-body">
+            <HorizontalBarChart data={extBars} height={16} />
+          </div>
+        </div>
+      )}
+
+      {/* Row 3: Vertical bars — buildings */}
+      {buildingBars.length > 0 && (
+        <div className="chart-card">
+          <h4 className="chart-card-title">Avancement par bâtiment</h4>
+          <div className="chart-card-body">
+            <VerticalBarChart data={buildingBars} barHeight={140} />
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -271,6 +401,21 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
               />
             )}
           </div>
+        )}
+
+        {/* Charts Section */}
+        {hasProjects && (
+          <>
+            <h3 className="dashboard-section-title">Tableau de bord</h3>
+            {db.projects.map((p) => (
+              <div key={p.id} className="dashboard-project-charts">
+                {db.projects.length > 1 && (
+                  <h4 className="dashboard-project-charts-title">{p.name}</h4>
+                )}
+                <ProjectCharts project={p} />
+              </div>
+            ))}
+          </>
         )}
 
         {/* Project Cards */}
