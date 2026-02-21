@@ -105,20 +105,20 @@ export default function TrackingGrid({ project, updateProject, type }) {
     });
   };
 
-  // Group rows by lot
+  // Group rows by lot (using Map to preserve insertion order, avoiding JS object numeric key sorting)
   const lotGroups = useMemo(() => {
-    const g = {};
+    const g = new Map();
     rows.forEach((r) => {
-      if (!g[r.lotNumero]) g[r.lotNumero] = { nom: r.lotNom, rows: [] };
-      g[r.lotNumero].rows.push(r);
+      if (!g.has(r.lotNumero)) g.set(r.lotNumero, { nom: r.lotNom, rows: [] });
+      g.get(r.lotNumero).rows.push(r);
     });
     return g;
   }, [rows]);
 
   // Filter
   const filteredLotGroups = useMemo(() => {
-    const result = {};
-    for (const [lotNum, lotGroup] of Object.entries(lotGroups)) {
+    const result = new Map();
+    for (const [lotNum, lotGroup] of lotGroups) {
       if (filters.lotNumero && lotNum !== filters.lotNumero) continue;
 
       const filteredRows = lotGroup.rows.filter((row) => {
@@ -147,7 +147,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
       });
 
       if (filteredRows.length > 0) {
-        result[lotNum] = { nom: lotGroup.nom, rows: filteredRows };
+        result.set(lotNum, { nom: lotGroup.nom, rows: filteredRows });
       }
     }
     return result;
@@ -156,8 +156,8 @@ export default function TrackingGrid({ project, updateProject, type }) {
   // Sort within lot groups
   const sortedLotGroups = useMemo(() => {
     if (!sortConfig.key) return filteredLotGroups;
-    const result = {};
-    for (const [lotNum, lotGroup] of Object.entries(filteredLotGroups)) {
+    const result = new Map();
+    for (const [lotNum, lotGroup] of filteredLotGroups) {
       const sorted = [...lotGroup.rows].sort((a, b) => {
         let aVal, bVal;
         if (sortConfig.key === "decomposition") {
@@ -176,12 +176,12 @@ export default function TrackingGrid({ project, updateProject, type }) {
         const cmp = String(aVal).localeCompare(String(bVal), "fr");
         return sortConfig.direction === "asc" ? cmp : -cmp;
       });
-      result[lotNum] = { nom: lotGroup.nom, rows: sorted };
+      result.set(lotNum, { nom: lotGroup.nom, rows: sorted });
     }
     return result;
   }, [filteredLotGroups, sortConfig, tracking]);
 
-  const visibleRowCount = Object.values(sortedLotGroups).reduce((s, g) => s + g.rows.length, 0);
+  const visibleRowCount = [...sortedLotGroups.values()].reduce((s, g) => s + g.rows.length, 0);
 
   if (project.batiments.length === 0) {
     return (
@@ -287,7 +287,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
             </tr>
           </thead>
           <tbody>
-            {Object.entries(sortedLotGroups).map(([lotNum, lotGroup]) => (
+            {[...sortedLotGroups.entries()].map(([lotNum, lotGroup]) => (
               <Fragment key={lotNum}>
                 <tr className="lot-separator">
                   <td colSpan={6 + entities.length}>
