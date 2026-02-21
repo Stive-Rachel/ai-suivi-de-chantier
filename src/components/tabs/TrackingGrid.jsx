@@ -9,7 +9,13 @@ import FilterBar from "../ui/FilterBar";
 
 export default function TrackingGrid({ project, updateProject, type }) {
   const isLogements = type === "logements";
-  const lots = isLogements ? project.lotsInt : project.lotsExt;
+  const lotsRaw = isLogements ? project.lotsInt : project.lotsExt;
+  const lots = useMemo(() => [...(lotsRaw || [])].sort((a, b) => {
+    const na = parseFloat(a.numero) || 0;
+    const nb = parseFloat(b.numero) || 0;
+    if (na !== nb) return na - nb;
+    return (a.nom || "").localeCompare(b.nom || "");
+  }), [lotsRaw]);
 
   const [filters, setFilters] = useState({ lotNumero: "", statusFilter: "all", searchText: "" });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
