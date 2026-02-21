@@ -7,7 +7,7 @@ import StatusCell from "../ui/StatusCell";
 import SortableHeader from "../ui/SortableHeader";
 import FilterBar from "../ui/FilterBar";
 
-export default function TrackingGrid({ project, updateProject, type }) {
+export default function TrackingGrid({ project, updateProject, supaSync, type }) {
   const isLogements = type === "logements";
   const lotsRaw = isLogements ? project.lotsInt : project.lotsExt;
   const lots = useMemo(() => [...(lotsRaw || [])].sort((a, b) => {
@@ -93,16 +93,19 @@ export default function TrackingGrid({ project, updateProject, type }) {
       t[type][rowKey] = { ...t[type][rowKey], [entityId]: { status } };
       return { ...p, tracking: t };
     });
+    supaSync?.setTrackingCell(type, rowKey, entityId, status);
   };
 
   const setPonderation = (rowKey, value) => {
+    const v = parseInt(value) || 1;
     updateProject((p) => {
       const t = { ...p.tracking };
       if (!t[type]) t[type] = {};
       if (!t[type][rowKey]) t[type][rowKey] = {};
-      t[type][rowKey] = { ...t[type][rowKey], _ponderation: parseInt(value) || 1 };
+      t[type][rowKey] = { ...t[type][rowKey], _ponderation: v };
       return { ...p, tracking: t };
     });
+    supaSync?.setTrackingMeta(type, rowKey, { ponderation: v });
   };
 
   // Group rows by lot (using Map to preserve insertion order, avoiding JS object numeric key sorting)
@@ -302,13 +305,15 @@ export default function TrackingGrid({ project, updateProject, type }) {
                         className="task-input"
                         defaultValue={tracking[row.key]?._tache || ""}
                         onBlur={(e) => {
+                          const val = e.target.value;
                           updateProject((p) => {
                             const t = { ...p.tracking };
                             if (!t[type]) t[type] = {};
                             if (!t[type][row.key]) t[type][row.key] = {};
-                            t[type][row.key] = { ...t[type][row.key], _tache: e.target.value };
+                            t[type][row.key] = { ...t[type][row.key], _tache: val };
                             return { ...p, tracking: t };
                           });
+                          supaSync?.setTrackingMeta(type, row.key, { tache: val });
                         }}
                         placeholder="—"
                       />

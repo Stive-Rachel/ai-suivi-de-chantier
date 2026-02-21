@@ -1,7 +1,7 @@
 import { getLogementNums } from "../../lib/db";
 import ExportButton from "../ui/ExportButton";
 
-export default function ExportTab({ project, updateProject }) {
+export default function ExportTab({ project, updateProject, supaSync }) {
   const exportCSV = (csvType) => {
     const isLogements = csvType === "logements";
     const lots = isLogements ? project.lotsInt : project.lotsExt;
@@ -67,12 +67,11 @@ export default function ExportTab({ project, updateProject }) {
         const data = JSON.parse(ev.target.result);
         if (data.name && data.batiments) {
           if (confirm(`Importer "${data.name}" ? Les données actuelles du projet seront remplacées.`)) {
-            updateProject((p) => ({
-              ...p,
-              ...data,
-              id: p.id,
-              createdAt: p.createdAt,
-            }));
+            updateProject((p) => {
+              const merged = { ...p, ...data, id: p.id, createdAt: p.createdAt };
+              supaSync?.fullSync(merged);
+              return merged;
+            });
           }
         } else {
           alert("Le fichier ne contient pas de données de projet valides.");

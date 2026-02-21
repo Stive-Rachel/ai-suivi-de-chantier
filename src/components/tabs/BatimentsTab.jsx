@@ -5,7 +5,7 @@ import Button from "../ui/Button";
 import Input from "../ui/Input";
 import Modal from "../ui/Modal";
 
-export default function BatimentsTab({ project, updateProject }) {
+export default function BatimentsTab({ project, updateProject, supaSync }) {
   const [showAddBat, setShowAddBat] = useState(false);
   const [batName, setBatName] = useState("");
   const [batLogements, setBatLogements] = useState("10");
@@ -29,13 +29,12 @@ export default function BatimentsTab({ project, updateProject }) {
 
   const addBatiment = () => {
     if (!batName.trim()) return;
-    updateProject((p) => ({
-      ...p,
-      batiments: [
-        ...p.batiments,
-        { id: generateId(), name: batName.trim(), nbLogements: parseInt(batLogements) || 1 },
-      ],
-    }));
+    const newBat = { id: generateId(), name: batName.trim(), nbLogements: parseInt(batLogements) || 1 };
+    updateProject((p) => {
+      const updated = { ...p, batiments: [...p.batiments, newBat] };
+      supaSync?.syncBatiments(updated.batiments);
+      return updated;
+    });
     setBatName("");
     setBatLogements("10");
     setShowAddBat(false);
@@ -44,17 +43,19 @@ export default function BatimentsTab({ project, updateProject }) {
   const removeBatiment = (id) => {
     if (!confirm("Supprimer ce bâtiment ? Les données de suivi associées seront perdues."))
       return;
-    updateProject((p) => ({
-      ...p,
-      batiments: p.batiments.filter((b) => b.id !== id),
-    }));
+    updateProject((p) => {
+      const updated = { ...p, batiments: p.batiments.filter((b) => b.id !== id) };
+      supaSync?.syncBatiments(updated.batiments);
+      return updated;
+    });
   };
 
   const updateBatiment = (id, field, value) => {
-    updateProject((p) => ({
-      ...p,
-      batiments: p.batiments.map((b) => (b.id === id ? { ...b, [field]: value } : b)),
-    }));
+    updateProject((p) => {
+      const updated = { ...p, batiments: p.batiments.map((b) => (b.id === id ? { ...b, [field]: value } : b)) };
+      supaSync?.syncBatiments(updated.batiments);
+      return updated;
+    });
   };
 
   const totalLogements = project.batiments.reduce((s, b) => s + (b.nbLogements || 0), 0);

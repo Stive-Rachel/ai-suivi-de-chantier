@@ -1,8 +1,9 @@
 import MoneyInput from "../ui/MoneyInput";
 
-export default function SetupTab({ project, updateProject }) {
+export default function SetupTab({ project, updateProject, supaSync }) {
   const updateField = (field, value) => {
     updateProject((p) => ({ ...p, [field]: value }));
+    supaSync?.updateFields({ [field]: value });
   };
 
   const totalLogements = project.batiments.reduce((s, b) => s + (b.nbLogements || 0), 0);

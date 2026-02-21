@@ -3,6 +3,7 @@ import { generateId, saveDB, migrateProject, getLogementNums } from "../lib/db";
 import { DEFAULT_LOTS, DEFAULT_LOTS_INT, DEFAULT_LOTS_EXT } from "../lib/constants";
 import { computeProjectProgress, computeDetailedProgress } from "../lib/computations";
 import { formatMontant } from "../lib/format";
+import * as dataLayer from "../lib/dataLayer";
 import initialData from "../initialData.json";
 import Icon from "./ui/Icon";
 import Button from "./ui/Button";
@@ -95,7 +96,7 @@ function ProjectKpis({ project }) {
   );
 }
 
-export default function Dashboard({ db, setDb, onOpenProject }) {
+export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
@@ -129,6 +130,7 @@ export default function Dashboard({ db, setDb, onOpenProject }) {
     const updated = { ...db, projects: [...db.projects, project] };
     setDb(updated);
     saveDB(updated);
+    dataLayer.createProjectInDB(project, userId).catch(console.error);
     setShowCreate(false);
     setNewName("");
     setNewLocation("");
@@ -140,6 +142,7 @@ export default function Dashboard({ db, setDb, onOpenProject }) {
     const updated = { ...db, projects: db.projects.filter((p) => p.id !== id) };
     setDb(updated);
     saveDB(updated);
+    dataLayer.deleteProjectFromDB(id).catch(console.error);
   };
 
   const loadDemo = () => {
@@ -152,10 +155,17 @@ export default function Dashboard({ db, setDb, onOpenProject }) {
       const updated = { ...db, projects: [...otherProjects, ...seedProjects] };
       setDb(updated);
       saveDB(updated);
+      // Sync each seed project to Supabase
+      for (const sp of seedProjects) {
+        dataLayer.fullProjectSync(sp, userId).catch(console.error);
+      }
     } else {
       const updated = { ...db, projects: [...db.projects, ...seedProjects] };
       setDb(updated);
       saveDB(updated);
+      for (const sp of seedProjects) {
+        dataLayer.createProjectInDB(sp, userId).catch(console.error);
+      }
     }
   };
 

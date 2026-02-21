@@ -6,7 +6,7 @@ import Input from "../ui/Input";
 import Modal from "../ui/Modal";
 import MoneyInput from "../ui/MoneyInput";
 
-export default function LotsTab({ project, updateProject }) {
+export default function LotsTab({ project, updateProject, supaSync }) {
   const [showAddLot, setShowAddLot] = useState(false);
   const [newLotNum, setNewLotNum] = useState("");
   const [newLotNom, setNewLotNom] = useState("");
@@ -19,8 +19,26 @@ export default function LotsTab({ project, updateProject }) {
   const totalExt = lots.reduce((s, l) => s + (l.montantExt || 0), 0);
   const totalInt = lots.reduce((s, l) => s + (l.montantInt || 0), 0);
 
-  const updateLotField = (index, field, value) => {
+  // Wrapper: sync lots to Supabase after any lots change
+  const updateProjectAndSyncLots = (updater) => {
     updateProject((p) => {
+      const result = updater(p);
+      supaSync?.syncLots(result.lots);
+      return result;
+    });
+  };
+
+  // Wrapper: sync decomps to Supabase after any decomp change
+  const updateProjectAndSyncDecomp = (updater) => {
+    updateProject((p) => {
+      const result = updater(p);
+      supaSync?.syncLotsDecomp(result.lotsInt, result.lotsExt);
+      return result;
+    });
+  };
+
+  const updateLotField = (index, field, value) => {
+    updateProjectAndSyncLots((p) => {
       const updated = [...p.lots];
       updated[index] = { ...updated[index], [field]: value };
       return { ...p, lots: updated };
@@ -28,7 +46,7 @@ export default function LotsTab({ project, updateProject }) {
   };
 
   const sortLots = () => {
-    updateProject((p) => ({
+    updateProjectAndSyncLots((p) => ({
       ...p,
       lots: [...p.lots].sort((a, b) => {
         const na = parseInt(a.numero) || 0;
@@ -40,7 +58,7 @@ export default function LotsTab({ project, updateProject }) {
 
   const addLot = () => {
     if (!newLotNum.trim() || !newLotNom.trim()) return;
-    updateProject((p) => ({
+    updateProjectAndSyncLots((p) => ({
       ...p,
       lots: [...p.lots, { numero: newLotNum.trim(), nom: newLotNom.trim(), montantMarche: 0, montantExt: 0, montantInt: 0 }],
     }));
@@ -52,7 +70,7 @@ export default function LotsTab({ project, updateProject }) {
   const removeLot = (index) => {
     const lot = lots[index];
     if (!confirm(`Supprimer le lot ${lot.numero} — ${lot.nom} ?`)) return;
-    updateProject((p) => ({
+    updateProjectAndSyncLots((p) => ({
       ...p,
       lots: p.lots.filter((_, i) => i !== index),
     }));
@@ -69,7 +87,7 @@ export default function LotsTab({ project, updateProject }) {
     if (!newDecomp.trim()) return;
     const field = type === "ext" ? "lotsExt" : "lotsInt";
     const lot = lots[lotIndex];
-    updateProject((p) => {
+    updateProjectAndSyncDecomp((p) => {
       const arr = [...p[field]];
       const matching = arr.filter((l) => l.numero === lot.numero);
       const target = matching[subLotIndex];
@@ -86,7 +104,7 @@ export default function LotsTab({ project, updateProject }) {
     if (!newDecomp.trim()) return;
     const field = type === "ext" ? "lotsExt" : "lotsInt";
     const lot = lots[lotIndex];
-    updateProject((p) => ({
+    updateProjectAndSyncDecomp((p) => ({
       ...p,
       [field]: [...p[field], { numero: lot.numero, nom: lot.nom, nomDecomp: newDecomp.trim(), montant: 0, decompositions: [] }],
     }));
@@ -96,7 +114,7 @@ export default function LotsTab({ project, updateProject }) {
   const removeDecomposition = (lotIndex, type, subLotIndex, decompIndex) => {
     const field = type === "ext" ? "lotsExt" : "lotsInt";
     const lot = lots[lotIndex];
-    updateProject((p) => {
+    updateProjectAndSyncDecomp((p) => {
       const arr = [...p[field]];
       const matching = arr.filter((l) => l.numero === lot.numero);
       const target = matching[subLotIndex];
@@ -111,7 +129,7 @@ export default function LotsTab({ project, updateProject }) {
   const updateDecompField = (lotIndex, type, subLotIndex, field, value) => {
     const arrField = type === "ext" ? "lotsExt" : "lotsInt";
     const lot = lots[lotIndex];
-    updateProject((p) => {
+    updateProjectAndSyncDecomp((p) => {
       const arr = [...p[arrField]];
       const matching = arr.filter((l) => l.numero === lot.numero);
       const target = matching[subLotIndex];
@@ -282,7 +300,7 @@ export default function LotsTab({ project, updateProject }) {
                               <button className="delete-btn" style={{ opacity: 1 }} onClick={() => {
                                 if (!confirm(`Supprimer "${subLot.nomDecomp || subLot.nom}" ?`)) return;
                                 const field = decompModal.type === "ext" ? "lotsExt" : "lotsInt";
-                                updateProject((p) => {
+                                updateProjectAndSyncDecomp((p) => {
                                   const arr = [...p[field]];
                                   const matching = arr.filter((l) => l.numero === (lots[decompModal.lotIndex] || {}).numero);
                                   const realIdx = arr.indexOf(matching[si]);

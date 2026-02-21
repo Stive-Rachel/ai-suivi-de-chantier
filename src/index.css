@@ -191,6 +191,27 @@ body {
 
 .project-header .header-progress { width: 220px; }
 
+/* Connection badge */
+.connection-badge {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  flex-shrink: 0;
+}
+.connection-badge.connected {
+  color: var(--success);
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+.connection-badge.local {
+  color: var(--text-tertiary);
+  background: var(--bg-elevated);
+  border: 1px solid var(--border-default);
+}
+
 /* ═══════ BUTTONS ═══════ */
 
 .btn {
