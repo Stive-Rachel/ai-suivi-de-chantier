@@ -245,25 +245,26 @@ export default function TrackingGrid({ project, updateProject, type }) {
             <tr>
               <SortableHeader
                 className="sticky-col"
-                style={{ minWidth: 200 }}
+                style={{ width: colWidths._decomp || 180, minWidth: 100, maxWidth: 400 }}
                 sortKey="decomposition"
                 sortConfig={sortConfig}
                 onSort={toggleSort}
+                resizeProps={getResizeProps("_decomp")}
               >
-                Lot — Décomposition
+                Décomposition
               </SortableHeader>
-              <th style={{ minWidth: 120 }}>Tâches</th>
+              <th style={{ width: colWidths._tache || 90, minWidth: 60 }}>Tâches</th>
               <SortableHeader
-                style={{ width: 55, textAlign: "center" }}
+                style={{ width: 45, textAlign: "center", fontSize: 10 }}
                 sortKey="ponderation"
                 sortConfig={sortConfig}
                 onSort={toggleSort}
               >
                 Pond.
               </SortableHeader>
-              <th style={{ width: 65, textAlign: "center", fontSize: 10 }}>Av. décomp.</th>
-              <th style={{ width: 65, textAlign: "center", fontSize: 10 }}>Av. / lot</th>
-              <th style={{ width: 50, textAlign: "center", fontSize: 10 }}>Nb ✓</th>
+              <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av.</th>
+              <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av/lot</th>
+              <th style={{ width: 35, textAlign: "center", fontSize: 10 }}>N</th>
               {entities.map((e) => (
                 <SortableHeader
                   key={e.id}
@@ -295,7 +296,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
                 </tr>
                 {lotGroup.rows.map((row) => (
                   <tr key={row.key}>
-                    <td className="sticky-col">{row.decomposition}</td>
+                    <td className="sticky-col" style={{ maxWidth: colWidths._decomp || 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-tooltip={row.decomposition}>{row.decomposition}</td>
                     <td>
                       <input
                         className="task-input"
