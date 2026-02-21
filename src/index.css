@@ -1396,27 +1396,54 @@ body {
   color: var(--text-primary);
 }
 
-/* ═══════ DASHBOARD CHARTS ═══════ */
+/* ═══════ DASHBOARD TAB & CHARTS ═══════ */
 
-.dashboard-project-charts {
-  margin-bottom: 32px;
-}
-
-.dashboard-project-charts-title {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-primary);
-  margin-bottom: 14px;
-  padding: 8px 14px;
-  background: var(--bg-raised);
-  border-radius: var(--radius-sm);
-  border-left: 3px solid var(--accent);
-}
-
-.project-charts {
+.dashboard-tab {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 16px;
+  max-width: 900px;
+}
+
+.dtab-kpi-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.dtab-kpi {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  flex: 1;
+  min-width: 130px;
+}
+
+.dtab-kpi > svg { color: var(--accent); flex-shrink: 0; }
+
+.dtab-kpi-value {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  display: block;
+  line-height: 1.1;
+}
+
+.dtab-kpi-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-tertiary);
+  display: block;
+  margin-top: 1px;
 }
 
 .charts-row {

@@ -10,6 +10,7 @@ import BatimentsTab from "./tabs/BatimentsTab";
 import LotsTab from "./tabs/LotsTab";
 import TrackingGrid from "./tabs/TrackingGrid";
 
+const DashboardTab = lazy(() => import("./tabs/DashboardTab"));
 const RecapTab = lazy(() => import("./tabs/RecapTab"));
 const RecapAvancementTab = lazy(() => import("./tabs/RecapAvancementTab"));
 const AvancementTab = lazy(() => import("./tabs/AvancementTab"));
@@ -20,7 +21,7 @@ function TabLoader() {
 }
 
 export default function ProjectView({ project, db, setDb, mode, userId, onBack }) {
-  const [activeTab, setActiveTab] = useState("setup");
+  const [activeTab, setActiveTab] = useState("dashboard");
 
   const updateProject = useCallback(
     (updater) => {
@@ -57,6 +58,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
   const currentProject = db.projects.find((p) => p.id === project.id) || project;
 
   const tabs = [
+    { key: "dashboard", label: "Tableau de bord", icon: "chart" },
     { key: "setup", label: "Configuration", icon: "settings" },
     { key: "batiments-config", label: "Bâtiments", icon: "building" },
     { key: "lots", label: "Lots", icon: "folder" },
@@ -102,6 +104,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
         {activeTab === "logements" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="logements" />}
         {activeTab === "batiments" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="batiments" />}
         <Suspense fallback={<TabLoader />}>
+          {activeTab === "dashboard" && <DashboardTab project={currentProject} />}
           {activeTab === "recap" && <RecapTab project={currentProject} />}
           {activeTab === "recap-av" && <RecapAvancementTab project={currentProject} />}
           {activeTab === "avancement" && <AvancementTab project={currentProject} />}
