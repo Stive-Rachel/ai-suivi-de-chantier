@@ -1430,6 +1430,24 @@ body {
   font-size: 9px;
 }
 
+/* ─── Écarts Récap Excel ─── */
+.cell-ecart {
+  color: #e67e22 !important;
+  font-weight: 600;
+}
+.cell-ecart::before {
+  content: "△ ";
+  font-size: 8px;
+}
+.cell-ecart-footer {
+  color: #e67e22 !important;
+  font-weight: 700;
+}
+.cell-ecart-footer::before {
+  content: "△ ";
+  font-size: 9px;
+}
+
 /* ─── Retards & Tooltips ─── */
 .row-retard { background: #fef5f4 !important; }
 .row-retard td:first-child { border-left: 3px solid #c0392b; padding-left: 8px; }

@@ -1,7 +1,19 @@
 import { useMemo, Fragment } from "react";
 import { getLogementNums } from "../../lib/db";
 import { formatMontant } from "../../lib/format";
+import { RECAP_EXCEL } from "../../lib/recapExcelRef";
 import ProgressBar from "../ui/ProgressBar";
+
+function ecart(appVal, excelVal, label) {
+  if (excelVal === undefined || excelVal === null) return {};
+  const diff = appVal - excelVal;
+  if (Math.abs(diff) <= 0.5) return {};
+  const sign = diff > 0 ? "+" : "";
+  return {
+    cls: "cell-ecart",
+    tip: `App : ${appVal.toFixed(2)}%\nExcel : ${excelVal.toFixed(2)}%\nÉcart : ${sign}${diff.toFixed(2)}%\n———\n${label}`,
+  };
+}
 
 export default function RecapTab({ project }) {
   const recap = useMemo(() => {
@@ -75,6 +87,10 @@ export default function RecapTab({ project }) {
         const avParLotDecomp = (pctMontantTotal / 100) * avancement;
         lotSumAvParLot += avParLotDecomp;
 
+        // Lookup Excel ref par nomDecomp
+        const refKey = (decompLabel || "").toLowerCase();
+        const exRef = RECAP_EXCEL.decomps[refKey];
+
         decompRows.push({
           lotLabel,
           decompLabel: decompLabel.toUpperCase(),
@@ -89,6 +105,9 @@ export default function RecapTab({ project }) {
           avancement,
           avParLotDecomp,
           fullLabel: decompLabel ? `${lotLabel} - ${decompLabel.toUpperCase()}` : lotLabel,
+          // Écarts Excel
+          ecartAv: ecart(avancement, exRef?.avDecomp, `Calcul app : ${doneWeighted.toFixed(0)} / ${totalPondWeighted.toFixed(0)} pondéré\n= ${avancement.toFixed(2)}%`),
+          ecartAvLot: ecart(avParLotDecomp, exRef?.avParLot, `Calcul app : ${pctMontantTotal.toFixed(2)}% du lot × ${avancement.toFixed(2)}%\n= ${avParLotDecomp.toFixed(2)}%`),
         });
       }
 
@@ -98,6 +117,9 @@ export default function RecapTab({ project }) {
       const lotPctTotal = 100;
       const lotAvancement = lotSumAvParLot;
       const lotAvParMontant = lotSumAvParLot;
+
+      // Écart lot Excel
+      const lotExRef = RECAP_EXCEL.lots[lot.numero];
 
       rows.push({
         lotNumero: lot.numero,
@@ -111,6 +133,7 @@ export default function RecapTab({ project }) {
         pctInt: totalIntGlobal > 0 ? (lotIntMontant / totalIntGlobal) * 100 : 0,
         avancement: lotAvancement,
         avParMontant: lotAvParMontant,
+        ecartAvLot: ecart(lotAvParMontant, lotExRef?.avParLot, `Calcul app : Σ (% décomp × av. décomp)\n= ${lotAvParMontant.toFixed(2)}%`),
       });
     }
 
@@ -124,6 +147,16 @@ export default function RecapTab({ project }) {
     const weight = totalMontantGlobal > 0 ? lot.montant / totalMontantGlobal : 0;
     globalAvParMontant += weight * lot.avParMontant;
   }
+
+  // Écart montant Ext total
+  const extDiff = totalExtGlobal - RECAP_EXCEL.totalExt;
+  const hasExtEcart = Math.abs(extDiff) > 1;
+  const extEcartTip = hasExtEcart
+    ? `App : ${formatMontant(totalExtGlobal)}\nExcel : ${formatMontant(RECAP_EXCEL.totalExt)}\nÉcart : ${formatMontant(extDiff)}`
+    : null;
+
+  // Écart avancement global
+  const globalEcart = ecart(globalAvParMontant, RECAP_EXCEL.avancementGlobal, `Calcul app : Σ (montant lot / montant total) × av. lot\n= ${globalAvParMontant.toFixed(2)}%`);
 
   const f = (v) => formatMontant(v);
   const pct = (v) => v.toFixed(2) + "%";
@@ -177,8 +210,20 @@ export default function RecapTab({ project }) {
                       <td className="cell-right cell-mono cell-muted col-int" style={s12}>{d.pctInt > 0 ? pct(d.pctInt) : "—"}</td>
                       <td className="cell-right cell-mono col-ext" style={s12}>{d.montantExt > 0 ? f(d.montantExt) : "—"}</td>
                       <td className="cell-right cell-mono cell-muted col-ext" style={s12}>{d.pctExt > 0 ? pct(d.pctExt) : "—"}</td>
-                      <td className="cell-right cell-mono" style={s12}>{pct(d.avancement)}</td>
-                      <td className="cell-right cell-mono" style={s12}>{pct(d.avParLotDecomp)}</td>
+                      <td
+                        className={`cell-right cell-mono ${d.ecartAv.cls || ""}`}
+                        style={s12}
+                        data-tooltip={d.ecartAv.tip || undefined}
+                      >
+                        {pct(d.avancement)}
+                      </td>
+                      <td
+                        className={`cell-right cell-mono ${d.ecartAvLot.cls || ""}`}
+                        style={s12}
+                        data-tooltip={d.ecartAvLot.tip || undefined}
+                      >
+                        {pct(d.avParLotDecomp)}
+                      </td>
                     </tr>
                   ))}
                   <tr className="recap-subtotal-row">
@@ -195,7 +240,13 @@ export default function RecapTab({ project }) {
                     <td className="cell-right" style={{ padding: "4px 6px" }}>
                       <ProgressBar value={lot.avancement} height={5} />
                     </td>
-                    <td className="cell-right cell-bold cell-mono" style={s12}>{pct(lot.avParMontant)}</td>
+                    <td
+                      className={`cell-right cell-bold cell-mono ${lot.ecartAvLot.cls || ""}`}
+                      style={s12}
+                      data-tooltip={lot.ecartAvLot.tip || undefined}
+                    >
+                      {pct(lot.avParMontant)}
+                    </td>
                   </tr>
                 </Fragment>
               ))}
@@ -207,10 +258,20 @@ export default function RecapTab({ project }) {
                 <td className="cell-right cell-bold cell-mono">100%</td>
                 <td className="cell-right cell-bold cell-mono col-int">{f(totalIntGlobal)}</td>
                 <td className="cell-right cell-bold cell-mono col-int">100%</td>
-                <td className="cell-right cell-bold cell-mono col-ext">{f(totalExtGlobal)}</td>
+                <td
+                  className={`cell-right cell-bold cell-mono col-ext ${hasExtEcart ? "cell-ecart-footer" : ""}`}
+                  data-tooltip={extEcartTip || undefined}
+                >
+                  {f(totalExtGlobal)}
+                </td>
                 <td className="cell-right cell-bold cell-mono col-ext">100%</td>
                 <td></td>
-                <td className="cell-right cell-bold cell-mono">{pct(globalAvParMontant)}</td>
+                <td
+                  className={`cell-right cell-bold cell-mono ${globalEcart.cls ? "cell-ecart-footer" : ""}`}
+                  data-tooltip={globalEcart.tip || undefined}
+                >
+                  {pct(globalAvParMontant)}
+                </td>
               </tr>
             </tfoot>
           </table>
