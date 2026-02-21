@@ -59,8 +59,15 @@ export function computeDetailedProgress(project) {
     });
   };
 
-  const lotProgressInt = calcLotProgress(project.lotsInt, "logements");
-  const lotProgressExt = calcLotProgress(project.lotsExt, "batiments");
+  const sortByNumero = (a, b) => {
+    const na = a.lot.split(" - ")[0], nb = b.lot.split(" - ")[0];
+    const pa = na.includes("&") ? parseFloat(na) : parseFloat(na);
+    const pb = nb.includes("&") ? parseFloat(nb) : parseFloat(nb);
+    if (pa !== pb) return pa - pb;
+    return a.lot.localeCompare(b.lot);
+  };
+  const lotProgressInt = calcLotProgress(project.lotsInt, "logements").sort(sortByNumero);
+  const lotProgressExt = calcLotProgress(project.lotsExt, "batiments").sort(sortByNumero);
 
   const batimentProgress = project.batiments.map((bat) => {
     const logEntities = getLogementNums(bat).map((num) => `${bat.id}_log_${num}`);
