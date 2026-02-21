@@ -34,12 +34,15 @@ export function HorizontalBarChart({ data = [], maxValue = 100, height = 20, sho
  * Vertical grouped bar chart — barres verticales groupées (ex: INT/EXT par bâtiment).
  * Props: data = [{ label, values: [{ value, color, label }] }], maxValue
  */
-export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 140 }) {
+export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 200 }) {
   if (data.length === 0) return null;
 
+  // Auto-scale bar width based on number of groups
+  const barWidth = data.length > 15 ? 14 : data.length > 8 ? 18 : 24;
+
   return (
-    <div className="vbar-chart">
-      <div className="vbar-grid">
+    <div className="vbar-chart" style={{ overflowX: data.length > 12 ? "auto" : "visible" }}>
+      <div className="vbar-grid" style={{ minWidth: data.length > 12 ? data.length * 55 : "auto" }}>
         {/* Y-axis labels */}
         <div className="vbar-yaxis">
           {[100, 75, 50, 25, 0].map((v) => (
@@ -67,12 +70,13 @@ export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 140 })
                   <div
                     key={bi}
                     className="vbar-bar-wrapper"
+                    style={{ width: barWidth }}
                     title={`${bar.label}: ${bar.value.toFixed(1)}%`}
                   >
                     <div
                       className="vbar-bar"
                       style={{
-                        height: `${Math.min((bar.value / maxValue) * 100, 100)}%`,
+                        height: `${Math.max(Math.min((bar.value / maxValue) * 100, 100), 1.5)}%`,
                         backgroundColor: bar.color || "var(--accent)",
                         transition: "height 0.5s ease",
                       }}

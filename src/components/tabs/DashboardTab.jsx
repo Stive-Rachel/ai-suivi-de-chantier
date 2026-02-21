@@ -171,32 +171,34 @@ export default function DashboardTab({ project }) {
         </div>
       </div>
 
-      {/* Horizontal bars — lots INT */}
-      {intBars.length > 0 && (
-        <div className="chart-card">
-          <h4 className="chart-card-title">Avancement par lot — Intérieur</h4>
-          <div className="chart-card-body">
-            <HorizontalBarChart data={intBars} height={18} />
-          </div>
+      {/* Horizontal bars — lots INT & EXT side by side */}
+      {(intBars.length > 0 || extBars.length > 0) && (
+        <div className="charts-row charts-row-bars">
+          {intBars.length > 0 && (
+            <div className="chart-card">
+              <h4 className="chart-card-title">Avancement par lot — Intérieur</h4>
+              <div className="chart-card-body">
+                <HorizontalBarChart data={intBars} height={18} />
+              </div>
+            </div>
+          )}
+          {extBars.length > 0 && (
+            <div className="chart-card">
+              <h4 className="chart-card-title">Avancement par lot — Extérieur</h4>
+              <div className="chart-card-body">
+                <HorizontalBarChart data={extBars} height={18} />
+              </div>
+            </div>
+          )}
         </div>
       )}
 
-      {/* Horizontal bars — lots EXT */}
-      {extBars.length > 0 && (
-        <div className="chart-card">
-          <h4 className="chart-card-title">Avancement par lot — Extérieur</h4>
-          <div className="chart-card-body">
-            <HorizontalBarChart data={extBars} height={18} />
-          </div>
-        </div>
-      )}
-
-      {/* Vertical bars — buildings */}
+      {/* Vertical bars — buildings — full width */}
       {buildingBars.length > 0 && (
         <div className="chart-card">
           <h4 className="chart-card-title">Avancement par bâtiment (INT / EXT)</h4>
           <div className="chart-card-body">
-            <VerticalBarChart data={buildingBars} barHeight={160} />
+            <VerticalBarChart data={buildingBars} barHeight={200} />
           </div>
         </div>
       )}
