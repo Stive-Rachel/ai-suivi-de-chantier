@@ -64,6 +64,27 @@ export default function TrackingGrid({ project, updateProject, type }) {
   const getValue = (rowKey, entityId) => tracking[rowKey]?.[entityId]?.status || "";
   const getPonderation = (rowKey) => tracking[rowKey]?._ponderation || 1;
 
+  // Calcul avancement par décomposition
+  const rowStats = useMemo(() => {
+    const stats = {};
+    const allLots = project.lots || [];
+    for (const lot of lots) {
+      const lotMarche = allLots.find((l) => l.numero === lot.numero)?.montantMarche || 0;
+      const pctDuLot = lotMarche > 0 ? (lot.montant || 0) / lotMarche : 0;
+      for (const decomp of lot.decompositions) {
+        const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
+        const pond = tracking[key]?._ponderation || 1;
+        let done = 0;
+        for (const e of entities) {
+          if (tracking[key]?.[e.id]?.status === "X") done++;
+        }
+        const av = entities.length > 0 ? (done / entities.length) * 100 : 0;
+        stats[key] = { done, total: entities.length, av, avParLot: pctDuLot * av, pctDuLot };
+      }
+    }
+    return stats;
+  }, [lots, entities, tracking, project.lots]);
+
   const setValue = (rowKey, entityId, status) => {
     updateProject((p) => {
       const t = { ...p.tracking };
@@ -213,7 +234,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
           <thead>
             {isLogements && (
               <tr className="group-header">
-                <th colSpan={3} style={{ background: "var(--bg-raised)" }} />
+                <th colSpan={6} style={{ background: "var(--bg-raised)" }} />
                 {Object.entries(groups).map(([gName, gEntities]) => (
                   <th key={gName} colSpan={gEntities.length}>
                     {gName}
@@ -240,6 +261,9 @@ export default function TrackingGrid({ project, updateProject, type }) {
               >
                 Pond.
               </SortableHeader>
+              <th style={{ width: 65, textAlign: "center", fontSize: 10 }}>Av. décomp.</th>
+              <th style={{ width: 65, textAlign: "center", fontSize: 10 }}>Av. / lot</th>
+              <th style={{ width: 50, textAlign: "center", fontSize: 10 }}>Nb ✓</th>
               {entities.map((e) => (
                 <SortableHeader
                   key={e.id}
@@ -265,7 +289,7 @@ export default function TrackingGrid({ project, updateProject, type }) {
             {Object.entries(sortedLotGroups).map(([lotNum, lotGroup]) => (
               <Fragment key={lotNum}>
                 <tr className="lot-separator">
-                  <td colSpan={3 + entities.length}>
+                  <td colSpan={6 + entities.length}>
                     LOT {lotNum} — {lotGroup.nom}
                   </td>
                 </tr>
@@ -301,6 +325,33 @@ export default function TrackingGrid({ project, updateProject, type }) {
                         ))}
                       </select>
                     </td>
+                    {(() => {
+                      const rs = rowStats[row.key] || { done: 0, total: 0, av: 0, avParLot: 0 };
+                      return (
+                        <>
+                          <td
+                            className="cell-mono"
+                            style={{ textAlign: "center", fontSize: 11, color: rs.av >= 100 ? "var(--success)" : rs.av > 0 ? "var(--warning)" : "var(--text-tertiary)" }}
+                            data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}\n= ${rs.av.toFixed(2)}%`}
+                          >
+                            {rs.av.toFixed(1)}%
+                          </td>
+                          <td
+                            className="cell-mono"
+                            style={{ textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}
+                            data-tooltip={`${(rs.pctDuLot * 100).toFixed(2)}% du lot × ${rs.av.toFixed(2)}%\n= ${rs.avParLot.toFixed(2)}%`}
+                          >
+                            {rs.avParLot.toFixed(1)}%
+                          </td>
+                          <td
+                            className="cell-mono"
+                            style={{ textAlign: "center", fontSize: 11, fontWeight: 600 }}
+                          >
+                            {rs.done}
+                          </td>
+                        </>
+                      );
+                    })()}
                     {entities.map((e) => (
                       <td
                         key={e.id}
@@ -325,6 +376,23 @@ export default function TrackingGrid({ project, updateProject, type }) {
               <td style={{ textAlign: "center" }}>
                 {rows.reduce((s, r) => s + getPonderation(r.key), 0)}
               </td>
+              {(() => {
+                let totalAv = 0, totalAvLot = 0, totalDone = 0;
+                for (const r of rows) {
+                  const rs = rowStats[r.key];
+                  if (rs) { totalAvLot += rs.avParLot; totalDone += rs.done; }
+                }
+                totalAv = rows.length > 0
+                  ? rows.reduce((s, r) => s + (rowStats[r.key]?.av || 0), 0) / rows.length
+                  : 0;
+                return (
+                  <>
+                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAv.toFixed(1)}%</td>
+                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAvLot.toFixed(1)}%</td>
+                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalDone}</td>
+                  </>
+                );
+              })()}
               {entities.map((e) => (
                 <td key={e.id} style={{ textAlign: "center", fontSize: 10, width: colWidths[e.id] || undefined }}>
                   {(() => {
