@@ -12,7 +12,7 @@ export default memo(function SortableHeader({
 }) {
   const isActive = sortConfig?.key === sortKey;
   const dir = isActive ? sortConfig.direction : null;
-  const arrow = dir === "asc" ? " \u25B2" : dir === "desc" ? " \u25BC" : "";
+  const arrow = dir === "asc" ? " ▲" : dir === "desc" ? " ▼" : "";
 
   return (
     <th
@@ -23,10 +23,14 @@ export default memo(function SortableHeader({
     >
       <span className="sortable-header-content">
         {children}
-        {onSort && <span className="sort-indicator">{arrow || " \u2195"}</span>}
+        {onSort && <span className="sort-indicator">{arrow || " ⇕"}</span>}
       </span>
       {resizeProps && (
-        <span className="col-resize-handle" {...resizeProps} />
+        <span
+          className="col-resize-handle"
+          onMouseDown={resizeProps.onMouseDown}
+          onClick={(e) => e.stopPropagation()}
+        />
       )}
     </th>
   );

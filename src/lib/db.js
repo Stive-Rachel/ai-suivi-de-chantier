@@ -24,12 +24,23 @@ function migrateProject(p) {
     p.lots = JSON.parse(JSON.stringify(seed.lots));
   }
   if (seed) {
-    const needsSync = (arr) => !arr || arr.length === 0 || arr.some((l) => l.montant === undefined);
-    if (seed.lotsExt && needsSync(p.lotsExt)) {
-      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt));
+    const needsSync = (arr, seedArr) =>
+      !arr || arr.length === 0 || arr.some((l) => l.montant === undefined) ||
+      (seedArr && arr.length !== seedArr.length);
+    if (seed.lotsExt && needsSync(p.lotsExt, seed.lotsExt)) {
+      // Merge: keep tracking data from existing entries, add missing ones from seed
+      const existing = new Map((p.lotsExt || []).map((l) => [l.trackPrefix, l]));
+      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt)).map((sl) => {
+        const ex = existing.get(sl.trackPrefix);
+        return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
+      });
     }
-    if (seed.lotsInt && needsSync(p.lotsInt)) {
-      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt));
+    if (seed.lotsInt && needsSync(p.lotsInt, seed.lotsInt)) {
+      const existing = new Map((p.lotsInt || []).map((l) => [l.trackPrefix, l]));
+      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt)).map((sl) => {
+        const ex = existing.get(sl.trackPrefix);
+        return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
+      });
     }
   }
   const def = (field, fallback) => {

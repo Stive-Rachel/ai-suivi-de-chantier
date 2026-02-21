@@ -723,6 +723,157 @@ body {
   background: var(--danger-bg);
 }
 
+/* ═══════ DASHBOARD KPI ═══════ */
+
+.dashboard-section-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin: 24px 0 14px;
+  letter-spacing: -0.3px;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 14px;
+  margin-bottom: 28px;
+}
+
+.kpi-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-xs);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.kpi-card:hover {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(-1px);
+}
+
+.kpi-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: var(--radius-sm);
+  background: var(--bg-elevated);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.kpi-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.kpi-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+  line-height: 1.2;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.kpi-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+
+.kpi-sub {
+  font-size: 11px;
+  color: var(--text-secondary);
+  margin-top: 2px;
+  font-family: var(--font-mono);
+}
+
+/* Project KPI Details in Cards */
+.project-kpis-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-kpis-row {
+  display: flex;
+  gap: 12px;
+}
+
+.project-kpi-mini {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.kpi-mini-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+  width: 28px;
+  flex-shrink: 0;
+}
+
+.project-kpis-stats {
+  display: flex;
+  gap: 14px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.project-kpis-stats span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.kpi-alert-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--warning);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.kpi-nok-badge {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--danger);
+  background: var(--danger-bg);
+  border: 1px solid var(--danger-border);
+  padding: 1px 7px;
+  border-radius: 10px;
+}
+
+.project-kpi-lowest {
+  font-size: 11px;
+  color: var(--danger);
+  font-weight: 500;
+  padding: 4px 8px;
+  background: var(--danger-bg);
+  border-radius: var(--radius-xs);
+  border: 1px solid var(--danger-border);
+}
+
 /* ═══════ EMPTY STATE ═══════ */
 
 .empty-state {
@@ -1307,19 +1458,20 @@ body {
 
 .col-resize-handle {
   position: absolute;
-  right: 0;
+  right: -3px;
   top: 0;
   bottom: 0;
-  width: 5px;
+  width: 7px;
   cursor: col-resize;
   background: transparent;
   transition: background 0.15s ease;
   z-index: 4;
+  touch-action: none;
 }
 .col-resize-handle:hover,
 .col-resize-handle:active {
   background: var(--accent);
-  opacity: 0.4;
+  opacity: 0.5;
 }
 
 .filter-bar {
