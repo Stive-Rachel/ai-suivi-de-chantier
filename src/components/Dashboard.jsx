@@ -10,6 +10,8 @@ import Button from "./ui/Button";
 import Input from "./ui/Input";
 import Modal from "./ui/Modal";
 import ProgressBar from "./ui/ProgressBar";
+import ThemeToggle from "./ui/ThemeToggle";
+import SyncStatusBadge from "./ui/SyncStatusBadge";
 
 function KpiCard({ icon, label, value, sub, color }) {
   return (
@@ -78,7 +80,7 @@ function ProjectKpis({ project }) {
         </div>
       </div>
       <div className="project-kpis-stats">
-        <span><Icon name="building" size={12} /> {nbBat} bât.</span>
+        <span><Icon name="building" size={12} /> {nbBat} b&acirc;t.</span>
         <span><Icon name="home" size={12} /> {nbLog} log.</span>
         {trackStats.alerts > 0 && (
           <span className="kpi-alert-badge">! {trackStats.alerts}</span>
@@ -96,7 +98,7 @@ function ProjectKpis({ project }) {
   );
 }
 
-export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
+export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme }) {
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
@@ -138,7 +140,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
   };
 
   const deleteProject = (id) => {
-    if (!confirm("Supprimer ce projet et toutes ses données ?")) return;
+    if (!confirm("Supprimer ce projet et toutes ses donn\u00e9es ?")) return;
     const updated = { ...db, projects: db.projects.filter((p) => p.id !== id) };
     setDb(updated);
     saveDB(updated);
@@ -150,12 +152,11 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
     const existingIds = new Set(db.projects.map((p) => p.id));
     const hasExisting = seedProjects.some((p) => existingIds.has(p.id));
     if (hasExisting) {
-      if (!confirm("Le projet de démo existe déjà. Voulez-vous le remplacer avec les données d'origine ?")) return;
+      if (!confirm("Le projet de d\u00e9mo existe d\u00e9j\u00e0. Voulez-vous le remplacer avec les donn\u00e9es d'origine ?")) return;
       const otherProjects = db.projects.filter((p) => !seedProjects.some((s) => s.id === p.id));
       const updated = { ...db, projects: [...otherProjects, ...seedProjects] };
       setDb(updated);
       saveDB(updated);
-      // Sync each seed project to Supabase
       for (const sp of seedProjects) {
         dataLayer.fullProjectSync(sp, userId).catch(console.error);
       }
@@ -221,9 +222,11 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
             <p>Gestion d'avancement multi-projets</p>
           </div>
         </div>
-        <div style={{ display: "flex", gap: 8 }}>
+        <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <SyncStatusBadge />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
           <Button variant="secondary" onClick={loadDemo}>
-            Charger démo
+            Charger d&eacute;mo
           </Button>
           <Button icon="plus" onClick={() => setShowCreate(true)}>
             Nouveau projet
@@ -243,7 +246,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
             />
             <KpiCard
               icon="building"
-              label="Bâtiments"
+              label="B&acirc;timents"
               value={globalKpis.nbBatTotal}
               sub={`${globalKpis.nbLogTotal} logements`}
               color="var(--info)"
@@ -280,13 +283,13 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
               <Icon name="folder" size={32} />
             </div>
             <h3>Aucun projet pour le moment</h3>
-            <p>Créez votre premier projet ou chargez les données de démo</p>
+            <p>Cr&eacute;ez votre premier projet ou chargez les donn&eacute;es de d&eacute;mo</p>
             <div style={{ display: "flex", gap: 10 }}>
               <Button icon="plus" onClick={() => setShowCreate(true)}>
-                Créer un projet
+                Cr&eacute;er un projet
               </Button>
               <Button variant="secondary" onClick={loadDemo}>
-                Charger démo
+                Charger d&eacute;mo
               </Button>
             </div>
           </div>
@@ -325,7 +328,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
                       <ProgressBar value={avgProgress} />
                       <ProjectKpis project={p} />
                       <div className="project-date">
-                        Créé le {new Date(p.createdAt).toLocaleDateString("fr-FR", {
+                        Cr&eacute;&eacute; le {new Date(p.createdAt).toLocaleDateString("fr-FR", {
                           day: "2-digit",
                           month: "short",
                           year: "numeric",
@@ -342,15 +345,15 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject }) {
 
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Nouveau projet">
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-          <Input label="Nom du projet *" value={newName} onChange={setNewName} placeholder="Ex: Résidence Les Oliviers" />
-          <Input label="Localisation" value={newLocation} onChange={setNewLocation} placeholder="Ex: Cotonou, Bénin" />
-          <Input label="Client / Maître d'ouvrage" value={newClient} onChange={setNewClient} placeholder="Ex: MCA-Bénin" />
+          <Input label="Nom du projet *" value={newName} onChange={setNewName} placeholder="Ex: R&eacute;sidence Les Oliviers" />
+          <Input label="Localisation" value={newLocation} onChange={setNewLocation} placeholder="Ex: Cotonou, B&eacute;nin" />
+          <Input label="Client / Ma&icirc;tre d'ouvrage" value={newClient} onChange={setNewClient} placeholder="Ex: MCA-B&eacute;nin" />
           <div style={{ display: "flex", gap: "8px", justifyContent: "flex-end", marginTop: "8px" }}>
             <Button variant="secondary" onClick={() => setShowCreate(false)}>
               Annuler
             </Button>
             <Button onClick={createProject} disabled={!newName.trim()}>
-              Créer le projet
+              Cr&eacute;er le projet
             </Button>
           </div>
         </div>
