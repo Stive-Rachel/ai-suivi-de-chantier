@@ -94,6 +94,23 @@ CREATE TABLE tracking_meta (
   PRIMARY KEY (project_id, track_type, row_key)
 );
 
+-- 7. Project Photos (metadata — actual files in Supabase Storage)
+CREATE TABLE project_photos (
+  id TEXT PRIMARY KEY,
+  project_id TEXT NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  file_name TEXT NOT NULL,
+  storage_path TEXT NOT NULL DEFAULT '',
+  batiment_id TEXT DEFAULT '',
+  lot_numero TEXT DEFAULT '',
+  mime_type TEXT DEFAULT 'image/jpeg',
+  file_size INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  notes TEXT DEFAULT ''
+);
+
+CREATE INDEX idx_project_photos_project
+  ON project_photos(project_id);
+
 -- ═══════════════════════════════════════════════════════════════════
 -- Row Level Security (RLS)
 -- ═══════════════════════════════════════════════════════════════════
@@ -104,6 +121,7 @@ ALTER TABLE lots ENABLE ROW LEVEL SECURITY;
 ALTER TABLE lots_decomp ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tracking_cells ENABLE ROW LEVEL SECURITY;
 ALTER TABLE tracking_meta ENABLE ROW LEVEL SECURITY;
+ALTER TABLE project_photos ENABLE ROW LEVEL SECURITY;
 
 -- Projects: users access their own
 CREATE POLICY "users_own_projects" ON projects
@@ -123,6 +141,9 @@ CREATE POLICY "users_own_tracking_cells" ON tracking_cells
   FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
 
 CREATE POLICY "users_own_tracking_meta" ON tracking_meta
+  FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
+
+CREATE POLICY "users_own_project_photos" ON project_photos
   FOR ALL USING (project_id IN (SELECT id FROM projects WHERE user_id = auth.uid()));
 
 -- ═══════════════════════════════════════════════════════════════════
