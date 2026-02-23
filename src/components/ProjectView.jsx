@@ -5,6 +5,7 @@ import * as dataLayer from "../lib/dataLayer";
 import Button from "./ui/Button";
 import Tabs from "./ui/Tabs";
 import ProgressBar from "./ui/ProgressBar";
+import AlertPanel, { countAlerts } from "./ui/AlertPanel";
 import SetupTab from "./tabs/SetupTab";
 import BatimentsTab from "./tabs/BatimentsTab";
 import LotsTab from "./tabs/LotsTab";
@@ -15,6 +16,8 @@ const RecapTab = lazy(() => import("./tabs/RecapTab"));
 const RecapAvancementTab = lazy(() => import("./tabs/RecapAvancementTab"));
 const AvancementTab = lazy(() => import("./tabs/AvancementTab"));
 const ExportTab = lazy(() => import("./tabs/ExportTab"));
+const GanttTab = lazy(() => import("./tabs/GanttTab"));
+const PhotosTab = lazy(() => import("./tabs/PhotosTab"));
 
 function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
@@ -22,6 +25,7 @@ function TabLoader() {
 
 export default function ProjectView({ project, db, setDb, mode, userId, onBack }) {
   const [activeTab, setActiveTab] = useState("setup");
+  const [alertOpen, setAlertOpen] = useState(false);
 
   const updateProject = useCallback(
     (updater) => {
@@ -57,6 +61,8 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
 
   const currentProject = db.projects.find((p) => p.id === project.id) || project;
 
+  const alertCounts = useMemo(() => countAlerts(currentProject), [currentProject]);
+
   const tabs = [
     { key: "setup", label: "Configuration", icon: "settings" },
     { key: "batiments-config", label: "Bâtiments", icon: "building" },
@@ -66,6 +72,8 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
     { key: "recap", label: "Récap", icon: "chart" },
     { key: "recap-av", label: "Récap Av.", icon: "chart" },
     { key: "avancement", label: "Avancement", icon: "chart" },
+    { key: "gantt", label: "Planning", icon: "calendar" },
+    { key: "photos", label: "Photos", icon: "camera" },
     { key: "export", label: "Export", icon: "download" },
     { key: "dashboard", label: "Tableau de bord", icon: "chart" },
   ];
@@ -87,6 +95,19 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
         <div className="header-progress">
           <ProgressBar value={computeProjectProgress(currentProject)} />
         </div>
+        <button
+          className="alert-bell-btn"
+          onClick={() => setAlertOpen(true)}
+          title={`${alertCounts.total} alerte(s)`}
+        >
+          <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 01-3.46 0" />
+          </svg>
+          {alertCounts.total > 0 && (
+            <span className="alert-bell-badge">{alertCounts.total}</span>
+          )}
+        </button>
         {mode === "supabase" && (
           <span className="connection-badge connected" title="Connecté à Supabase">cloud</span>
         )}
@@ -108,9 +129,14 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
           {activeTab === "recap" && <RecapTab project={currentProject} />}
           {activeTab === "recap-av" && <RecapAvancementTab project={currentProject} />}
           {activeTab === "avancement" && <AvancementTab project={currentProject} />}
+          {activeTab === "gantt" && <GanttTab project={currentProject} />}
+          {activeTab === "photos" && <PhotosTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "export" && <ExportTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         </Suspense>
       </div>
+
+      {/* Alert Panel */}
+      <AlertPanel project={currentProject} open={alertOpen} onClose={() => setAlertOpen(false)} />
     </div>
   );
 }

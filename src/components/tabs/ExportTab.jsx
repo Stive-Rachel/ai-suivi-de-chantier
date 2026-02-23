@@ -1,7 +1,22 @@
+import { useState } from "react";
 import { getLogementNums } from "../../lib/db";
 import ExportButton from "../ui/ExportButton";
 
 export default function ExportTab({ project, updateProject, supaSync }) {
+  const [pdfLoading, setPdfLoading] = useState(false);
+
+  const exportPDF = async () => {
+    setPdfLoading(true);
+    try {
+      const { generateProjectPDF } = await import("../../lib/pdfExport.js");
+      await generateProjectPDF(project);
+    } catch (err) {
+      console.error("Erreur PDF:", err);
+      alert("Erreur lors de la generation du PDF. Verifiez que les dependances sont installees.");
+    } finally {
+      setPdfLoading(false);
+    }
+  };
   const exportCSV = (csvType) => {
     const isLogements = csvType === "logements";
     const lots = isLogements ? project.lotsInt : project.lotsExt;
@@ -92,7 +107,14 @@ export default function ExportTab({ project, updateProject, supaSync }) {
           <ExportButton label="Logements (CSV)" desc="Export suivi intérieur" onClick={() => exportCSV("logements")} />
           <ExportButton label="Bâtiments (CSV)" desc="Export suivi extérieur" onClick={() => exportCSV("batiments")} />
         </div>
-        <ExportButton label="Backup complet (JSON)" desc="Sauvegarde du projet entier" onClick={exportJSON} />
+        <div className="export-grid">
+          <ExportButton
+            label={pdfLoading ? "Generation..." : "Rapport PDF"}
+            desc="Synthese projet avec KPIs et avancement"
+            onClick={exportPDF}
+          />
+          <ExportButton label="Backup complet (JSON)" desc="Sauvegarde du projet entier" onClick={exportJSON} />
+        </div>
         <div className="import-section">
           <h4>Importer un projet</h4>
           <input
