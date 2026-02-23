@@ -54,11 +54,13 @@ function ProjectKpis({ project }) {
     return { alerts, noks };
   }, [project.tracking]);
 
-  const avgInt = lotProgressInt.length > 0
-    ? lotProgressInt.reduce((s, lp) => s + lp.progress, 0) / lotProgressInt.length
+  const totalMontantInt = lotProgressInt.reduce((s, lp) => s + lp.montant, 0);
+  const avgInt = totalMontantInt > 0
+    ? lotProgressInt.reduce((s, lp) => s + (lp.montant / totalMontantInt) * lp.progress, 0)
     : 0;
-  const avgExt = lotProgressExt.length > 0
-    ? lotProgressExt.reduce((s, lp) => s + lp.progress, 0) / lotProgressExt.length
+  const totalMontantExt = lotProgressExt.reduce((s, lp) => s + lp.montant, 0);
+  const avgExt = totalMontantExt > 0
+    ? lotProgressExt.reduce((s, lp) => s + (lp.montant / totalMontantExt) * lp.progress, 0)
     : 0;
 
   // Find lot with lowest progress
@@ -203,9 +205,17 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
       }
     }
 
-    const avgProgress = projectProgresses.length > 0
-      ? projectProgresses.reduce((s, v) => s + v, 0) / projectProgresses.length
-      : 0;
+    const totalProjectMontant = projects.reduce((s, p) => {
+      return s + (p.lots || []).reduce((sl, l) => sl + (l.montantMarche || 0), 0);
+    }, 0);
+    const avgProgress = totalProjectMontant > 0
+      ? projects.reduce((s, p, i) => {
+          const pMontant = (p.lots || []).reduce((sl, l) => sl + (l.montantMarche || 0), 0);
+          return s + (pMontant / totalProjectMontant) * projectProgresses[i];
+        }, 0)
+      : projectProgresses.length > 0
+        ? projectProgresses.reduce((s, v) => s + v, 0) / projectProgresses.length
+        : 0;
 
     return { nbProjects, nbBatTotal, nbLogTotal, montantTotal, avgProgress, totalAlerts, totalNoks, totalDone, totalCells };
   }, [db.projects]);

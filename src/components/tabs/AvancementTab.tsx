@@ -45,7 +45,7 @@ export default function AvancementTab({ project }) {
         if (allEntities.length > 0) {
           for (const step of decomp.decompositions) {
             const key = `${decomp.trackPrefix || decomp.numero}-${step}`;
-            const pond = tracking[key]?._ponderation || 1;
+            const pond = tracking[key]?._ponderation ?? 1;
             tpw += pond * allEntities.length;
             for (const eId of allEntities) {
               if (tracking[key]?.[eId]?.status === "X") dw += pond;
@@ -133,7 +133,7 @@ export default function AvancementTab({ project }) {
                 <div
                   key={bp.name}
                   className={`batiment-progress-card ${isRetard ? "batiment-retard" : ""}`}
-                  data-tooltip={`INT: ${bp.int.toFixed(1)}% (moy. pond. logements)\nEXT: ${bp.ext.toFixed(1)}% (moy. pond. bâtiment)\nTotal: (INT + EXT) / 2 = ${bp.total.toFixed(1)}%`}
+                  data-tooltip={`INT: ${bp.int.toFixed(1)}%\nEXT: ${bp.ext.toFixed(1)}%\nTotal (pondéré montant): ${bp.total.toFixed(1)}%`}
                 >
                   <h5>{bp.name}</h5>
                   <ProgressBar value={bp.total} />

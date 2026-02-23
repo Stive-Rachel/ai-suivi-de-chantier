@@ -36,12 +36,14 @@ export default function DashboardTab({ project }) {
     return { done, alerts, noks, empty, total: done + alerts + noks + empty };
   }, [project.tracking]);
 
-  // INT/EXT averages
-  const avgInt = lotProgressInt.length > 0
-    ? lotProgressInt.reduce((s, lp) => s + lp.progress, 0) / lotProgressInt.length
+  // INT/EXT weighted averages
+  const totalMontantInt = lotProgressInt.reduce((s, lp) => s + lp.montant, 0);
+  const avgInt = totalMontantInt > 0
+    ? lotProgressInt.reduce((s, lp) => s + (lp.montant / totalMontantInt) * lp.progress, 0)
     : 0;
-  const avgExt = lotProgressExt.length > 0
-    ? lotProgressExt.reduce((s, lp) => s + lp.progress, 0) / lotProgressExt.length
+  const totalMontantExt = lotProgressExt.reduce((s, lp) => s + lp.montant, 0);
+  const avgExt = totalMontantExt > 0
+    ? lotProgressExt.reduce((s, lp) => s + (lp.montant / totalMontantExt) * lp.progress, 0)
     : 0;
 
   // INT lots bar data

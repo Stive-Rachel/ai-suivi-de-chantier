@@ -39,7 +39,7 @@ export default function RecapAvancementTab({ project }) {
         if (nbEntities > 0) {
           for (const step of decomp.decompositions) {
             const key = `${decomp.trackPrefix || decomp.numero}-${step}`;
-            const pond = tracking[key]?._ponderation || 1;
+            const pond = tracking[key]?._ponderation ?? 1;
             totalPondWeighted += pond * nbEntities;
             for (const eId of allEntities) {
               if (tracking[key]?.[eId]?.status === "X") doneWeighted += pond;

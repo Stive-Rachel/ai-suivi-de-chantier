@@ -171,15 +171,22 @@ export function countAlerts(project) {
 
   const scan = (trackType, lotsSource) => {
     const trackingData = project.tracking?.[trackType] || {};
+    const isInt = trackType === "logements";
+    const entities = isInt
+      ? project.batiments.flatMap((bat) =>
+          getLogementNums(bat).map((num) => `${bat.id}_log_${num}`)
+        )
+      : project.batiments.map((bat) => bat.id);
+
     for (const lot of lotsSource) {
       for (const decomp of lot.decompositions) {
         const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
         const rowData = trackingData[key];
         if (!rowData) continue;
-        for (const [k, v] of Object.entries(rowData)) {
-          if (k.startsWith("_")) continue;
-          if (v?.status === "NOK") nok++;
-          else if (v?.status === "!") warn++;
+        for (const eId of entities) {
+          const status = rowData[eId]?.status;
+          if (status === "NOK") nok++;
+          else if (status === "!") warn++;
         }
       }
     }

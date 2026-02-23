@@ -36,7 +36,7 @@ export function computeDetailedProgress(project: Project): DetailedProgress {
       if (allEntities.length > 0) {
         for (const decomp of lot.decompositions) {
           const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
-          const pond = trackingData[key]?._ponderation || 1;
+          const pond = trackingData[key]?._ponderation ?? 1;
           totalPondWeighted += pond * allEntities.length;
           for (const eId of allEntities) {
             if (trackingData[key]?.[eId]?.status === "X") doneWeighted += pond;
@@ -67,16 +67,24 @@ export function computeDetailedProgress(project: Project): DetailedProgress {
   const lotProgressInt = calcLotProgress(project.lotsInt, "logements").sort(sortByNumero);
   const lotProgressExt = calcLotProgress(project.lotsExt, "batiments").sort(sortByNumero);
 
+  const totalMontantInt = (project.lotsInt || []).reduce((s, l) => s + (l.montant || 0), 0);
+  const totalMontantExt = (project.lotsExt || []).reduce((s, l) => s + (l.montant || 0), 0);
+  const totalMontantAll = totalMontantInt + totalMontantExt;
+
   const batimentProgress = project.batiments.map((bat) => {
     const logEntities = getLogementNums(bat).map((num) => `${bat.id}_log_${num}`);
     const intProgress = calcEntityProgress(project.lotsInt, "logements", logEntities, project.tracking);
     const extProgress = calcEntityProgress(project.lotsExt, "batiments", [bat.id], project.tracking);
 
+    const total = totalMontantAll > 0
+      ? (intProgress * totalMontantInt + extProgress * totalMontantExt) / totalMontantAll
+      : (intProgress + extProgress) / 2;
+
     return {
       name: bat.name,
       int: intProgress,
       ext: extProgress,
-      total: (intProgress + extProgress) / 2,
+      total,
     };
   });
 
@@ -93,7 +101,7 @@ export function calcEntityProgress(lots: LotDecomp[], trackType: string, entityI
   for (const lot of lots) {
     for (const decomp of lot.decompositions) {
       const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
-      const pond = t[key]?._ponderation || 1;
+      const pond = t[key]?._ponderation ?? 1;
       totalPond += pond;
 
       let done = 0;
