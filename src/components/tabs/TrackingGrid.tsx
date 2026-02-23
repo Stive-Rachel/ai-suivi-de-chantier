@@ -233,7 +233,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       )}
 
       <div style={{ overflowX: "auto", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
-        <table className="tracking-table">
+        <table className="tracking-table" role="grid" aria-label="Grille de suivi">
           <thead>
             {isLogements && (
               <tr className="group-header">

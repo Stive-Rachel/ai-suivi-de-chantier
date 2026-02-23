@@ -1,6 +1,7 @@
 import { getLogementNums } from "./db";
+import type { Project, LotDecomp, LotProgress, DetailedProgress, TrackingData } from "../types";
 
-export function computeProjectProgress(project) {
+export function computeProjectProgress(project: Project): number {
   const { lotProgressInt, lotProgressExt } = computeDetailedProgress(project);
   const totalMontant = (project.lots || []).reduce((s, l) => s + (l.montantMarche || 0), 0);
   if (totalMontant === 0) return 0;
@@ -14,14 +15,14 @@ export function computeProjectProgress(project) {
   return progress;
 }
 
-export function computeDetailedProgress(project) {
+export function computeDetailedProgress(project: Project): DetailedProgress {
   const batEntitiesGrouped = project.batiments.map((bat) => ({
     batId: bat.id,
     extEntities: [bat.id],
     intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
   }));
 
-  const calcLotProgress = (lots, trackType) => {
+  const calcLotProgress = (lots: LotDecomp[], trackType: "logements" | "batiments"): LotProgress[] => {
     const trackingData = project.tracking?.[trackType] || {};
     const isInt = trackType === "logements";
 
@@ -82,7 +83,7 @@ export function computeDetailedProgress(project) {
   return { lotProgressInt, lotProgressExt, batimentProgress };
 }
 
-export function calcEntityProgress(lots, trackType, entityIds, tracking) {
+export function calcEntityProgress(lots: LotDecomp[], trackType: string, entityIds: string[], tracking: TrackingData | undefined): number {
   const t = tracking?.[trackType] || {};
   if (entityIds.length === 0) return 0;
 
