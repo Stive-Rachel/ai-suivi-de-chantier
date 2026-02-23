@@ -1,60 +1,60 @@
 import initialData from "../initialData.json";
+import type { Project, DB, Batiment } from "../types";
 
 // ─── DATA LAYER ──────────────────────────────────────────────────────────────
 const DB_KEY = "construction_tracker_v1";
 
-function migrateProject(p) {
+function migrateProject(p: any): Project {
   const seed = initialData.projects.find((s) => s.id === p.id);
 
   if (!p.lots) {
     if (seed && seed.lots) {
       p.lots = JSON.parse(JSON.stringify(seed.lots));
     } else {
-      const numeros = new Set();
-      [...(p.lotsInt || []), ...(p.lotsExt || [])].forEach((l) => numeros.add(l.numero));
+      const numeros = new Set<string>();
+      [...(p.lotsInt || []), ...(p.lotsExt || [])].forEach((l: any) => numeros.add(l.numero));
       p.lots = [...numeros].map((num) => {
-        const intLots = (p.lotsInt || []).filter((l) => l.numero === num);
-        const extLots = (p.lotsExt || []).filter((l) => l.numero === num);
+        const intLots = (p.lotsInt || []).filter((l: any) => l.numero === num);
+        const extLots = (p.lotsExt || []).filter((l: any) => l.numero === num);
         const nom = (intLots[0] || extLots[0] || {}).nom || "";
         return { numero: num, nom, montantMarche: 0, montantExt: 0, montantInt: 0 };
       });
     }
   }
-  if (seed && seed.lots && p.lots.every((l) => !l.montantMarche && !l.montantExt && !l.montantInt)) {
+  if (seed && seed.lots && p.lots.every((l: any) => !l.montantMarche && !l.montantExt && !l.montantInt)) {
     p.lots = JSON.parse(JSON.stringify(seed.lots));
   }
   if (seed) {
-    const needsSync = (arr, seedArr) =>
-      !arr || arr.length === 0 || arr.some((l) => l.montant === undefined) ||
+    const needsSync = (arr: any[] | undefined, seedArr: any[] | undefined) =>
+      !arr || arr.length === 0 || arr.some((l: any) => l.montant === undefined) ||
       (seedArr && arr.length !== seedArr.length);
     if (seed.lotsExt && needsSync(p.lotsExt, seed.lotsExt)) {
-      // Merge: keep tracking data from existing entries, add missing ones from seed
-      const existing = new Map((p.lotsExt || []).map((l) => [l.trackPrefix, l]));
-      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt)).map((sl) => {
+      const existing = new Map((p.lotsExt || []).map((l: any) => [l.trackPrefix, l]));
+      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt)).map((sl: any) => {
         const ex = existing.get(sl.trackPrefix);
         return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
       });
     }
     if (seed.lotsInt && needsSync(p.lotsInt, seed.lotsInt)) {
-      const existing = new Map((p.lotsInt || []).map((l) => [l.trackPrefix, l]));
-      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt)).map((sl) => {
+      const existing = new Map((p.lotsInt || []).map((l: any) => [l.trackPrefix, l]));
+      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt)).map((sl: any) => {
         const ex = existing.get(sl.trackPrefix);
         return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
       });
     }
   }
-  const def = (field, fallback) => {
-    if (p[field] === undefined || (p[field] === 0 && seed?.[field])) p[field] = seed?.[field] ?? fallback;
+  const def = (field: string, fallback: any) => {
+    if (p[field] === undefined || (p[field] === 0 && seed?.[field as keyof typeof seed])) p[field] = (seed as any)?.[field] ?? fallback;
   };
   def("montantTotal", 0); def("dateDebutChantier", ""); def("dureeTotale", 0);
   def("montantExt", 0); def("montantInt", 0);
   def("dureeExt", 0); def("dureeInt", 0);
   def("dateDebutInt", ""); def("dateDebutExt", "");
   def("semainesExclues", 0); def("semainesTravaillees", 0);
-  return p;
+  return p as Project;
 }
 
-export function loadDB() {
+export function loadDB(): DB {
   try {
     const raw = JSON.parse(localStorage.getItem(DB_KEY) || "null");
     if (raw && raw.projects && raw.projects.length > 0) {
@@ -73,15 +73,15 @@ export function loadDB() {
   }
 }
 
-export function saveDB(db) {
+export function saveDB(db: DB): void {
   localStorage.setItem(DB_KEY, JSON.stringify(db));
 }
 
-export function generateId() {
+export function generateId(): string {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
 }
 
-export function getLogementNums(bat) {
+export function getLogementNums(bat: Batiment): number[] {
   if (bat.logements && bat.logements.length > 0) return bat.logements;
   return Array.from({ length: bat.nbLogements || 0 }, (_, i) => i + 1);
 }

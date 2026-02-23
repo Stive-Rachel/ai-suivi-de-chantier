@@ -1,5 +1,7 @@
+import type { LotDecomp, Lot, StatusConfig, StatusBadgeStyle, CellStatus } from "../types";
+
 // ─── DEFAULT LOTS ────────────────────────────────────────────────────────────
-export const DEFAULT_LOTS_INT = [
+export const DEFAULT_LOTS_INT: Omit<LotDecomp, "montant">[] = [
   { numero: "1", nom: "GROS OEUVRE", decompositions: ["Fondations", "Élévation", "Planchers", "Escaliers"] },
   { numero: "2", nom: "CHARPENTE COUVERTURE", decompositions: ["Charpente", "Couverture", "Zinguerie"] },
   { numero: "3", nom: "ÉTANCHÉITÉ", decompositions: ["Étanchéité toiture", "Étanchéité terrasse"] },
@@ -12,7 +14,7 @@ export const DEFAULT_LOTS_INT = [
   { numero: "10", nom: "ÉLECTRICITÉ", decompositions: ["Courants forts", "Courants faibles", "Appareillage"] },
 ];
 
-export const DEFAULT_LOTS_EXT = [
+export const DEFAULT_LOTS_EXT: Omit<LotDecomp, "montant">[] = [
   { numero: "1", nom: "GROS OEUVRE", decompositions: ["Fondations", "Élévation", "Planchers"] },
   { numero: "2", nom: "CHARPENTE COUVERTURE", decompositions: ["Charpente", "Couverture"] },
   { numero: "3", nom: "ÉTANCHÉITÉ", decompositions: ["Étanchéité"] },
@@ -21,7 +23,7 @@ export const DEFAULT_LOTS_EXT = [
   { numero: "6", nom: "VRD", decompositions: ["Voirie", "Réseaux", "Aménagements ext."] },
 ];
 
-export const DEFAULT_LOTS = [
+export const DEFAULT_LOTS: Lot[] = [
   { numero: "1", nom: "GROS OEUVRE", montantMarche: 0, montantExt: 0, montantInt: 0 },
   { numero: "2", nom: "CHARPENTE COUVERTURE", montantMarche: 0, montantExt: 0, montantInt: 0 },
   { numero: "3", nom: "ÉTANCHÉITÉ", montantMarche: 0, montantExt: 0, montantInt: 0 },
@@ -34,7 +36,7 @@ export const DEFAULT_LOTS = [
   { numero: "10", nom: "VRD", montantMarche: 0, montantExt: 0, montantInt: 0 },
 ];
 
-export const STATUS_CONFIG = {
+export const STATUS_CONFIG: Record<CellStatus, StatusConfig> = {
   "": { label: "—", cls: "status-empty" },
   X: { label: "X", cls: "status-ok" },
   "!": { label: "!", cls: "status-alert" },
@@ -42,7 +44,7 @@ export const STATUS_CONFIG = {
   i: { label: "i", cls: "status-info" },
 };
 
-export const STATUS_BADGE_STYLES = {
+export const STATUS_BADGE_STYLES: Record<string, StatusBadgeStyle> = {
   X: { background: "var(--success)", color: "#fff" },
   "!": { background: "var(--warning)", color: "#fff" },
   NOK: { background: "var(--danger)", color: "#fff" },
