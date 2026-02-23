@@ -5,6 +5,7 @@ import * as dataLayer from "../lib/dataLayer";
 import Button from "./ui/Button";
 import Tabs from "./ui/Tabs";
 import ProgressBar from "./ui/ProgressBar";
+import Modal from "./ui/Modal";
 import AlertPanel, { countAlerts } from "./ui/AlertPanel";
 import ThemeToggle from "./ui/ThemeToggle";
 import SyncStatusBadge from "./ui/SyncStatusBadge";
@@ -29,6 +30,10 @@ function TabLoader() {
 export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: any) {
   const [activeTab, setActiveTab] = useState("setup");
   const [alertOpen, setAlertOpen] = useState(false);
+  const [disclaimerOpen, setDisclaimerOpen] = useState(() => {
+    const isBergevin = project.name?.toLowerCase().includes("bergevin");
+    return isBergevin && !localStorage.getItem(`disclaimer-dismissed-${project.id}`);
+  });
 
   const updateProject = useCallback(
     (updater: any) => {
@@ -167,6 +172,28 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
       </div>
 
       <AlertPanel project={currentProject} open={alertOpen} onClose={() => setAlertOpen(false)} />
+
+      <Modal open={disclaimerOpen} onClose={() => {
+        localStorage.setItem(`disclaimer-dismissed-${project.id}`, "1");
+        setDisclaimerOpen(false);
+      }} title="Avertissement" width={480}>
+        <div style={{ padding: "16px 20px", lineHeight: 1.6, color: "var(--text-secondary)" }}>
+          <p style={{ margin: "0 0 12px" }}>
+            <strong style={{ color: "var(--text-primary)" }}>Des écarts peuvent exister</strong> entre le fichier Excel d'origine et les calculs effectués dans cette application.
+          </p>
+          <p style={{ margin: "0 0 16px" }}>
+            Il est recommandé de <strong style={{ color: "var(--text-primary)" }}>vérifier les données et les calculs</strong> avant de les utiliser comme référence officielle.
+          </p>
+          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+            <Button variant="primary" onClick={() => {
+              localStorage.setItem(`disclaimer-dismissed-${project.id}`, "1");
+              setDisclaimerOpen(false);
+            }}>
+              J'ai compris
+            </Button>
+          </div>
+        </div>
+      </Modal>
 
       <QuickEntry
         project={currentProject}
