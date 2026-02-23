@@ -1,6 +1,7 @@
 // ─── Unified Data Layer ─────────────────────────────────────────────────────
 // Delegates to Supabase when configured, otherwise falls back to localStorage.
 // All functions are async for consistency.
+// When offline, operations are enqueued via syncQueue for later replay.
 
 import { supabase, isSupabaseConfigured } from "./supabaseClient";
 import { loadDB, saveDB } from "./db";
@@ -13,12 +14,21 @@ import {
   trackingToRows,
   rowsToTracking,
 } from "./supabaseOps";
+import { enqueue } from "./syncQueue";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
 function throwIfError(result) {
   if (result.error) throw result.error;
   return result.data;
+}
+
+/**
+ * Check if we should enqueue rather than send now.
+ * Returns true if offline AND Supabase is configured (otherwise nothing to queue).
+ */
+function shouldEnqueue() {
+  return isSupabaseConfigured() && typeof navigator !== "undefined" && !navigator.onLine;
 }
 
 // ── Load All Projects ───────────────────────────────────────────────────────
@@ -203,6 +213,11 @@ export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
 export async function setTrackingCell(projectId, trackType, rowKey, entityId, status) {
   if (!isSupabaseConfigured()) return;
 
+  if (shouldEnqueue()) {
+    enqueue({ type: "setTrackingCell", args: [projectId, trackType, rowKey, entityId, status] });
+    return;
+  }
+
   throwIfError(
     await supabase.from("tracking_cells").upsert({
       project_id: projectId,
@@ -218,6 +233,11 @@ export async function setTrackingCell(projectId, trackType, rowKey, entityId, st
 
 export async function setTrackingMeta(projectId, trackType, rowKey, meta) {
   if (!isSupabaseConfigured()) return;
+
+  if (shouldEnqueue()) {
+    enqueue({ type: "setTrackingMeta", args: [projectId, trackType, rowKey, meta] });
+    return;
+  }
 
   const row = {
     project_id: projectId,
@@ -238,4 +258,25 @@ export async function fullProjectSync(project, userId) {
   // Delete existing then re-create
   await supabase.from("projects").delete().eq("id", project.id);
   await createProjectInDB(project, userId);
+}
+
+// ── Replay function for offline sync queue ──────────────────────────────────
+
+export async function replayOperation(type, args) {
+  switch (type) {
+    case "setTrackingCell":
+      return setTrackingCell(...args);
+    case "setTrackingMeta":
+      return setTrackingMeta(...args);
+    case "updateProjectFields":
+      return updateProjectFields(...args);
+    case "syncBatiments":
+      return syncBatiments(...args);
+    case "syncLots":
+      return syncLots(...args);
+    case "syncLotsDecomp":
+      return syncLotsDecomp(...args);
+    default:
+      console.warn("[DataLayer] Unknown replay operation:", type);
+  }
 }

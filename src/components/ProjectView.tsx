@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo, lazy, Suspense } from "react";
+import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from "react";
 import { saveDB } from "../lib/db";
 import { computeProjectProgress } from "../lib/computations";
 import * as dataLayer from "../lib/dataLayer";
@@ -6,10 +6,13 @@ import Button from "./ui/Button";
 import Tabs from "./ui/Tabs";
 import ProgressBar from "./ui/ProgressBar";
 import AlertPanel, { countAlerts } from "./ui/AlertPanel";
+import ThemeToggle from "./ui/ThemeToggle";
+import SyncStatusBadge from "./ui/SyncStatusBadge";
 import SetupTab from "./tabs/SetupTab";
 import BatimentsTab from "./tabs/BatimentsTab";
 import LotsTab from "./tabs/LotsTab";
 import TrackingGrid from "./tabs/TrackingGrid";
+import QuickEntry from "./QuickEntry";
 
 const DashboardTab = lazy(() => import("./tabs/DashboardTab"));
 const RecapTab = lazy(() => import("./tabs/RecapTab"));
@@ -23,16 +26,16 @@ function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
 }
 
-export default function ProjectView({ project, db, setDb, mode, userId, onBack }) {
+export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: any) {
   const [activeTab, setActiveTab] = useState("setup");
   const [alertOpen, setAlertOpen] = useState(false);
 
   const updateProject = useCallback(
-    (updater) => {
-      setDb((prev) => {
+    (updater: any) => {
+      setDb((prev: any) => {
         const updated = {
           ...prev,
-          projects: prev.projects.map((p) => (p.id === project.id ? updater(p) : p)),
+          projects: prev.projects.map((p: any) => (p.id === project.id ? updater(p) : p)),
         };
         saveDB(updated);
         return updated;
@@ -43,27 +46,27 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
 
   // Supabase sync helpers — fire-and-forget, localStorage is always saved first
   const supaSync = useMemo(() => ({
-    updateFields: (fields) =>
+    updateFields: (fields: any) =>
       dataLayer.updateProjectFields(project.id, fields).catch(console.error),
-    setTrackingCell: (trackType, rowKey, entityId, status) =>
+    setTrackingCell: (trackType: string, rowKey: string, entityId: string, status: string) =>
       dataLayer.setTrackingCell(project.id, trackType, rowKey, entityId, status).catch(console.error),
-    setTrackingMeta: (trackType, rowKey, meta) =>
+    setTrackingMeta: (trackType: string, rowKey: string, meta: any) =>
       dataLayer.setTrackingMeta(project.id, trackType, rowKey, meta).catch(console.error),
-    syncBatiments: (batiments) =>
+    syncBatiments: (batiments: any) =>
       dataLayer.syncBatiments(project.id, batiments).catch(console.error),
-    syncLots: (lots) =>
+    syncLots: (lots: any) =>
       dataLayer.syncLots(project.id, lots).catch(console.error),
-    syncLotsDecomp: (lotsInt, lotsExt) =>
+    syncLotsDecomp: (lotsInt: any, lotsExt: any) =>
       dataLayer.syncLotsDecomp(project.id, lotsInt, lotsExt).catch(console.error),
-    fullSync: (p) =>
+    fullSync: (p: any) =>
       dataLayer.fullProjectSync(p, userId).catch(console.error),
   }), [project.id, userId]);
 
-  const currentProject = db.projects.find((p) => p.id === project.id) || project;
+  const currentProject = db.projects.find((p: any) => p.id === project.id) || project;
 
   const alertCounts = useMemo(() => countAlerts(currentProject), [currentProject]);
 
-  const tabs = [
+  const tabs = useMemo(() => [
     { key: "setup", label: "Configuration", icon: "settings" },
     { key: "batiments-config", label: "Bâtiments", icon: "building" },
     { key: "lots", label: "Lots", icon: "folder" },
@@ -76,20 +79,43 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
     { key: "photos", label: "Photos", icon: "camera" },
     { key: "export", label: "Export", icon: "download" },
     { key: "dashboard", label: "Tableau de bord", icon: "chart" },
-  ];
+  ], []);
+
+  // Keyboard shortcuts: digits 1-9 switch tabs, 0 for 10th tab
+  useEffect(() => {
+    const tabKeys = tabs.map((t) => t.key);
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.target as HTMLElement).tagName === "INPUT" || (e.target as HTMLElement).tagName === "SELECT" || (e.target as HTMLElement).tagName === "TEXTAREA") return;
+      const digit = parseInt(e.key);
+      if (!isNaN(digit) && digit >= 1 && digit <= 9) {
+        const idx = digit - 1;
+        if (idx < tabKeys.length) setActiveTab(tabKeys[idx]);
+      }
+      if (e.key === "0" && tabKeys.length >= 10) setActiveTab(tabKeys[9]);
+    };
+    document.addEventListener("keydown", handleKey);
+    return () => document.removeEventListener("keydown", handleKey);
+  }, [tabs]);
 
   return (
     <div className="app-shell">
       <header className="project-header">
-        <Button variant="ghost" icon="back" onClick={onBack} size="sm">
-          Projets
-        </Button>
-        <div className="separator" />
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <Button variant="ghost" icon="back" onClick={onBack} size="sm">
+            Projets
+          </Button>
+          <div className="separator" />
+          <nav className="breadcrumbs">
+            <button className="breadcrumb-link" onClick={onBack}>Projets</button>
+            <span className="breadcrumb-sep">&rsaquo;</span>
+            <span className="breadcrumb-current">{currentProject.name}</span>
+          </nav>
+        </div>
         <div className="project-info">
           <h2>{currentProject.name}</h2>
           <p>
             {currentProject.location}
-            {currentProject.client ? ` \u00b7 ${currentProject.client}` : ""}
+            {currentProject.client ? ` · ${currentProject.client}` : ""}
           </p>
         </div>
         <div className="header-progress">
@@ -99,6 +125,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
           className="alert-bell-btn"
           onClick={() => setAlertOpen(true)}
           title={`${alertCounts.total} alerte(s)`}
+          aria-label={`${alertCounts.total} alertes`}
         >
           <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
             <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9" />
@@ -108,17 +135,21 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
             <span className="alert-bell-badge">{alertCounts.total}</span>
           )}
         </button>
-        {mode === "supabase" && (
-          <span className="connection-badge connected" title="Connecté à Supabase">cloud</span>
-        )}
-        {mode === "local" && (
-          <span className="connection-badge local" title="Mode local (localStorage)">local</span>
-        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+          <SyncStatusBadge />
+          <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          {mode === "supabase" && (
+            <span className="connection-badge connected" title="Connecté à Supabase">cloud</span>
+          )}
+          {mode === "local" && (
+            <span className="connection-badge local" title="Mode local (localStorage)">local</span>
+          )}
+        </div>
       </header>
 
       <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
-      <div className="tab-content" role="tabpanel">
+      <div className="tab-content" key={activeTab} role="tabpanel">
         {activeTab === "setup" && <SetupTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "batiments-config" && <BatimentsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "lots" && <LotsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
@@ -135,8 +166,13 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack }
         </Suspense>
       </div>
 
-      {/* Alert Panel */}
       <AlertPanel project={currentProject} open={alertOpen} onClose={() => setAlertOpen(false)} />
+
+      <QuickEntry
+        project={currentProject}
+        updateProject={updateProject}
+        supaSync={supaSync}
+      />
     </div>
   );
 }

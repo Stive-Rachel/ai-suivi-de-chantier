@@ -11,9 +11,10 @@ export default function Tabs({ tabs, active, onChange }) {
             aria-selected={active === t.key}
             onClick={() => onChange(t.key)}
             className={`tab-btn ${active === t.key ? "active" : ""}`}
+            title={t.label}
           >
             {t.icon && <Icon name={t.icon} size={14} />}
-            {t.label}
+            <span className="tab-label">{t.label}</span>
           </button>
         ))}
       </div>
