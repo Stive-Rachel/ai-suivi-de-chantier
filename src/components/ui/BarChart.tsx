@@ -1,5 +1,5 @@
 /**
- * Horizontal bar chart — affiche des barres horizontales avec labels et valeurs.
+ * Horizontal bar chart — premium data visualization.
  * Props: data = [{ label, value, color }], maxValue (default 100)
  */
 export function HorizontalBarChart({ data = [], maxValue = 100, height = 20, showValue = true }) {
@@ -7,25 +7,43 @@ export function HorizontalBarChart({ data = [], maxValue = 100, height = 20, sho
 
   return (
     <div className="hbar-chart">
-      {data.map((item, i) => (
-        <div key={i} className="hbar-row">
-          <span className="hbar-label" title={item.label}>{item.label}</span>
-          <div className="hbar-track" style={{ height }}>
-            <div
-              className="hbar-fill"
-              style={{
-                width: `${Math.min((item.value / maxValue) * 100, 100)}%`,
-                backgroundColor: item.color || "var(--accent)",
-                height: "100%",
-                transition: "width 0.5s ease",
-              }}
-            />
+      {data.map((item, i) => {
+        const pct = Math.min((item.value / maxValue) * 100, 100);
+        const color = item.color || "var(--accent)";
+        // Extract lot number
+        const dashIdx = item.label.indexOf(" - ");
+        const lotNum = dashIdx > -1 ? item.label.slice(0, dashIdx).trim() : "";
+        const lotName = dashIdx > -1 ? item.label.slice(dashIdx + 3).trim() : item.label;
+
+        return (
+          <div key={i} className={`hbar-row ${i % 2 === 0 ? "hbar-row-alt" : ""}`}>
+            <div className="hbar-row-accent" style={{ background: color }} />
+            <div className="hbar-label">
+              {lotNum && <span className="hbar-lot-num">{lotNum}</span>}
+              <span className="hbar-lot-name">{lotName}</span>
+            </div>
+            <div className="hbar-track" style={{ height }}>
+              <div className="hbar-ticks">
+                <span style={{ left: "25%" }} />
+                <span style={{ left: "50%" }} />
+                <span style={{ left: "75%" }} />
+              </div>
+              <div
+                className="hbar-fill"
+                style={{
+                  width: `${pct}%`,
+                  backgroundColor: color,
+                  height: "100%",
+                  transition: "width 0.6s cubic-bezier(.4,0,.2,1)",
+                }}
+              />
+            </div>
+            {showValue && (
+              <span className="hbar-value" style={{ color }}>{item.value.toFixed(2)}%</span>
+            )}
           </div>
-          {showValue && (
-            <span className="hbar-value">{item.value.toFixed(2)}%</span>
-          )}
-        </div>
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -37,7 +55,6 @@ export function HorizontalBarChart({ data = [], maxValue = 100, height = 20, sho
 export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 200 }) {
   if (data.length === 0) return null;
 
-  // Auto-scale bar width based on number of groups
   const barWidth = data.length > 15 ? 14 : data.length > 8 ? 18 : 24;
 
   return (
