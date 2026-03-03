@@ -22,6 +22,7 @@ const AvancementTab = lazy(() => import("./tabs/AvancementTab"));
 const ExportTab = lazy(() => import("./tabs/ExportTab"));
 const GanttTab = lazy(() => import("./tabs/GanttTab"));
 const PhotosTab = lazy(() => import("./tabs/PhotosTab"));
+const PlanningTab = lazy(() => import("./tabs/PlanningTab"));
 
 function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
@@ -69,6 +70,8 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
 
   const currentProject = db.projects.find((p: any) => p.id === project.id) || project;
 
+  const globalProgress = useMemo(() => computeProjectProgress(currentProject), [currentProject]);
+
   const alertCounts = useMemo(() => countAlerts(currentProject), [currentProject]);
 
   const tabs = useMemo(() => [
@@ -81,6 +84,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
     { key: "recap-av", label: "Récap Av.", icon: "chart" },
     { key: "avancement", label: "Avancement", icon: "chart" },
     { key: "gantt", label: "Planning", icon: "calendar" },
+    { key: "planning-logements", label: "Cibles Log.", icon: "target" },
     { key: "photos", label: "Photos", icon: "camera" },
     { key: "export", label: "Export", icon: "download" },
     { key: "dashboard", label: "Tableau de bord", icon: "chart" },
@@ -124,7 +128,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           </p>
         </div>
         <div className="header-progress">
-          <ProgressBar value={computeProjectProgress(currentProject)} />
+          <ProgressBar value={globalProgress} />
         </div>
         <button
           className="alert-bell-btn"
@@ -166,6 +170,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           {activeTab === "recap-av" && <RecapAvancementTab project={currentProject} />}
           {activeTab === "avancement" && <AvancementTab project={currentProject} />}
           {activeTab === "gantt" && <GanttTab project={currentProject} />}
+          {activeTab === "planning-logements" && <PlanningTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "photos" && <PhotosTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "export" && <ExportTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         </Suspense>

@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { generateId, saveDB, migrateProject, getLogementNums } from "../lib/db";
 import { DEFAULT_LOTS, DEFAULT_LOTS_INT, DEFAULT_LOTS_EXT } from "../lib/constants";
-import { computeProjectProgress, computeDetailedProgress } from "../lib/computations";
+import { computeProjectProgress, computeDetailedProgress, getLogementCounts } from "../lib/computations";
 import { formatMontant } from "../lib/format";
 import * as dataLayer from "../lib/dataLayer";
 import initialData from "../initialData.json";
@@ -35,7 +35,9 @@ function ProjectKpis({ project }) {
   );
 
   const nbBat = project.batiments.length;
-  const nbLog = project.batiments.reduce((s, b) => s + getLogementNums(b).length, 0);
+  const logCounts = getLogementCounts(project);
+  const nbLog = logCounts.total;
+  const nbLogExc = logCounts.exceptions;
 
   // Count alerts and NOK
   const trackStats = useMemo(() => {
@@ -83,7 +85,7 @@ function ProjectKpis({ project }) {
       </div>
       <div className="project-kpis-stats">
         <span><Icon name="building" size={12} /> {nbBat} b&acirc;t.</span>
-        <span><Icon name="home" size={12} /> {nbLog} log.</span>
+        <span><Icon name="home" size={12} /> {nbLog} log.{nbLogExc > 0 && ` (${nbLogExc} exc.)`}</span>
         {trackStats.alerts > 0 && (
           <span className="kpi-alert-badge">! {trackStats.alerts}</span>
         )}

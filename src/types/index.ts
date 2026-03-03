@@ -1,5 +1,11 @@
 // ─── Core Domain Types ──────────────────────────────────────────────────────
 
+export interface PlanningLogementEntry {
+  semaine: number;
+  dateDebut: string;
+  cible: number;
+}
+
 export interface Batiment {
   id: string;
   name: string;
@@ -42,6 +48,9 @@ export interface TrackingData {
   batiments: TrackingMap;
 }
 
+/** Map of entityId -> true for logements excluded from progress tracking */
+export type ExceptionsMap = Record<string, boolean>;
+
 export interface Project {
   id: string;
   name: string;
@@ -64,6 +73,9 @@ export interface Project {
   lotsInt: LotDecomp[];
   lotsExt: LotDecomp[];
   tracking: TrackingData;
+  /** Logements marked as exceptions (excluded from progress calculations) */
+  exceptions?: ExceptionsMap;
+  planningLogements?: PlanningLogementEntry[];
 }
 
 export interface DB {

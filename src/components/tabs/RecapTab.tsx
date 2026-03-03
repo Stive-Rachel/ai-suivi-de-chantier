@@ -23,10 +23,12 @@ export default function RecapTab({ project }) {
     const totalExtGlobal = (project.lotsExt || []).reduce((s, l) => s + (l.montant || 0), 0);
     const totalIntGlobal = (project.lotsInt || []).reduce((s, l) => s + (l.montant || 0), 0);
 
+    const exceptions = project.exceptions || {};
     const logEntities = [];
     for (const bat of project.batiments) {
       for (const num of getLogementNums(bat)) {
-        logEntities.push(`${bat.id}_log_${num}`);
+        const eId = `${bat.id}_log_${num}`;
+        if (!exceptions[eId]) logEntities.push(eId);
       }
     }
     const batEntities = project.batiments.map((b) => b.id);
@@ -37,7 +39,9 @@ export default function RecapTab({ project }) {
       batId: bat.id,
       batName: bat.name,
       extEntities: [bat.id],
-      intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
+      intEntities: getLogementNums(bat)
+        .map((num) => `${bat.id}_log_${num}`)
+        .filter((eId) => !exceptions[eId]),
     }));
 
     for (const lot of lots) {

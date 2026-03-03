@@ -141,6 +141,38 @@ export default function LotsTab({ project, updateProject, supaSync }) {
     });
   };
 
+  const renameDecompStep = (lotIndex, type, subLotIndex, stepIndex, newName) => {
+    if (!newName.trim()) return;
+    const arrField = type === "ext" ? "lotsExt" : "lotsInt";
+    const lot = lots[lotIndex];
+    updateProjectAndSyncDecomp((p) => {
+      const arr = [...p[arrField]];
+      const matching = arr.filter((l) => l.numero === lot.numero);
+      const target = matching[subLotIndex];
+      if (target) {
+        const realIdx = arr.indexOf(target);
+        const oldName = target.decompositions[stepIndex];
+        const newDecomps = [...target.decompositions];
+        newDecomps[stepIndex] = newName.trim();
+        arr[realIdx] = { ...target, decompositions: newDecomps };
+        // Also update tracking keys if the name changed
+        if (oldName !== newName.trim()) {
+          const trackType = type === "ext" ? "batiments" : "logements";
+          const oldKey = `${target.trackPrefix || target.numero}-${oldName}`;
+          const newKey = `${target.trackPrefix || target.numero}-${newName.trim()}`;
+          const tracking = { ...p.tracking };
+          if (tracking[trackType]?.[oldKey]) {
+            tracking[trackType] = { ...tracking[trackType] };
+            tracking[trackType][newKey] = tracking[trackType][oldKey];
+            delete tracking[trackType][oldKey];
+            return { ...p, [arrField]: arr, tracking };
+          }
+        }
+      }
+      return { ...p, [arrField]: arr };
+    });
+  };
+
   return (
     <div className="setup-content-wide" style={{ animation: "slideInUp 0.4s ease both" }}>
       <div className="config-section">
@@ -287,7 +319,13 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                             <td style={{ fontWeight: 600 }}>
                               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
                                 <span style={{ fontSize: 10, color: "var(--text-tertiary)", transition: "transform 0.2s", transform: expandedDecomp === si ? "rotate(90deg)" : "rotate(0deg)" }}>&#9654;</span>
-                                {subLot.nomDecomp || subLot.nom}
+                                <input
+                                  className="inline-edit"
+                                  style={{ fontWeight: 600, fontSize: 13 }}
+                                  value={subLot.nomDecomp || subLot.nom}
+                                  onClick={(e) => e.stopPropagation()}
+                                  onChange={(e) => updateDecompField(decompModal.lotIndex, decompModal.type, si, "nomDecomp", e.target.value)}
+                                />
                               </span>
                             </td>
                             <td className="cell-right cell-mono" onClick={(e) => e.stopPropagation()}>
@@ -318,7 +356,12 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                                 <div style={{ display: "flex", flexDirection: "column", gap: 3, paddingTop: 8 }}>
                                   {subLot.decompositions.map((d, di) => (
                                     <div key={di} className="decomp-item" style={{ fontSize: 12 }}>
-                                      <span>{d}</span>
+                                      <input
+                                        className="inline-edit"
+                                        style={{ flex: 1, fontSize: 12, padding: "2px 6px" }}
+                                        value={d}
+                                        onChange={(e) => renameDecompStep(decompModal.lotIndex, decompModal.type, si, di, e.target.value)}
+                                      />
                                       <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeDecomposition(decompModal.lotIndex, decompModal.type, si, di)}>
                                         <Icon name="trash" size={11} />
                                       </button>

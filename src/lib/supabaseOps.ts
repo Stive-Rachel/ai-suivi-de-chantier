@@ -20,6 +20,7 @@ export function projectToRow(project, userId) {
     date_debut_ext: project.dateDebutExt || "",
     semaines_exclues: project.semainesExclues || 0,
     semaines_travaillees: project.semainesTravaillees || 0,
+    exceptions: project.exceptions || {},
     user_id: userId,
   };
 }
@@ -42,6 +43,7 @@ export function rowToProject(row, batiments, lots, lotsDecomp, tracking) {
     dateDebutExt: row.date_debut_ext || "",
     semainesExclues: row.semaines_exclues || 0,
     semainesTravaillees: row.semaines_travaillees || 0,
+    exceptions: row.exceptions || {},
     batiments: batiments.map(rowToBatiment),
     lots: lots.map(rowToLot),
     lotsInt: lotsDecomp.filter((d) => d.type === "int").map(rowToLotDecomp),

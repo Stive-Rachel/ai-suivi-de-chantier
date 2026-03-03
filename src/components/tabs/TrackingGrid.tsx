@@ -35,6 +35,8 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
   });
   const { colWidths, getResizeProps } = useColumnResize({});
 
+  const exceptions = project.exceptions || {};
+
   const toggleCol = (key) => {
     setVisibleCols((prev) => {
       const next = { ...prev, [key]: !prev[key] };
@@ -53,6 +55,18 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
     });
   };
 
+  const toggleException = (entityId) => {
+    updateProject((p) => {
+      const exc = { ...(p.exceptions || {}) };
+      if (exc[entityId]) {
+        delete exc[entityId];
+      } else {
+        exc[entityId] = true;
+      }
+      return { ...p, exceptions: exc };
+    });
+  };
+
   const entities = useMemo(() => {
     if (isLogements) {
       const result = [];
@@ -66,6 +80,17 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       return project.batiments.map((b) => ({ id: b.id, label: b.name, group: null }));
     }
   }, [project.batiments, isLogements]);
+
+  // Active entities (non-exception) for progress calculations
+  const activeEntities = useMemo(() => {
+    if (!isLogements) return entities;
+    return entities.filter((e) => !exceptions[e.id]);
+  }, [entities, exceptions, isLogements]);
+
+  const excCount = useMemo(() => {
+    if (!isLogements) return 0;
+    return entities.filter((e) => exceptions[e.id]).length;
+  }, [entities, exceptions, isLogements]);
 
   const rows = useMemo(() => {
     const result = [];
@@ -86,7 +111,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
   const getValue = (rowKey, entityId) => tracking[rowKey]?.[entityId]?.status || "";
   const getPonderation = (rowKey) => tracking[rowKey]?._ponderation || 1;
 
-  // Calcul avancement par décomposition
+  // Calcul avancement par décomposition (only active entities count)
   const rowStats = useMemo(() => {
     const stats = {};
     const allLots = project.lots || [];
@@ -96,15 +121,15 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       for (const decomp of lot.decompositions) {
         const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
         let done = 0;
-        for (const e of entities) {
+        for (const e of activeEntities) {
           if (tracking[key]?.[e.id]?.status === "X") done++;
         }
-        const av = entities.length > 0 ? (done / entities.length) * 100 : 0;
-        stats[key] = { done, total: entities.length, av, avParLot: pctDuLot * av, pctDuLot };
+        const av = activeEntities.length > 0 ? (done / activeEntities.length) * 100 : 0;
+        stats[key] = { done, total: activeEntities.length, av, avParLot: pctDuLot * av, pctDuLot };
       }
     }
     return stats;
-  }, [lots, entities, tracking, project.lots]);
+  }, [lots, activeEntities, tracking, project.lots]);
 
   const setValue = (rowKey, entityId, status) => {
     updateProject((p) => {
@@ -238,6 +263,11 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
         <h3 style={{ fontSize: 15, fontWeight: 600 }}>
           {isLogements ? "Suivi Intérieur — Logements" : "Suivi Extérieur — Bâtiments"}
         </h3>
+        {isLogements && excCount > 0 && (
+          <span className="exception-summary-badge">
+            {activeEntities.length}/{entities.length} actifs ({excCount} exc.)
+          </span>
+        )}
         <div className="status-legend">
           {Object.entries(STATUS_BADGE_STYLES).map(([k, s]) => (
             <span key={k} className="status-badge" style={s}>
@@ -329,11 +359,13 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                 <th style={{ width: 40, textAlign: "center", fontSize: 10 }}>N</th>
               )}
               {entities.map((e) => {
+                const isExc = isLogements && exceptions[e.id];
                 const done = getColumnDoneCount(e.id);
                 const allDone = done === rows.length && rows.length > 0;
                 return (
                   <th
                     key={e.id}
+                    className={isExc ? "col-exception" : ""}
                     style={{
                       textAlign: "center",
                       width: colWidths[e.id] || undefined,
@@ -348,9 +380,36 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                         writingMode: entities.length > 10 ? "vertical-lr" : undefined,
                         transform: entities.length > 10 ? "rotate(180deg)" : undefined,
                         whiteSpace: "nowrap",
+                        opacity: isExc ? 0.5 : 1,
                       }}>
                         {e.label}
                       </span>
+                      {isLogements && (
+                        <button
+                          className={`exc-toggle-btn ${isExc ? "exc-active" : ""}`}
+                          onClick={(ev) => {
+                            ev.stopPropagation();
+                            toggleException(e.id);
+                          }}
+                          title={isExc ? "Réintégrer ce logement" : "Marquer comme exception (exclu du calcul)"}
+                          style={{
+                            width: 26, height: 14, borderRadius: 7,
+                            border: `1px solid ${isExc ? "var(--warning)" : "var(--border-default)"}`,
+                            background: isExc ? "var(--warning)" : "var(--bg-elevated)",
+                            color: isExc ? "#fff" : "var(--text-tertiary)",
+                            cursor: "pointer", display: "inline-flex", alignItems: "center",
+                            justifyContent: isExc ? "flex-end" : "flex-start",
+                            fontSize: 8, fontWeight: 600, padding: "0 2px", lineHeight: 1,
+                            flexShrink: 0, transition: "all 0.2s ease",
+                          }}
+                        >
+                          <span style={{
+                            width: 10, height: 10, borderRadius: "50%",
+                            background: isExc ? "#fff" : "var(--text-tertiary)",
+                            transition: "all 0.2s ease",
+                          }} />
+                        </button>
+                      )}
                       <button
                         className="col-toggle-btn"
                         onClick={() => toggleColumn(e.id)}
@@ -363,6 +422,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                           cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
                           fontSize: 11, fontWeight: 700, padding: 0, lineHeight: 1,
                           flexShrink: 0,
+                          opacity: isExc ? 0.4 : 1,
                         }}
                       >
                         {allDone ? "✓" : ""}
@@ -414,13 +474,14 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                 )}
                 {(() => {
                   const rs = rowStats[row.key] || { done: 0, total: 0, av: 0, avParLot: 0 };
+                  const excLabel = excCount > 0 ? ` (${excCount} exc.)` : "";
                   return (
                     <>
                       {visibleCols.av && (
                         <td
                           className="cell-mono"
                           style={{ textAlign: "center", fontSize: 11, color: rs.av >= 100 ? "var(--success)" : rs.av > 0 ? "var(--warning)" : "var(--text-tertiary)" }}
-                          data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}\n= ${rs.av.toFixed(2)}%`}
+                          data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}${excLabel}\n= ${rs.av.toFixed(2)}%`}
                         >
                           {rs.av.toFixed(2)}%
                         </td>
@@ -445,18 +506,22 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                     </>
                   );
                 })()}
-                {entities.map((e) => (
-                  <td
-                    key={e.id}
-                    style={{
-                      textAlign: "center",
-                      padding: 2,
-                      width: colWidths[e.id] || undefined,
-                    }}
-                  >
-                    <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
-                  </td>
-                ))}
+                {entities.map((e) => {
+                  const isExc = isLogements && exceptions[e.id];
+                  return (
+                    <td
+                      key={e.id}
+                      className={isExc ? "cell-exception" : ""}
+                      style={{
+                        textAlign: "center",
+                        padding: 2,
+                        width: colWidths[e.id] || undefined,
+                      }}
+                    >
+                      <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
+                    </td>
+                  );
+                })}
               </tr>
             ))}
           </tbody>
@@ -492,19 +557,23 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                   </>
                 );
               })()}
-              {entities.map((e) => (
-                <td key={e.id} style={{ textAlign: "center", fontSize: 10, width: colWidths[e.id] || undefined }}>
-                  {(() => {
-                    let done = 0, total = 0;
-                    for (const r of rows) {
-                      const p = getPonderation(r.key);
-                      total += p;
-                      if (getValue(r.key, e.id) === "X") done += p;
-                    }
-                    return total > 0 ? ((done / total) * 100).toFixed(2) + "%" : "—";
-                  })()}
-                </td>
-              ))}
+              {entities.map((e) => {
+                const isExc = isLogements && exceptions[e.id];
+                return (
+                  <td key={e.id} className={isExc ? "cell-exception" : ""} style={{ textAlign: "center", fontSize: 10, width: colWidths[e.id] || undefined }}>
+                    {(() => {
+                      if (isExc) return <span className="exc-label-footer">exc.</span>;
+                      let done = 0, total = 0;
+                      for (const r of rows) {
+                        const p = getPonderation(r.key);
+                        total += p;
+                        if (getValue(r.key, e.id) === "X") done += p;
+                      }
+                      return total > 0 ? ((done / total) * 100).toFixed(2) + "%" : "—";
+                    })()}
+                  </td>
+                );
+              })}
             </tr>
           </tfoot>
         </table>

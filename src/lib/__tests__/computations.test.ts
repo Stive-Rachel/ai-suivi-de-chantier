@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { computeProjectProgress, computeDetailedProgress, calcEntityProgress } from '../computations';
+import { computeProjectProgress, computeDetailedProgress, calcEntityProgress, countExceptions, getLogementCounts } from '../computations';
 import type { Project, LotDecomp } from '../../types';
 
 function makeProject(overrides: Partial<Project> = {}): Project {
@@ -174,5 +174,151 @@ describe('calcEntityProgress', () => {
     const progress = calcEntityProgress(lots, "logements", ["e1"], tracking as any);
     // 1 done out of 2 decomps = 50%
     expect(progress).toBe(50);
+  });
+});
+
+describe('exceptions', () => {
+  it('excludes exception logements from INT progress', () => {
+    // 2 logements: 101 and 102. Mark 102 as exception.
+    // Only log 101 is done for all decomps -> should be 100% INT
+    const project = makeProject({
+      exceptions: { "bat_1_log_102": true },
+      tracking: {
+        logements: {
+          "1-Fondations": {
+            "bat_1_log_101": { status: "X" },
+            // bat_1_log_102 not done, but it's excluded
+          },
+          "1-Élévation": {
+            "bat_1_log_101": { status: "X" },
+          },
+        },
+        batiments: {
+          "1-Fondations": {
+            "bat_1": { status: "X" },
+          },
+        },
+      },
+    });
+
+    const { lotProgressInt, batimentProgress } = computeDetailedProgress(project);
+    // Only 1 active logement (101), all decomps done -> 100%
+    expect(lotProgressInt[0].progress).toBe(100);
+    // Batiment INT should be 100%
+    expect(batimentProgress[0].int).toBe(100);
+    // EXT should also be 100% (not affected by logement exceptions)
+    expect(batimentProgress[0].ext).toBe(100);
+  });
+
+  it('project reaches 100% when all non-exception logements are done', () => {
+    const project = makeProject({
+      exceptions: { "bat_1_log_102": true },
+      tracking: {
+        logements: {
+          "1-Fondations": {
+            "bat_1_log_101": { status: "X" },
+          },
+          "1-Élévation": {
+            "bat_1_log_101": { status: "X" },
+          },
+        },
+        batiments: {
+          "1-Fondations": {
+            "bat_1": { status: "X" },
+          },
+        },
+      },
+    });
+
+    const progress = computeProjectProgress(project);
+    expect(progress).toBe(100);
+  });
+
+  it('calculates partial progress correctly with exceptions', () => {
+    const project = makeProject({
+      exceptions: { "bat_1_log_102": true },
+      tracking: {
+        logements: {
+          "1-Fondations": {
+            "bat_1_log_101": { status: "X" },
+          },
+          "1-Élévation": {
+            // log 101 not done for this decomp
+          },
+        },
+        batiments: {},
+      },
+    });
+
+    const { lotProgressInt } = computeDetailedProgress(project);
+    // 1 active logement (101), 1/2 decomps done = 50%
+    expect(lotProgressInt[0].progress).toBe(50);
+  });
+
+  it('empty exceptions map has no effect', () => {
+    const project = makeProject({
+      exceptions: {},
+      tracking: {
+        logements: {
+          "1-Fondations": {
+            "bat_1_log_101": { status: "X" },
+            "bat_1_log_102": { status: "" },
+          },
+          "1-Élévation": {},
+        },
+        batiments: {},
+      },
+    });
+
+    const projectWithout = makeProject({
+      tracking: {
+        logements: {
+          "1-Fondations": {
+            "bat_1_log_101": { status: "X" },
+            "bat_1_log_102": { status: "" },
+          },
+          "1-Élévation": {},
+        },
+        batiments: {},
+      },
+    });
+
+    expect(computeProjectProgress(project)).toBe(computeProjectProgress(projectWithout));
+  });
+
+  it('countExceptions counts total exceptions', () => {
+    const project = makeProject({
+      exceptions: {
+        "bat_1_log_101": true,
+        "bat_1_log_102": true,
+      },
+    });
+    expect(countExceptions(project)).toBe(2);
+  });
+
+  it('countExceptions counts by batiment', () => {
+    const project = makeProject({
+      batiments: [
+        { id: "bat_1", name: "Bât 1", nbLogements: 2, logements: [101, 102] },
+        { id: "bat_2", name: "Bât 2", nbLogements: 2, logements: [201, 202] },
+      ],
+      exceptions: {
+        "bat_1_log_101": true,
+        "bat_2_log_201": true,
+        "bat_2_log_202": true,
+      },
+    });
+    expect(countExceptions(project, "bat_1")).toBe(1);
+    expect(countExceptions(project, "bat_2")).toBe(2);
+  });
+
+  it('getLogementCounts returns correct totals', () => {
+    const project = makeProject({
+      exceptions: { "bat_1_log_102": true },
+    });
+    const counts = getLogementCounts(project);
+    expect(counts.total).toBe(2);
+    expect(counts.active).toBe(1);
+    expect(counts.exceptions).toBe(1);
   });
 });

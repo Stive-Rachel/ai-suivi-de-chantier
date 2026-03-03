@@ -1,4 +1,4 @@
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import Icon from "../ui/Icon";
 
 /**
@@ -8,6 +8,11 @@ import Icon from "../ui/Icon";
  */
 export default function PhotosTab({ project, updateProject, supaSync }) {
   const [photos, setPhotos] = useState(project.photos || []);
+
+  // Sync local photos state when project.photos changes externally
+  useEffect(() => {
+    setPhotos(project.photos || []);
+  }, [project.photos]);
   const [filterBat, setFilterBat] = useState("all");
   const [filterLot, setFilterLot] = useState("all");
   const [lightbox, setLightbox] = useState(null);

@@ -1,5 +1,5 @@
 import { getLogementNums } from "./db";
-import type { Project, LotDecomp, LotProgress, DetailedProgress, TrackingData } from "../types";
+import type { Project, LotDecomp, LotProgress, DetailedProgress, TrackingData, ExceptionsMap } from "../types";
 
 export function computeProjectProgress(project: Project): number {
   const { lotProgressInt, lotProgressExt } = computeDetailedProgress(project);
@@ -16,10 +16,14 @@ export function computeProjectProgress(project: Project): number {
 }
 
 export function computeDetailedProgress(project: Project): DetailedProgress {
+  const exceptions = project.exceptions || {};
+
   const batEntitiesGrouped = project.batiments.map((bat) => ({
     batId: bat.id,
     extEntities: [bat.id],
-    intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
+    intEntities: getLogementNums(bat)
+      .map((num) => `${bat.id}_log_${num}`)
+      .filter((eId) => !exceptions[eId]),
   }));
 
   const calcLotProgress = (lots: LotDecomp[], trackType: "logements" | "batiments"): LotProgress[] => {
@@ -72,7 +76,9 @@ export function computeDetailedProgress(project: Project): DetailedProgress {
   const totalMontantAll = totalMontantInt + totalMontantExt;
 
   const batimentProgress = project.batiments.map((bat) => {
-    const logEntities = getLogementNums(bat).map((num) => `${bat.id}_log_${num}`);
+    const logEntities = getLogementNums(bat)
+      .map((num) => `${bat.id}_log_${num}`)
+      .filter((eId) => !exceptions[eId]);
     const intProgress = calcEntityProgress(project.lotsInt, "logements", logEntities, project.tracking);
     const extProgress = calcEntityProgress(project.lotsExt, "batiments", [bat.id], project.tracking);
 
@@ -114,4 +120,27 @@ export function calcEntityProgress(lots: LotDecomp[], trackType: string, entityI
   }
 
   return totalPond > 0 ? Math.min(weightedProgress / totalPond, 100) : 0;
+}
+
+/**
+ * Count the number of exceptions (excluded logements) for a project,
+ * optionally filtered by batiment ID.
+ */
+export function countExceptions(project: Project, batId?: string): number {
+  const exceptions = project.exceptions || {};
+  if (!batId) {
+    return Object.values(exceptions).filter(Boolean).length;
+  }
+  return Object.entries(exceptions)
+    .filter(([eId, v]) => v && eId.startsWith(`${batId}_log_`))
+    .length;
+}
+
+/**
+ * Get the total number of logements for a project, and the number of active (non-exception) ones.
+ */
+export function getLogementCounts(project: Project): { total: number; active: number; exceptions: number } {
+  const total = project.batiments.reduce((s, b) => s + getLogementNums(b).length, 0);
+  const exc = countExceptions(project);
+  return { total, active: total - exc, exceptions: exc };
 }

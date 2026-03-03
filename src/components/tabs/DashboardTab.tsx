@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { computeProjectProgress, computeDetailedProgress } from "../../lib/computations";
+import { computeProjectProgress, computeDetailedProgress, getLogementCounts } from "../../lib/computations";
 import { getLogementNums } from "../../lib/db";
 import DonutChart, { MultiDonut } from "../ui/DonutChart";
 import { HorizontalBarChart, VerticalBarChart } from "../ui/BarChart";
@@ -14,7 +14,10 @@ export default function DashboardTab({ project }) {
   const avgProgress = computeProjectProgress(project);
 
   const nbBat = project.batiments.length;
-  const nbLog = project.batiments.reduce((s, b) => s + getLogementNums(b).length, 0);
+  const logCounts = getLogementCounts(project);
+  const nbLog = logCounts.total;
+  const nbLogActive = logCounts.active;
+  const nbLogExc = logCounts.exceptions;
 
   // Status distribution
   const statusStats = useMemo(() => {
@@ -106,8 +109,13 @@ export default function DashboardTab({ project }) {
         <div className="dtab-kpi">
           <Icon name="home" size={16} />
           <div>
-            <span className="dtab-kpi-value">{nbLog}</span>
-            <span className="dtab-kpi-label">{nbLog > 1 ? "Logements" : "Logement"}</span>
+            <span className="dtab-kpi-value">
+              {nbLogExc > 0 ? `${nbLogActive}/${nbLog}` : nbLog}
+            </span>
+            <span className="dtab-kpi-label">
+              {nbLog > 1 ? "Logements" : "Logement"}
+              {nbLogExc > 0 && ` (${nbLogExc} exc.)`}
+            </span>
           </div>
         </div>
       </div>

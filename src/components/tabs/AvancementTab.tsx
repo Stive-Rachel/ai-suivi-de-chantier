@@ -19,9 +19,12 @@ export default function AvancementTab({ project }) {
     const lots = project.lots || [];
     const trackInt = project.tracking?.logements || {};
     const trackExt = project.tracking?.batiments || {};
+    const exceptions = project.exceptions || {};
     const batGroups = project.batiments.map((bat) => ({
       extEntities: [bat.id],
-      intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
+      intEntities: getLogementNums(bat)
+        .map((num) => `${bat.id}_log_${num}`)
+        .filter((eId) => !exceptions[eId]),
     }));
 
     return lots.map((lot) => {

@@ -9,10 +9,13 @@ export default function RecapAvancementTab({ project }) {
     const lots = project.lots || [];
     const trackInt = project.tracking?.logements || {};
     const trackExt = project.tracking?.batiments || {};
+    const exceptions = project.exceptions || {};
 
     const batEntitiesGrouped = project.batiments.map((bat) => ({
       extEntities: [bat.id],
-      intEntities: getLogementNums(bat).map((num) => `${bat.id}_log_${num}`),
+      intEntities: getLogementNums(bat)
+        .map((num) => `${bat.id}_log_${num}`)
+        .filter((eId) => !exceptions[eId]),
     }));
 
     const totalMontantGlobal = lots.reduce((s, l) => s + (l.montantMarche || 0), 0);

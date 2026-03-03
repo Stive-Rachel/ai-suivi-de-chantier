@@ -158,6 +158,7 @@ export async function updateProjectFields(projectId, fields) {
     dateDebutExt: "date_debut_ext",
     semainesExclues: "semaines_exclues",
     semainesTravaillees: "semaines_travaillees",
+    exceptions: "exceptions",
   };
 
   for (const [appKey, dbKey] of Object.entries(fieldMap)) {
