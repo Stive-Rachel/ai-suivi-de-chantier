@@ -936,9 +936,7 @@ body {
   color: var(--text-primary);
   letter-spacing: -0.5px;
   line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  line-height: 1.2;
 }
 
 .kpi-label {
@@ -1428,10 +1426,8 @@ body {
   font-size: 12px;
   color: var(--text-secondary);
   min-width: 170px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   font-weight: 500;
+  word-break: break-word;
 }
 
 .batiment-progress-grid {
@@ -1707,11 +1703,8 @@ body {
   font-weight: 500;
   color: var(--text-secondary);
   min-width: 160px;
-  max-width: 160px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
   flex-shrink: 0;
+  word-break: break-word;
 }
 
 .hbar-track {
@@ -2252,10 +2245,7 @@ body {
 
 .gantt-legend-label {
   font-weight: 500;
-  max-width: 200px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .gantt-legend-value {
@@ -2354,9 +2344,7 @@ body {
   font-size: 11px;
   font-weight: 600;
   color: var(--text-primary);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 .photo-actions {
@@ -2686,9 +2674,7 @@ body {
   font-size: 11px;
   color: var(--text-secondary);
   margin-top: 2px;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  word-break: break-word;
 }
 
 @media (max-width: 768px) {
