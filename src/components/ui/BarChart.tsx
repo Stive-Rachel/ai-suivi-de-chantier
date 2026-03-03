@@ -22,7 +22,7 @@ export function HorizontalBarChart({ data = [], maxValue = 100, height = 20, sho
             />
           </div>
           {showValue && (
-            <span className="hbar-value">{item.value.toFixed(1)}%</span>
+            <span className="hbar-value">{item.value.toFixed(2)}%</span>
           )}
         </div>
       ))}
@@ -71,7 +71,7 @@ export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 200 })
                     key={bi}
                     className="vbar-bar-wrapper"
                     style={{ width: barWidth }}
-                    title={`${bar.label}: ${bar.value.toFixed(1)}%`}
+                    title={`${bar.label}: ${bar.value.toFixed(2)}%`}
                   >
                     <div
                       className="vbar-bar"

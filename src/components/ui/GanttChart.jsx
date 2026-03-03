@@ -350,7 +350,7 @@ export default function GanttChart({
                     fontFamily="var(--font-mono)"
                     textAnchor="middle"
                   >
-                    {progress.toFixed(0)}%
+                    {progress.toFixed(2)}%
                   </text>
                 )}
               </g>
@@ -414,7 +414,7 @@ export default function GanttChart({
           <div className="gantt-tooltip-row">
             <span>Avancement :</span>
             <span style={{ fontWeight: 700, color: "var(--accent)" }}>
-              {(tooltip.task.progress || 0).toFixed(1)}%
+              {(tooltip.task.progress || 0).toFixed(2)}%
             </span>
           </div>
         </div>

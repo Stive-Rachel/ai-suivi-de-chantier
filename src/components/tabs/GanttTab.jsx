@@ -191,7 +191,7 @@ export default function GanttTab({ project }) {
                   style={{ backgroundColor: t.color }}
                 />
                 <span className="gantt-legend-label">{t.label}</span>
-                <span className="gantt-legend-value">{t.progress.toFixed(1)}%</span>
+                <span className="gantt-legend-value">{t.progress.toFixed(2)}%</span>
               </div>
             ))}
           </div>

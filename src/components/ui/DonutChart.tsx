@@ -46,7 +46,7 @@ export default function DonutChart({
         />
       </svg>
       <div className="donut-chart-center">
-        <span className="donut-chart-value">{value.toFixed(1)}%</span>
+        <span className="donut-chart-value">{value.toFixed(2)}%</span>
         {label && <span className="donut-chart-label">{label}</span>}
         {sub && <span className="donut-chart-sub">{sub}</span>}
       </div>

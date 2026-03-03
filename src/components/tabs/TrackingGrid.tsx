@@ -1,4 +1,4 @@
-import { useState, useMemo, Fragment } from "react";
+import { useState, useMemo } from "react";
 import { getLogementNums } from "../../lib/db";
 import { STATUS_BADGE_STYLES } from "../../lib/constants";
 import { useColumnResize } from "../../lib/useColumnResize";
@@ -17,7 +17,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
     return (a.nom || "").localeCompare(b.nom || "");
   }), [lotsRaw]);
 
-  const [filters, setFilters] = useState({ lotNumero: "", statusFilter: "all", searchText: "" });
+  const [filters, setFilters] = useState({ statusFilter: "all", searchText: "" });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
   const { colWidths, getResizeProps } = useColumnResize({});
 
@@ -96,6 +96,31 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
     supaSync?.setTrackingCell(type, rowKey, entityId, status);
   };
 
+  const toggleColumn = (entityId) => {
+    const allDone = rows.every((r) => getValue(r.key, entityId) === "X");
+    const newStatus = allDone ? "" : "X";
+    updateProject((p) => {
+      const t = { ...p.tracking };
+      if (!t[type]) t[type] = {};
+      for (const r of rows) {
+        if (!t[type][r.key]) t[type][r.key] = {};
+        t[type][r.key] = { ...t[type][r.key], [entityId]: { status: newStatus } };
+      }
+      return { ...p, tracking: t };
+    });
+    for (const r of rows) {
+      supaSync?.setTrackingCell(type, r.key, entityId, newStatus);
+    }
+  };
+
+  const getColumnDoneCount = (entityId) => {
+    let done = 0;
+    for (const r of rows) {
+      if (getValue(r.key, entityId) === "X") done++;
+    }
+    return done;
+  };
+
   const setPonderation = (rowKey, value) => {
     const v = parseInt(value) || 1;
     updateProject((p) => {
@@ -108,83 +133,62 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
     supaSync?.setTrackingMeta(type, rowKey, { ponderation: v });
   };
 
-  // Group rows by lot (using Map to preserve insertion order, avoiding JS object numeric key sorting)
-  const lotGroups = useMemo(() => {
-    const g = new Map();
-    rows.forEach((r) => {
-      if (!g.has(r.lotNumero)) g.set(r.lotNumero, { nom: r.lotNom, rows: [] });
-      g.get(r.lotNumero).rows.push(r);
-    });
-    return g;
-  }, [rows]);
-
-  // Filter
-  const filteredLotGroups = useMemo(() => {
-    const result = new Map();
-    for (const [lotNum, lotGroup] of lotGroups) {
-      if (filters.lotNumero && lotNum !== filters.lotNumero) continue;
-
-      const filteredRows = lotGroup.rows.filter((row) => {
-        if (filters.searchText) {
-          const search = filters.searchText.toLowerCase();
-          if (!row.decomposition.toLowerCase().includes(search)) return false;
-        }
-        if (filters.statusFilter !== "all") {
-          const statuses = entities.map((e) => getValue(row.key, e.id));
-          switch (filters.statusFilter) {
-            case "incomplete":
-              if (statuses.every((s) => s === "X")) return false;
-              break;
-            case "complete":
-              if (!statuses.every((s) => s === "X")) return false;
-              break;
-            case "alert":
-              if (!statuses.some((s) => s === "!")) return false;
-              break;
-            case "nok":
-              if (!statuses.some((s) => s === "NOK")) return false;
-              break;
-          }
-        }
-        return true;
-      });
-
-      if (filteredRows.length > 0) {
-        result.set(lotNum, { nom: lotGroup.nom, rows: filteredRows });
+  // Filter rows
+  const filteredRows = useMemo(() => {
+    return rows.filter((row) => {
+      if (filters.searchText) {
+        const search = filters.searchText.toLowerCase();
+        if (!row.decomposition.toLowerCase().includes(search)) return false;
       }
-    }
-    return result;
-  }, [lotGroups, filters, entities, tracking]);
-
-  // Sort within lot groups
-  const sortedLotGroups = useMemo(() => {
-    if (!sortConfig.key) return filteredLotGroups;
-    const result = new Map();
-    for (const [lotNum, lotGroup] of filteredLotGroups) {
-      const sorted = [...lotGroup.rows].sort((a, b) => {
-        let aVal, bVal;
-        if (sortConfig.key === "decomposition") {
-          aVal = a.decomposition;
-          bVal = b.decomposition;
-        } else if (sortConfig.key === "ponderation") {
-          aVal = getPonderation(a.key);
-          bVal = getPonderation(b.key);
-        } else {
-          aVal = getValue(a.key, sortConfig.key) || "";
-          bVal = getValue(b.key, sortConfig.key) || "";
+      if (filters.statusFilter !== "all") {
+        const statuses = entities.map((e) => getValue(row.key, e.id));
+        switch (filters.statusFilter) {
+          case "incomplete":
+            if (statuses.every((s) => s === "X")) return false;
+            break;
+          case "complete":
+            if (!statuses.every((s) => s === "X")) return false;
+            break;
+          case "alert":
+            if (!statuses.some((s) => s === "!")) return false;
+            break;
+          case "nok":
+            if (!statuses.some((s) => s === "NOK")) return false;
+            break;
         }
-        if (typeof aVal === "number" && typeof bVal === "number") {
-          return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
-        }
-        const cmp = String(aVal).localeCompare(String(bVal), "fr");
-        return sortConfig.direction === "asc" ? cmp : -cmp;
-      });
-      result.set(lotNum, { nom: lotGroup.nom, rows: sorted });
-    }
-    return result;
-  }, [filteredLotGroups, sortConfig, tracking]);
+      }
+      return true;
+    });
+  }, [rows, filters, entities, tracking]);
 
-  const visibleRowCount = [...sortedLotGroups.values()].reduce((s, g) => s + g.rows.length, 0);
+  // Sort rows: default A-Z by decomposition name, or by user-selected column
+  const sortedRows = useMemo(() => {
+    const sorted = [...filteredRows].sort((a, b) => {
+      if (!sortConfig.key) {
+        // Default: alphabetical A-Z by decomposition
+        return a.decomposition.localeCompare(b.decomposition, "fr");
+      }
+      let aVal, bVal;
+      if (sortConfig.key === "decomposition") {
+        aVal = a.decomposition;
+        bVal = b.decomposition;
+      } else if (sortConfig.key === "ponderation") {
+        aVal = getPonderation(a.key);
+        bVal = getPonderation(b.key);
+      } else {
+        aVal = getValue(a.key, sortConfig.key) || "";
+        bVal = getValue(b.key, sortConfig.key) || "";
+      }
+      if (typeof aVal === "number" && typeof bVal === "number") {
+        return sortConfig.direction === "asc" ? aVal - bVal : bVal - aVal;
+      }
+      const cmp = String(aVal).localeCompare(String(bVal), "fr");
+      return sortConfig.direction === "asc" ? cmp : -cmp;
+    });
+    return sorted;
+  }, [filteredRows, sortConfig, tracking]);
+
+  const visibleRowCount = sortedRows.length;
 
   if (project.batiments.length === 0) {
     return (
@@ -221,7 +225,6 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       </div>
 
       <FilterBar
-        lots={lots.map((l) => ({ numero: l.numero, nom: l.nom }))}
         filters={filters}
         onFilterChange={setFilters}
       />
@@ -232,7 +235,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
         </div>
       )}
 
-      <div style={{ overflowX: "auto", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
+      <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 220px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
         <table className="tracking-table" role="grid" aria-label="Grille de suivi">
           <thead>
             {isLogements && (
@@ -268,36 +271,47 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
               <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av.</th>
               <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av/lot</th>
               <th style={{ width: 35, textAlign: "center", fontSize: 10 }}>N</th>
-              {entities.map((e) => (
-                <SortableHeader
-                  key={e.id}
-                  sortKey={e.id}
-                  sortConfig={sortConfig}
-                  onSort={toggleSort}
-                  resizeProps={getResizeProps(e.id)}
-                  style={{
-                    textAlign: "center",
-                    width: colWidths[e.id] || undefined,
-                    minWidth: 42,
-                    fontSize: 10,
-                    writingMode: entities.length > 12 ? "vertical-lr" : undefined,
-                    transform: entities.length > 12 ? "rotate(180deg)" : undefined,
-                  }}
-                >
-                  {e.label}
-                </SortableHeader>
-              ))}
+              {entities.map((e) => {
+                const done = getColumnDoneCount(e.id);
+                const allDone = done === rows.length && rows.length > 0;
+                return (
+                  <th
+                    key={e.id}
+                    style={{
+                      textAlign: "center",
+                      width: colWidths[e.id] || undefined,
+                      minWidth: 42,
+                      fontSize: 10,
+                      writingMode: entities.length > 12 ? "vertical-lr" : undefined,
+                      transform: entities.length > 12 ? "rotate(180deg)" : undefined,
+                      padding: "4px 2px",
+                    }}
+                  >
+                    <div style={{ display: "flex", flexDirection: entities.length > 12 ? "row" : "column", alignItems: "center", gap: 3 }}>
+                      <span>{e.label}</span>
+                      <button
+                        className="col-toggle-btn"
+                        onClick={() => toggleColumn(e.id)}
+                        title={allDone ? "Décocher toute la colonne" : "Cocher toute la colonne"}
+                        style={{
+                          width: 18, height: 18, borderRadius: 3, border: "1.5px solid var(--border-default)",
+                          background: allDone ? "var(--success)" : "var(--bg-default)",
+                          color: allDone ? "#fff" : "var(--text-tertiary)",
+                          cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 11, fontWeight: 700, padding: 0, lineHeight: 1,
+                          transform: entities.length > 12 ? "rotate(180deg)" : undefined,
+                        }}
+                      >
+                        {allDone ? "✓" : ""}
+                      </button>
+                    </div>
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
-            {[...sortedLotGroups.entries()].map(([lotNum, lotGroup]) => (
-              <Fragment key={lotNum}>
-                <tr className="lot-separator">
-                  <td colSpan={6 + entities.length}>
-                    LOT {lotNum} — {lotGroup.nom}
-                  </td>
-                </tr>
-                {lotGroup.rows.map((row) => (
+            {sortedRows.map((row) => (
                   <tr key={row.key}>
                     <td className="sticky-col" style={{ maxWidth: colWidths._decomp || 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-tooltip={row.decomposition}>{row.decomposition}</td>
                     <td>
@@ -340,14 +354,14 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                             style={{ textAlign: "center", fontSize: 11, color: rs.av >= 100 ? "var(--success)" : rs.av > 0 ? "var(--warning)" : "var(--text-tertiary)" }}
                             data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}\n= ${rs.av.toFixed(2)}%`}
                           >
-                            {rs.av.toFixed(1)}%
+                            {rs.av.toFixed(2)}%
                           </td>
                           <td
                             className="cell-mono"
                             style={{ textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}
                             data-tooltip={`${(rs.pctDuLot * 100).toFixed(2)}% du lot × ${rs.av.toFixed(2)}%\n= ${rs.avParLot.toFixed(2)}%`}
                           >
-                            {rs.avParLot.toFixed(1)}%
+                            {rs.avParLot.toFixed(2)}%
                           </td>
                           <td
                             className="cell-mono"
@@ -371,8 +385,6 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                       </td>
                     ))}
                   </tr>
-                ))}
-              </Fragment>
             ))}
           </tbody>
           <tfoot>
@@ -393,8 +405,8 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                   : 0;
                 return (
                   <>
-                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAv.toFixed(1)}%</td>
-                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAvLot.toFixed(1)}%</td>
+                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAv.toFixed(2)}%</td>
+                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAvLot.toFixed(2)}%</td>
                     <td style={{ textAlign: "center", fontSize: 10 }}>{totalDone}</td>
                   </>
                 );
@@ -408,7 +420,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                       total += p;
                       if (getValue(r.key, e.id) === "X") done += p;
                     }
-                    return total > 0 ? ((done / total) * 100).toFixed(0) + "%" : "—";
+                    return total > 0 ? ((done / total) * 100).toFixed(2) + "%" : "—";
                   })()}
                 </td>
               ))}

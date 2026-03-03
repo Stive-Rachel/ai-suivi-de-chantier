@@ -11,7 +11,7 @@ export default memo(function ProgressBar({ value, max = 100, height = 6 }) {
           style={{ width: `${pct}%`, height }}
         />
       </div>
-      <span className="progress-label">{pct.toFixed(1)}%</span>
+      <span className="progress-label">{pct.toFixed(2)}%</span>
     </div>
   );
 })

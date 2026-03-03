@@ -575,21 +575,36 @@ body {
   font-size: 11px;
   text-transform: uppercase;
   letter-spacing: 0.6px;
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .tracking-table thead th.sticky-col {
   position: sticky;
   left: 0;
-  z-index: 3;
+  z-index: 4;
   background: var(--bg-raised);
 }
 
 .tracking-table .group-header th {
+  position: sticky;
+  top: 0;
+  z-index: 3;
   text-align: center;
   background: var(--accent-bg);
   color: var(--accent);
   font-size: 10px;
   letter-spacing: 1px;
+}
+
+.tracking-table .group-header + tr th {
+  top: 30px;
+}
+
+.col-toggle-btn:hover {
+  border-color: var(--accent) !important;
+  background: var(--accent-bg) !important;
   padding: 8px 8px;
   border-bottom: 2px solid var(--border-strong);
   font-weight: 700;

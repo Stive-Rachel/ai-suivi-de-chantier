@@ -93,7 +93,7 @@ function ProjectKpis({ project }) {
       </div>
       {lowestLot && (
         <div className="project-kpi-lowest">
-          Retard : {lowestLot.shortLot || lowestLot.lot} ({lowestLot.progress.toFixed(1)}%)
+          Retard : {lowestLot.shortLot || lowestLot.lot} ({lowestLot.progress.toFixed(2)}%)
         </div>
       )}
     </div>
@@ -264,7 +264,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
             <KpiCard
               icon="chart"
               label="Avancement moyen"
-              value={`${globalKpis.avgProgress.toFixed(1)}%`}
+              value={`${globalKpis.avgProgress.toFixed(2)}%`}
               sub={`${globalKpis.totalDone} / ${globalKpis.totalCells} cellules`}
               color={globalKpis.avgProgress >= 50 ? "var(--success)" : "var(--warning)"}
             />

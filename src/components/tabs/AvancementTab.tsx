@@ -59,7 +59,7 @@ export default function AvancementTab({ project }) {
         progress += contribution;
 
         const label = decomp.nomDecomp || decomp.nom || decomp.type;
-        tooltipParts.push(`${label} (${decomp.type}): ${decompAv.toFixed(1)}% × ${(pctDuLot * 100).toFixed(1)}% = ${contribution.toFixed(2)}%`);
+        tooltipParts.push(`${label} (${decomp.type}): ${decompAv.toFixed(2)}% × ${(pctDuLot * 100).toFixed(2)}% = ${contribution.toFixed(2)}%`);
       }
 
       const tooltip = `Montant: ${formatMontant(lotMontantMarche)}\n${tooltipParts.join("\n")}\n= ${progress.toFixed(2)}%`;
@@ -82,7 +82,7 @@ export default function AvancementTab({ project }) {
             className="progress-card-total"
             data-tooltip={`Σ(montant_decomp / montant_total × av_decomp)\n= ${globalProgress.toFixed(2)}%`}
           >
-            {globalProgress.toFixed(1)}%
+            {globalProgress.toFixed(2)}%
           </span>
         </div>
         <div className="config-table-wrap">
@@ -133,13 +133,13 @@ export default function AvancementTab({ project }) {
                 <div
                   key={bp.name}
                   className={`batiment-progress-card ${isRetard ? "batiment-retard" : ""}`}
-                  data-tooltip={`INT: ${bp.int.toFixed(1)}%\nEXT: ${bp.ext.toFixed(1)}%\nTotal (pondéré montant): ${bp.total.toFixed(1)}%`}
+                  data-tooltip={`INT: ${bp.int.toFixed(2)}%\nEXT: ${bp.ext.toFixed(2)}%\nTotal (pondéré montant): ${bp.total.toFixed(2)}%`}
                 >
                   <h5>{bp.name}</h5>
                   <ProgressBar value={bp.total} />
                   <div className="batiment-progress-detail">
-                    <span className={bp.int < 20 ? "val-retard" : ""}>INT {bp.int.toFixed(1)}%</span>
-                    <span className={bp.ext < 20 ? "val-retard" : ""}>EXT {bp.ext.toFixed(1)}%</span>
+                    <span className={bp.int < 20 ? "val-retard" : ""}>INT {bp.int.toFixed(2)}%</span>
+                    <span className={bp.ext < 20 ? "val-retard" : ""}>EXT {bp.ext.toFixed(2)}%</span>
                   </div>
                 </div>
               );

@@ -78,21 +78,21 @@ export default function DashboardTab({ project }) {
         <div className="dtab-kpi">
           <Icon name="chart" size={16} />
           <div>
-            <span className="dtab-kpi-value">{avgProgress.toFixed(1)}%</span>
+            <span className="dtab-kpi-value">{avgProgress.toFixed(2)}%</span>
             <span className="dtab-kpi-label">Global</span>
           </div>
         </div>
         <div className="dtab-kpi">
           <Icon name="home" size={16} />
           <div>
-            <span className="dtab-kpi-value">{avgInt.toFixed(1)}%</span>
+            <span className="dtab-kpi-value">{avgInt.toFixed(2)}%</span>
             <span className="dtab-kpi-label">Intérieur</span>
           </div>
         </div>
         <div className="dtab-kpi">
           <Icon name="building" size={16} />
           <div>
-            <span className="dtab-kpi-value">{avgExt.toFixed(1)}%</span>
+            <span className="dtab-kpi-value">{avgExt.toFixed(2)}%</span>
             <span className="dtab-kpi-label">Extérieur</span>
           </div>
         </div>

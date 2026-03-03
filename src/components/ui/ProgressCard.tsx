@@ -17,7 +17,7 @@ export default memo(function ProgressCard({ title, items }) {
           >
             {compact ? "Aa" : "ABC"}
           </button>
-          <span className="progress-card-total">{total.toFixed(1)}%</span>
+          <span className="progress-card-total">{total.toFixed(2)}%</span>
         </div>
       </div>
       <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>

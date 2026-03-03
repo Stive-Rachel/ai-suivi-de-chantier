@@ -79,7 +79,7 @@ export async function generateProjectPDF(project) {
 
   // KPI boxes
   const kpis = [
-    { label: "Avancement global", value: `${progress.toFixed(1)}%` },
+    { label: "Avancement global", value: `${progress.toFixed(2)}%` },
     { label: "Montant total", value: formatMontant(project.montantTotal) },
     { label: "Batiments", value: `${(project.batiments || []).length}` },
     { label: "Duree (sem.)", value: `${project.dureeTotale || 0}` },
@@ -136,7 +136,7 @@ export async function generateProjectPDF(project) {
     doc.setFontSize(9);
     doc.setFont("helvetica", "normal");
     setColor(gray);
-    doc.text(`${avgProgress.toFixed(1)}%`, margin + contentW, y + 5, { align: "right" });
+    doc.text(`${avgProgress.toFixed(2)}%`, margin + contentW, y + 5, { align: "right" });
     y += 10;
 
     lotsProgress.forEach((lp) => {
@@ -152,7 +152,7 @@ export async function generateProjectPDF(project) {
       // Value
       doc.setFont("helvetica", "bold");
       setColor(lp.progress >= 80 ? success : lp.progress >= 40 ? warning : danger);
-      doc.text(`${lp.progress.toFixed(1)}%`, margin + contentW, y + 4, { align: "right" });
+      doc.text(`${lp.progress.toFixed(2)}%`, margin + contentW, y + 4, { align: "right" });
 
       // Bar track
       const barX = margin + 80;
@@ -206,13 +206,13 @@ export async function generateProjectPDF(project) {
 
     doc.setFont("helvetica", "bold");
     setColor(bp.int >= 80 ? success : bp.int >= 40 ? warning : danger);
-    doc.text(`${bp.int.toFixed(1)}%`, margin + 85, y + 4, { align: "center" });
+    doc.text(`${bp.int.toFixed(2)}%`, margin + 85, y + 4, { align: "center" });
 
     setColor(bp.ext >= 80 ? success : bp.ext >= 40 ? warning : danger);
-    doc.text(`${bp.ext.toFixed(1)}%`, margin + 115, y + 4, { align: "center" });
+    doc.text(`${bp.ext.toFixed(2)}%`, margin + 115, y + 4, { align: "center" });
 
     setColor(bp.total >= 80 ? success : bp.total >= 40 ? warning : danger);
-    doc.text(`${bp.total.toFixed(1)}%`, margin + 145, y + 4, { align: "center" });
+    doc.text(`${bp.total.toFixed(2)}%`, margin + 145, y + 4, { align: "center" });
 
     // separator
     drawColor([240, 237, 232]);
