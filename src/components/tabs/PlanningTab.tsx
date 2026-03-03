@@ -108,9 +108,15 @@ interface PlanningTabProps {
 export default function PlanningTab({ project, updateProject, supaSync }: PlanningTabProps) {
   const [editingCell, setEditingCell] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
+  const [extraWeeks, setExtraWeeks] = useState(0);
 
   const startDate = project.dateDebutInt || project.dateDebutChantier || "";
-  const weekCount = computeWeekCount(startDate);
+  const baseWeekCount = computeWeekCount(startDate);
+  const maxPlannedWeek = useMemo(() => {
+    const entries = project.planningLogements || [];
+    return entries.reduce((max, e) => Math.max(max, e.semaine), 0);
+  }, [project.planningLogements]);
+  const weekCount = Math.max(baseWeekCount, maxPlannedWeek) + extraWeeks;
   const totalLogements = getTotalLogements(project);
   const completedLogements = useMemo(() => countCompletedLogements(project), [project]);
 
@@ -174,14 +180,8 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
   );
 
   const addMoreWeeks = useCallback(() => {
-    // This is handled reactively through weekCount computation
-    // Just trigger a re-render by adding an empty entry for a future week
-    const nextWeek = weekCount + 1;
-    if (!startDate) return;
-    const monday = getMonday(new Date(startDate));
-    const weekStart = addWeeks(monday, nextWeek - 1);
-    updateCible(nextWeek, toISO(weekStart), 0);
-  }, [weekCount, startDate, updateCible]);
+    setExtraWeeks((prev) => prev + 4);
+  }, []);
 
   const handleStartEdit = (semaine: number, currentCible: number) => {
     setEditingCell(semaine);
