@@ -602,27 +602,37 @@ body {
   background: var(--bg-raised);
 }
 
+/* Group header row (BATIMENT 1, BATIMENT 2, ...) — must be OPAQUE */
 .tracking-table .group-header th {
   position: sticky;
   top: 0;
   z-index: 3;
   text-align: center;
-  background: var(--accent-bg);
+  background: #FBF3EE;
   color: var(--accent);
   font-size: 10px;
   letter-spacing: 1px;
   padding: 6px 8px;
-  border-bottom: 2px solid var(--border-strong);
+  border-bottom: 1px solid var(--border-default);
   font-weight: 700;
 }
 
+/* The empty first cell of the group header */
+.tracking-table .group-header th:first-child {
+  background: var(--bg-raised);
+}
+
+/* Second header row — sticks below the group header.
+   Height of group-header = padding(6+6) + lineHeight(~15) + border(1) ≈ 28px */
 .tracking-table .group-header + tr th {
-  top: 32px;
+  top: 28px;
+  background: var(--bg-raised);
 }
 
 .tracking-table .group-header + tr th.sticky-col {
-  top: 32px;
+  top: 28px;
   z-index: 5;
+  background: var(--bg-raised);
 }
 
 .col-toggle-btn {
@@ -3076,6 +3086,8 @@ html.dark [data-tooltip]::after {
 }
 
 html.dark .row-retard { background: rgba(192, 57, 43, 0.12) !important; }
+html.dark .tracking-table .group-header th { background: #352520; }
+html.dark .tracking-table .group-header th:first-child { background: var(--bg-raised); }
 html.dark .batiment-retard { background: linear-gradient(135deg, var(--bg-card), rgba(192, 57, 43, 0.1)) !important; }
 
 html.dark .recap-type-int {
