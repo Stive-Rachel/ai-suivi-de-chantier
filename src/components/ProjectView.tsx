@@ -109,17 +109,9 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
   return (
     <div className="app-shell">
       <header className="project-header">
-        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-          <Button variant="ghost" icon="back" onClick={onBack} size="sm">
-            Projets
-          </Button>
-          <div className="separator" />
-          <nav className="breadcrumbs">
-            <button className="breadcrumb-link" onClick={onBack}>Projets</button>
-            <span className="breadcrumb-sep">&rsaquo;</span>
-            <span className="breadcrumb-current">{currentProject.name}</span>
-          </nav>
-        </div>
+        <Button variant="ghost" icon="back" onClick={onBack} size="sm">
+          Projets
+        </Button>
         <div className="project-info">
           <h2>{currentProject.name}</h2>
           <p>
