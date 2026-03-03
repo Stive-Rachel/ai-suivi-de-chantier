@@ -1579,6 +1579,7 @@ body {
   color: var(--text-primary);
   line-height: 1.35;
   word-break: break-word;
+  text-transform: uppercase;
 }
 
 .pc-row-pct {
@@ -1980,6 +1981,7 @@ body {
   color: var(--text-primary);
   word-break: break-word;
   line-height: 1.35;
+  text-transform: uppercase;
 }
 
 .hbar-track {
