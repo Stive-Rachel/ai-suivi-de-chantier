@@ -17,7 +17,7 @@ export default memo(function SortableHeader({
   return (
     <th
       className={`sortable-header ${isActive ? "sort-active" : ""} ${className}`}
-      style={{ ...style, position: "relative" }}
+      style={style}
       onClick={onSort ? () => onSort(sortKey) : undefined}
       {...thProps}
     >
