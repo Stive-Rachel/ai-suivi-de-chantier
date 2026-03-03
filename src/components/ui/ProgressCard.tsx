@@ -2,7 +2,7 @@ import { memo, useState } from "react";
 import ProgressBar from "./ProgressBar";
 
 export default memo(function ProgressCard({ title, items }) {
-  const [compact, setCompact] = useState(true);
+  const [compact, setCompact] = useState(false);
   const total = items.length > 0 ? items.reduce((s, i) => s + i.progress, 0) / items.length : 0;
   return (
     <div className="progress-card">

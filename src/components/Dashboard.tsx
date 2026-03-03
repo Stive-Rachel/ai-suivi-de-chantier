@@ -265,7 +265,6 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
               icon="chart"
               label="Avancement moyen"
               value={`${globalKpis.avgProgress.toFixed(2)}%`}
-              sub={`${globalKpis.totalDone} / ${globalKpis.totalCells} cellules`}
               color={globalKpis.avgProgress >= 50 ? "var(--success)" : "var(--warning)"}
             />
             <KpiCard

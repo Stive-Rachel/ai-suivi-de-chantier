@@ -140,8 +140,10 @@ export default function DashboardTab({ project }) {
                 { value: statusStats.empty, color: "var(--border-default)", label: "Vide" },
               ].filter((s) => s.value > 0)}
             >
-              <span className="donut-chart-value">{statusStats.total}</span>
-              <span className="donut-chart-label">cellules</span>
+              <span className="donut-chart-value">
+                {statusStats.total > 0 ? ((statusStats.done / statusStats.total) * 100).toFixed(2) : 0}%
+              </span>
+              <span className="donut-chart-label">complété</span>
             </MultiDonut>
             <div className="chart-legend">
               {statusStats.done > 0 && (

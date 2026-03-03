@@ -7,6 +7,14 @@ import StatusCell from "../ui/StatusCell";
 import SortableHeader from "../ui/SortableHeader";
 import FilterBar from "../ui/FilterBar";
 
+const ALL_COLUMNS = [
+  { key: "tache", label: "Tâches", defaultVisible: true },
+  { key: "ponderation", label: "Pondération", defaultVisible: true },
+  { key: "av", label: "Avancement", defaultVisible: true },
+  { key: "avlot", label: "Av/Lot", defaultVisible: true },
+  { key: "count", label: "Nb. fait", defaultVisible: true },
+];
+
 export default function TrackingGrid({ project, updateProject, supaSync, type }) {
   const isLogements = type === "logements";
   const lotsRaw = isLogements ? project.lotsInt : project.lotsExt;
@@ -19,7 +27,21 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
 
   const [filters, setFilters] = useState({ statusFilter: "all", searchText: "" });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
+  const [showSettings, setShowSettings] = useState(false);
+  const [visibleCols, setVisibleCols] = useState(() => {
+    const saved = localStorage.getItem(`tracking_cols_${type}`);
+    if (saved) try { return JSON.parse(saved); } catch {}
+    return Object.fromEntries(ALL_COLUMNS.map((c) => [c.key, c.defaultVisible]));
+  });
   const { colWidths, getResizeProps } = useColumnResize({});
+
+  const toggleCol = (key) => {
+    setVisibleCols((prev) => {
+      const next = { ...prev, [key]: !prev[key] };
+      localStorage.setItem(`tracking_cols_${type}`, JSON.stringify(next));
+      return next;
+    });
+  };
 
   const toggleSort = (key) => {
     setSortConfig((prev) => {
@@ -73,7 +95,6 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       const pctDuLot = lotMarche > 0 ? (lot.montant || 0) / lotMarche : 0;
       for (const decomp of lot.decompositions) {
         const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
-        const pond = tracking[key]?._ponderation || 1;
         let done = 0;
         for (const e of entities) {
           if (tracking[key]?.[e.id]?.status === "X") done++;
@@ -165,7 +186,6 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
   const sortedRows = useMemo(() => {
     const sorted = [...filteredRows].sort((a, b) => {
       if (!sortConfig.key) {
-        // Default: alphabetical A-Z by decomposition
         return a.decomposition.localeCompare(b.decomposition, "fr");
       }
       let aVal, bVal;
@@ -190,6 +210,9 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
 
   const visibleRowCount = sortedRows.length;
 
+  // Count visible data columns for colspan
+  const dataColCount = 1 + ALL_COLUMNS.filter((c) => visibleCols[c.key]).length;
+
   if (project.batiments.length === 0) {
     return (
       <div className="empty-state">
@@ -211,7 +234,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
 
   return (
     <div style={{ animation: "slideInUp 0.4s ease both" }}>
-      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18 }}>
+      <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18, flexWrap: "wrap" }}>
         <h3 style={{ fontSize: 15, fontWeight: 600 }}>
           {isLogements ? "Suivi Intérieur — Logements" : "Suivi Extérieur — Bâtiments"}
         </h3>
@@ -222,7 +245,31 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
             </span>
           ))}
         </div>
+        <button
+          className="btn btn-ghost btn-sm"
+          onClick={() => setShowSettings((v) => !v)}
+          style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 4 }}
+        >
+          <Icon name="settings" size={14} />
+          Colonnes
+        </button>
       </div>
+
+      {showSettings && (
+        <div className="grid-settings-panel">
+          <span className="grid-settings-label">Colonnes visibles :</span>
+          {ALL_COLUMNS.map((col) => (
+            <label key={col.key} className="grid-settings-check">
+              <input
+                type="checkbox"
+                checked={visibleCols[col.key]}
+                onChange={() => toggleCol(col.key)}
+              />
+              {col.label}
+            </label>
+          ))}
+        </div>
+      )}
 
       <FilterBar
         filters={filters}
@@ -235,12 +282,12 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
         </div>
       )}
 
-      <div style={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 220px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
+      <div className="tracking-table-scroll" style={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 240px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
         <table className="tracking-table" role="grid" aria-label="Grille de suivi">
           <thead>
             {isLogements && (
               <tr className="group-header">
-                <th colSpan={6} style={{ background: "var(--bg-raised)" }} />
+                <th colSpan={dataColCount} style={{ background: "var(--bg-raised)" }} />
                 {Object.entries(groups).map(([gName, gEntities]) => (
                   <th key={gName} colSpan={gEntities.length}>
                     {gName}
@@ -251,7 +298,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
             <tr>
               <SortableHeader
                 className="sticky-col"
-                style={{ width: colWidths._decomp || 180, minWidth: 100, maxWidth: 400 }}
+                style={{ minWidth: 200 }}
                 sortKey="decomposition"
                 sortConfig={sortConfig}
                 onSort={toggleSort}
@@ -259,18 +306,28 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
               >
                 Décomposition
               </SortableHeader>
-              <th style={{ width: colWidths._tache || 90, minWidth: 60 }}>Tâches</th>
-              <SortableHeader
-                style={{ width: 45, textAlign: "center", fontSize: 10 }}
-                sortKey="ponderation"
-                sortConfig={sortConfig}
-                onSort={toggleSort}
-              >
-                Pond.
-              </SortableHeader>
-              <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av.</th>
-              <th style={{ width: 55, textAlign: "center", fontSize: 10 }}>Av/lot</th>
-              <th style={{ width: 35, textAlign: "center", fontSize: 10 }}>N</th>
+              {visibleCols.tache && (
+                <th style={{ width: colWidths._tache || 100, minWidth: 70 }}>Tâches</th>
+              )}
+              {visibleCols.ponderation && (
+                <SortableHeader
+                  style={{ width: 50, textAlign: "center", fontSize: 10 }}
+                  sortKey="ponderation"
+                  sortConfig={sortConfig}
+                  onSort={toggleSort}
+                >
+                  Pond.
+                </SortableHeader>
+              )}
+              {visibleCols.av && (
+                <th style={{ width: 60, textAlign: "center", fontSize: 10 }}>Av.</th>
+              )}
+              {visibleCols.avlot && (
+                <th style={{ width: 60, textAlign: "center", fontSize: 10 }}>Av/lot</th>
+              )}
+              {visibleCols.count && (
+                <th style={{ width: 40, textAlign: "center", fontSize: 10 }}>N</th>
+              )}
               {entities.map((e) => {
                 const done = getColumnDoneCount(e.id);
                 const allDone = done === rows.length && rows.length > 0;
@@ -280,26 +337,32 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                     style={{
                       textAlign: "center",
                       width: colWidths[e.id] || undefined,
-                      minWidth: 42,
+                      minWidth: 44,
                       fontSize: 10,
-                      writingMode: entities.length > 12 ? "vertical-lr" : undefined,
-                      transform: entities.length > 12 ? "rotate(180deg)" : undefined,
-                      padding: "4px 2px",
+                      padding: "6px 2px",
+                      verticalAlign: "bottom",
                     }}
                   >
-                    <div style={{ display: "flex", flexDirection: entities.length > 12 ? "row" : "column", alignItems: "center", gap: 3 }}>
-                      <span>{e.label}</span>
+                    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4 }}>
+                      <span style={{
+                        writingMode: entities.length > 10 ? "vertical-lr" : undefined,
+                        transform: entities.length > 10 ? "rotate(180deg)" : undefined,
+                        whiteSpace: "nowrap",
+                      }}>
+                        {e.label}
+                      </span>
                       <button
                         className="col-toggle-btn"
                         onClick={() => toggleColumn(e.id)}
                         title={allDone ? "Décocher toute la colonne" : "Cocher toute la colonne"}
                         style={{
-                          width: 18, height: 18, borderRadius: 3, border: "1.5px solid var(--border-default)",
+                          width: 18, height: 18, borderRadius: 3,
+                          border: `1.5px solid ${allDone ? "var(--success)" : "var(--border-default)"}`,
                           background: allDone ? "var(--success)" : "var(--bg-default)",
                           color: allDone ? "#fff" : "var(--text-tertiary)",
                           cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
                           fontSize: 11, fontWeight: 700, padding: 0, lineHeight: 1,
-                          transform: entities.length > 12 ? "rotate(180deg)" : undefined,
+                          flexShrink: 0,
                         }}
                       >
                         {allDone ? "✓" : ""}
@@ -312,88 +375,100 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
           </thead>
           <tbody>
             {sortedRows.map((row) => (
-                  <tr key={row.key}>
-                    <td className="sticky-col" style={{ maxWidth: colWidths._decomp || 180, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }} data-tooltip={row.decomposition}>{row.decomposition}</td>
-                    <td>
-                      <input
-                        className="task-input"
-                        defaultValue={tracking[row.key]?._tache || ""}
-                        onBlur={(e) => {
-                          const val = e.target.value;
-                          updateProject((p) => {
-                            const t = { ...p.tracking };
-                            if (!t[type]) t[type] = {};
-                            if (!t[type][row.key]) t[type][row.key] = {};
-                            t[type][row.key] = { ...t[type][row.key], _tache: val };
-                            return { ...p, tracking: t };
-                          });
-                          supaSync?.setTrackingMeta(type, row.key, { tache: val });
-                        }}
-                        placeholder="—"
-                      />
-                    </td>
-                    <td style={{ textAlign: "center" }}>
-                      <select
-                        className="pond-select"
-                        value={getPonderation(row.key)}
-                        onChange={(e) => setPonderation(row.key, e.target.value)}
-                      >
-                        {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((n) => (
-                          <option key={n} value={n}>
-                            {n}
-                          </option>
-                        ))}
-                      </select>
-                    </td>
-                    {(() => {
-                      const rs = rowStats[row.key] || { done: 0, total: 0, av: 0, avParLot: 0 };
-                      return (
-                        <>
-                          <td
-                            className="cell-mono"
-                            style={{ textAlign: "center", fontSize: 11, color: rs.av >= 100 ? "var(--success)" : rs.av > 0 ? "var(--warning)" : "var(--text-tertiary)" }}
-                            data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}\n= ${rs.av.toFixed(2)}%`}
-                          >
-                            {rs.av.toFixed(2)}%
-                          </td>
-                          <td
-                            className="cell-mono"
-                            style={{ textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}
-                            data-tooltip={`${(rs.pctDuLot * 100).toFixed(2)}% du lot × ${rs.av.toFixed(2)}%\n= ${rs.avParLot.toFixed(2)}%`}
-                          >
-                            {rs.avParLot.toFixed(2)}%
-                          </td>
-                          <td
-                            className="cell-mono"
-                            style={{ textAlign: "center", fontSize: 11, fontWeight: 600 }}
-                          >
-                            {rs.done}
-                          </td>
-                        </>
-                      );
-                    })()}
-                    {entities.map((e) => (
-                      <td
-                        key={e.id}
-                        style={{
-                          textAlign: "center",
-                          padding: 2,
-                          width: colWidths[e.id] || undefined,
-                        }}
-                      >
-                        <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
-                      </td>
-                    ))}
-                  </tr>
+              <tr key={row.key}>
+                <td className="sticky-col decomp-cell" title={row.decomposition}>
+                  {row.decomposition}
+                </td>
+                {visibleCols.tache && (
+                  <td>
+                    <input
+                      className="task-input"
+                      defaultValue={tracking[row.key]?._tache || ""}
+                      onBlur={(e) => {
+                        const val = e.target.value;
+                        updateProject((p) => {
+                          const t = { ...p.tracking };
+                          if (!t[type]) t[type] = {};
+                          if (!t[type][row.key]) t[type][row.key] = {};
+                          t[type][row.key] = { ...t[type][row.key], _tache: val };
+                          return { ...p, tracking: t };
+                        });
+                        supaSync?.setTrackingMeta(type, row.key, { tache: val });
+                      }}
+                      placeholder="—"
+                    />
+                  </td>
+                )}
+                {visibleCols.ponderation && (
+                  <td style={{ textAlign: "center" }}>
+                    <input
+                      type="number"
+                      className="pond-input"
+                      min={1}
+                      step={1}
+                      value={getPonderation(row.key)}
+                      onChange={(e) => setPonderation(row.key, e.target.value)}
+                      style={{ width: 42, textAlign: "center", padding: "2px 4px", fontSize: 12, border: "1px solid var(--border-default)", borderRadius: 4, background: "var(--bg-default)", color: "var(--text-primary)" }}
+                    />
+                  </td>
+                )}
+                {(() => {
+                  const rs = rowStats[row.key] || { done: 0, total: 0, av: 0, avParLot: 0 };
+                  return (
+                    <>
+                      {visibleCols.av && (
+                        <td
+                          className="cell-mono"
+                          style={{ textAlign: "center", fontSize: 11, color: rs.av >= 100 ? "var(--success)" : rs.av > 0 ? "var(--warning)" : "var(--text-tertiary)" }}
+                          data-tooltip={`${rs.done} / ${rs.total} ${isLogements ? "logements" : "bâtiments"}\n= ${rs.av.toFixed(2)}%`}
+                        >
+                          {rs.av.toFixed(2)}%
+                        </td>
+                      )}
+                      {visibleCols.avlot && (
+                        <td
+                          className="cell-mono"
+                          style={{ textAlign: "center", fontSize: 11, color: "var(--text-secondary)" }}
+                          data-tooltip={`${(rs.pctDuLot * 100).toFixed(2)}% du lot × ${rs.av.toFixed(2)}%\n= ${rs.avParLot.toFixed(2)}%`}
+                        >
+                          {rs.avParLot.toFixed(2)}%
+                        </td>
+                      )}
+                      {visibleCols.count && (
+                        <td
+                          className="cell-mono"
+                          style={{ textAlign: "center", fontSize: 11, fontWeight: 600 }}
+                        >
+                          {rs.done}
+                        </td>
+                      )}
+                    </>
+                  );
+                })()}
+                {entities.map((e) => (
+                  <td
+                    key={e.id}
+                    style={{
+                      textAlign: "center",
+                      padding: 2,
+                      width: colWidths[e.id] || undefined,
+                    }}
+                  >
+                    <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
+                  </td>
+                ))}
+              </tr>
             ))}
           </tbody>
           <tfoot>
             <tr style={{ fontWeight: 600, fontSize: 12, background: "var(--bg-raised)" }}>
-              <td className="sticky-col">Total pondérations</td>
-              <td></td>
-              <td style={{ textAlign: "center" }}>
-                {rows.reduce((s, r) => s + getPonderation(r.key), 0)}
-              </td>
+              <td className="sticky-col">Total</td>
+              {visibleCols.tache && <td></td>}
+              {visibleCols.ponderation && (
+                <td style={{ textAlign: "center" }}>
+                  {rows.reduce((s, r) => s + getPonderation(r.key), 0)}
+                </td>
+              )}
               {(() => {
                 let totalAv = 0, totalAvLot = 0, totalDone = 0;
                 for (const r of rows) {
@@ -405,9 +480,15 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                   : 0;
                 return (
                   <>
-                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAv.toFixed(2)}%</td>
-                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalAvLot.toFixed(2)}%</td>
-                    <td style={{ textAlign: "center", fontSize: 10 }}>{totalDone}</td>
+                    {visibleCols.av && (
+                      <td style={{ textAlign: "center", fontSize: 10 }}>{totalAv.toFixed(2)}%</td>
+                    )}
+                    {visibleCols.avlot && (
+                      <td style={{ textAlign: "center", fontSize: 10 }}>{totalAvLot.toFixed(2)}%</td>
+                    )}
+                    {visibleCols.count && (
+                      <td style={{ textAlign: "center", fontSize: 10 }}>{totalDone}</td>
+                    )}
                   </>
                 );
               })()}
