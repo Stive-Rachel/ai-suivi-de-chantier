@@ -115,11 +115,15 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           Projets
         </Button>
         <div className="project-info">
-          <h2>{currentProject.name}</h2>
-          <p>
-            {currentProject.location}
-            {currentProject.client ? ` · ${currentProject.client}` : ""}
-          </p>
+          <h2>
+            {currentProject.name}
+            {currentProject.location && (
+              <span style={{ fontWeight: 400, fontSize: "0.6em", color: "var(--text-secondary)", marginLeft: 12 }}>
+                {currentProject.location}
+                {currentProject.client ? ` · ${currentProject.client}` : ""}
+              </span>
+            )}
+          </h2>
         </div>
         <div className="header-progress">
           <ProgressBar value={globalProgress} />
