@@ -150,6 +150,12 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
     return result;
   }, [startDate, weekCount, planningMap]);
 
+  // Cumulative cible: running sum of per-week targets
+  const cibleCumul = useMemo(() => {
+    let sum = 0;
+    return weeks.map((w) => { sum += w.cible; return sum; });
+  }, [weeks]);
+
   // Determine which week is "current"
   const currentWeekIndex = useMemo(() => {
     if (!startDate) return -1;
@@ -241,9 +247,8 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
     );
   }
 
-  // Find the last week with a non-zero cible for the "target this week" summary
-  const currentWeek = currentWeekIndex >= 0 && currentWeekIndex < weeks.length ? weeks[currentWeekIndex] : null;
-  const cibleCourante = currentWeek?.cible ?? 0;
+  // Find the cumulative cible for current week
+  const cibleCourante = currentWeekIndex >= 0 && currentWeekIndex < cibleCumul.length ? cibleCumul[currentWeekIndex] : 0;
 
   // Calculate ecart (gap)
   const ecart = completedLogements - cibleCourante;
@@ -320,15 +325,15 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
         const chartW = W - padL - padR;
         const chartH = H - padT - padB;
         const maxY = totalLogements;
-        const dataWeeks = weeks.filter((w) => w.cible > 0 || weeks.indexOf(w) <= currentWeekIndex);
-        const lastCibleWeekIdx = weeks.reduce((acc, w, i) => w.cible > 0 ? i : acc, -1);
+        const lastCibleWeekIdx = cibleCumul.reduce((acc, v, i) => v > 0 ? i : acc, -1);
         const endIdx = Math.max(currentWeekIndex, lastCibleWeekIdx, 0);
         const displayWeeks = weeks.slice(0, endIdx + 2);
+        const displayCumul = cibleCumul.slice(0, endIdx + 2);
         if (displayWeeks.length < 2) return null;
         const xScale = (i: number) => padL + (i / (displayWeeks.length - 1)) * chartW;
         const yScale = (v: number) => padT + chartH - (v / maxY) * chartH;
-        // Build cible path
-        const ciblePts = displayWeeks.map((w, i) => `${xScale(i)},${yScale(w.cible)}`);
+        // Build cible path (cumulative)
+        const ciblePts = displayCumul.map((v, i) => `${xScale(i)},${yScale(v)}`);
         const cibleLine = "M" + ciblePts.join(" L");
         const cibleArea = cibleLine + ` L${xScale(displayWeeks.length - 1)},${yScale(0)} L${xScale(0)},${yScale(0)} Z`;
         // Build réel path (flat line at completedLogements up to currentWeekIndex)
@@ -393,8 +398,8 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
               {reelArea && <path d={reelArea} fill="var(--success)" opacity={0.10} />}
               {reelLine && <path d={reelLine} fill="none" stroke="var(--success)" strokeWidth={2.5} strokeLinejoin="round" />}
               {/* Dots on cible */}
-              {displayWeeks.map((w, i) => w.cible > 0 ? (
-                <circle key={`c${i}`} cx={xScale(i)} cy={yScale(w.cible)} r={3.5} fill="var(--accent)" />
+              {displayCumul.map((v, i) => v > 0 ? (
+                <circle key={`c${i}`} cx={xScale(i)} cy={yScale(v)} r={3.5} fill="var(--accent)" />
               ) : null)}
               {/* Réel endpoint dot */}
               {reelEnd >= 0 && (
@@ -437,11 +442,14 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
             <tr>
               <th style={{ minWidth: 80, textAlign: "center", fontSize: 12 }}>Semaine</th>
               <th style={{ minWidth: 120, textAlign: "center", fontSize: 12 }}>Date debut</th>
-              <th style={{ minWidth: 140, textAlign: "center", fontSize: 12 }}>
-                Nb logements cible (cumul)
+              <th style={{ minWidth: 100, textAlign: "center", fontSize: 12 }}>
+                Cible / sem.
               </th>
-              <th style={{ minWidth: 140, textAlign: "center", fontSize: 12 }}>
-                Nb logements reels (cumul)
+              <th style={{ minWidth: 100, textAlign: "center", fontSize: 12 }}>
+                Cible cumul
+              </th>
+              <th style={{ minWidth: 100, textAlign: "center", fontSize: 12 }}>
+                Réel cumul
               </th>
               <th style={{ minWidth: 200, fontSize: 12 }}>Comparaison</th>
               <th style={{ minWidth: 80, textAlign: "center", fontSize: 12 }}>Ecart</th>
@@ -451,11 +459,12 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
             {weeks.map((week, idx) => {
               const isCurrent = idx === currentWeekIndex;
               const isPast = idx < currentWeekIndex;
-              const ecartWeek = completedLogements - week.cible;
-              const showComparison = week.cible > 0 || isPast || isCurrent;
+              const cumul = cibleCumul[idx] || 0;
+              const ecartWeek = completedLogements - cumul;
+              const showComparison = cumul > 0 || isPast || isCurrent;
 
               // Progress bar calculations
-              const ciblePct = totalLogements > 0 ? (week.cible / totalLogements) * 100 : 0;
+              const ciblePct = totalLogements > 0 ? (cumul / totalLogements) * 100 : 0;
               const reelPct = totalLogements > 0 ? (completedLogements / totalLogements) * 100 : 0;
 
               return (
@@ -464,7 +473,7 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                   style={{
                     background: isCurrent
                       ? "var(--accent-bg)"
-                      : isPast && week.cible > 0 && completedLogements < week.cible
+                      : isPast && cumul > 0 && completedLogements < cumul
                         ? "var(--danger-bg)"
                         : undefined,
                   }}
@@ -549,6 +558,16 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                     )}
                   </td>
 
+                  {/* Cible cumul */}
+                  <td style={{
+                    textAlign: "center",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: cumul > 0 ? "var(--accent)" : "var(--text-tertiary)",
+                  }}>
+                    {cumul > 0 ? cumul : "—"}
+                  </td>
+
                   {/* Reels column - auto-calculated */}
                   <td style={{
                     textAlign: "center",
@@ -598,7 +617,7 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                             <div style={{
                               width: `${Math.min(reelPct, 100)}%`,
                               height: "100%",
-                              background: completedLogements >= week.cible ? "var(--success)" : "var(--warning)",
+                              background: completedLogements >= cumul ? "var(--success)" : "var(--warning)",
                               borderRadius: 4,
                               transition: "width 0.3s ease",
                             }} />
@@ -619,7 +638,7 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                     fontSize: 13,
                     fontWeight: 600,
                   }}>
-                    {showComparison && (isPast || isCurrent) && week.cible > 0 ? (
+                    {showComparison && (isPast || isCurrent) && cumul > 0 ? (
                       <span style={{
                         display: "inline-block",
                         padding: "2px 10px",
@@ -644,8 +663,11 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
             <tr style={{ fontWeight: 600, fontSize: 12, background: "var(--bg-raised)" }}>
               <td style={{ textAlign: "center" }}>Total</td>
               <td></td>
+              <td style={{ textAlign: "center", fontWeight: 700 }}>
+                {weeks.reduce((s, w) => s + w.cible, 0)}
+              </td>
               <td style={{ textAlign: "center", fontWeight: 700, color: "var(--accent)" }}>
-                {weeks.length > 0 ? weeks[weeks.length - 1].cible : 0}
+                {cibleCumul.length > 0 ? cibleCumul[cibleCumul.length - 1] : 0}
               </td>
               <td style={{ textAlign: "center", fontWeight: 700, color: "var(--success)" }}>
                 {completedLogements}
