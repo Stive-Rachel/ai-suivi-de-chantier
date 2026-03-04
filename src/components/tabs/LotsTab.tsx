@@ -322,9 +322,14 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                                 <input
                                   className="inline-edit"
                                   style={{ fontWeight: 600, fontSize: 13 }}
-                                  value={subLot.nomDecomp || subLot.nom}
+                                  defaultValue={subLot.nomDecomp || subLot.nom}
                                   onClick={(e) => e.stopPropagation()}
-                                  onChange={(e) => updateDecompField(decompModal.lotIndex, decompModal.type, si, "nomDecomp", e.target.value)}
+                                  onBlur={(e) => {
+                                    const val = e.target.value.trim();
+                                    if (val && val !== (subLot.nomDecomp || subLot.nom)) {
+                                      updateDecompField(decompModal.lotIndex, decompModal.type, si, "nomDecomp", val);
+                                    }
+                                  }}
                                 />
                               </span>
                             </td>
@@ -359,8 +364,13 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                                       <input
                                         className="inline-edit"
                                         style={{ flex: 1, fontSize: 12, padding: "2px 6px" }}
-                                        value={d}
-                                        onChange={(e) => renameDecompStep(decompModal.lotIndex, decompModal.type, si, di, e.target.value)}
+                                        defaultValue={d}
+                                        onBlur={(e) => {
+                                          const val = e.target.value.trim();
+                                          if (val && val !== d) {
+                                            renameDecompStep(decompModal.lotIndex, decompModal.type, si, di, val);
+                                          }
+                                        }}
                                       />
                                       <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeDecomposition(decompModal.lotIndex, decompModal.type, si, di)}>
                                         <Icon name="trash" size={11} />
