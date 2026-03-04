@@ -1232,7 +1232,7 @@ body {
 
 .cell-center { text-align: center; }
 .cell-right { text-align: right; }
-.cell-mono { font-family: var(--font-mono); font-size: 12px; }
+.cell-mono { font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
 .cell-bold { font-weight: 700; }
 .cell-muted { color: var(--text-tertiary); }
 
