@@ -314,6 +314,97 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
         </div>
       </div>
 
+      {/* ── Chart: Cible vs Réel ── */}
+      {weeks.length > 0 && totalLogements > 0 && (() => {
+        const W = 800, H = 300, padL = 50, padR = 20, padT = 20, padB = 40;
+        const chartW = W - padL - padR;
+        const chartH = H - padT - padB;
+        const maxY = totalLogements;
+        const dataWeeks = weeks.filter((w) => w.cible > 0 || weeks.indexOf(w) <= currentWeekIndex);
+        const lastCibleWeekIdx = weeks.reduce((acc, w, i) => w.cible > 0 ? i : acc, -1);
+        const endIdx = Math.max(currentWeekIndex, lastCibleWeekIdx, 0);
+        const displayWeeks = weeks.slice(0, endIdx + 2);
+        if (displayWeeks.length < 2) return null;
+        const xScale = (i: number) => padL + (i / (displayWeeks.length - 1)) * chartW;
+        const yScale = (v: number) => padT + chartH - (v / maxY) * chartH;
+        // Build cible path
+        const ciblePts = displayWeeks.map((w, i) => `${xScale(i)},${yScale(w.cible)}`);
+        const cibleLine = "M" + ciblePts.join(" L");
+        const cibleArea = cibleLine + ` L${xScale(displayWeeks.length - 1)},${yScale(0)} L${xScale(0)},${yScale(0)} Z`;
+        // Build réel path (flat line at completedLogements up to currentWeekIndex)
+        const reelEnd = Math.min(currentWeekIndex, displayWeeks.length - 1);
+        const reelPts = displayWeeks.slice(0, reelEnd + 1).map((_, i) => `${xScale(i)},${yScale(completedLogements)}`);
+        const reelLine = reelPts.length > 1 ? "M" + reelPts.join(" L") : null;
+        const reelArea = reelLine ? reelLine + ` L${xScale(reelEnd)},${yScale(0)} L${xScale(0)},${yScale(0)} Z` : null;
+        // Y-axis ticks
+        const yTicks = [0, 0.25, 0.5, 0.75, 1].map((p) => Math.round(p * maxY));
+        return (
+          <div style={{
+            background: "var(--bg-card)",
+            borderRadius: "var(--radius-md)",
+            padding: "20px 16px 12px",
+            border: "1px solid var(--border-default)",
+            boxShadow: "var(--shadow-card)",
+            marginBottom: 24,
+            overflowX: "auto",
+          }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 20, marginBottom: 12 }}>
+              <h4 style={{ fontSize: 14, fontWeight: 600, margin: 0 }}>Courbe Cible vs Réel</h4>
+              <div style={{ display: "flex", gap: 16, fontSize: 11, color: "var(--text-secondary)" }}>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ width: 16, height: 3, background: "var(--accent)", borderRadius: 2, display: "inline-block" }} />
+                  Cible
+                </span>
+                <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                  <span style={{ width: 16, height: 3, background: "var(--success)", borderRadius: 2, display: "inline-block" }} />
+                  Réel
+                </span>
+              </div>
+            </div>
+            <svg viewBox={`0 0 ${W} ${H}`} style={{ width: "100%", maxWidth: W, height: "auto" }}>
+              {/* Grid lines */}
+              {yTicks.map((v) => (
+                <g key={v}>
+                  <line x1={padL} x2={W - padR} y1={yScale(v)} y2={yScale(v)} stroke="var(--border-subtle)" strokeWidth={1} />
+                  <text x={padL - 8} y={yScale(v) + 4} textAnchor="end" fontSize={10} fill="var(--text-tertiary)">{v}</text>
+                </g>
+              ))}
+              {/* X-axis labels */}
+              {displayWeeks.map((w, i) => {
+                const showLabel = displayWeeks.length <= 20 || i % Math.ceil(displayWeeks.length / 15) === 0;
+                return showLabel ? (
+                  <text key={i} x={xScale(i)} y={H - 8} textAnchor="middle" fontSize={10} fill="var(--text-tertiary)">
+                    S{w.semaine}
+                  </text>
+                ) : null;
+              })}
+              {/* Current week vertical line */}
+              {currentWeekIndex >= 0 && currentWeekIndex < displayWeeks.length && (
+                <line
+                  x1={xScale(currentWeekIndex)} x2={xScale(currentWeekIndex)}
+                  y1={padT} y2={padT + chartH}
+                  stroke="var(--accent)" strokeWidth={1} strokeDasharray="4 3" opacity={0.5}
+                />
+              )}
+              {/* Cible area + line */}
+              <path d={cibleArea} fill="var(--accent)" opacity={0.08} />
+              <path d={cibleLine} fill="none" stroke="var(--accent)" strokeWidth={2.5} strokeLinejoin="round" />
+              {/* Réel area + line */}
+              {reelArea && <path d={reelArea} fill="var(--success)" opacity={0.10} />}
+              {reelLine && <path d={reelLine} fill="none" stroke="var(--success)" strokeWidth={2.5} strokeLinejoin="round" />}
+              {/* Dots on cible */}
+              {displayWeeks.map((w, i) => w.cible > 0 ? (
+                <circle key={`c${i}`} cx={xScale(i)} cy={yScale(w.cible)} r={3.5} fill="var(--accent)" />
+              ) : null)}
+              {/* Réel endpoint dot */}
+              {reelEnd >= 0 && (
+                <circle cx={xScale(reelEnd)} cy={yScale(completedLogements)} r={4.5} fill="var(--success)" stroke="var(--bg-card)" strokeWidth={2} />
+              )}
+            </svg>
+          </div>
+        );
+      })()}
+
       {/* Table header */}
       <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 16, flexWrap: "wrap" }}>
         <h3 style={{ fontSize: 15, fontWeight: 600 }}>
