@@ -30,7 +30,7 @@ export interface LotDecomp {
   montant: number;
 }
 
-export type CellStatus = "" | "X" | "!" | "NOK" | "i";
+export type CellStatus = "" | "X" | "!" | "NOK" | "i" | "N/A";
 
 export interface TrackingCell {
   status: CellStatus;

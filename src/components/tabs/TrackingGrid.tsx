@@ -122,11 +122,15 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       for (const decomp of lot.decompositions) {
         const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
         let done = 0;
+        let naCount = 0;
         for (const e of activeEntities) {
-          if (tracking[key]?.[e.id]?.status === "X") done++;
+          const status = tracking[key]?.[e.id]?.status;
+          if (status === "X") done++;
+          else if (status === "N/A") naCount++;
         }
-        const av = activeEntities.length > 0 ? (done / activeEntities.length) * 100 : 0;
-        stats[key] = { done, total: activeEntities.length, av, avParLot: pctDuLot * av, pctDuLot };
+        const activeCount = activeEntities.length - naCount;
+        const av = activeCount > 0 ? (done / activeCount) * 100 : 0;
+        stats[key] = { done, total: activeCount, av, avParLot: pctDuLot * av, pctDuLot };
       }
     }
     return stats;
@@ -212,6 +216,9 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
   const sortedRows = useMemo(() => {
     const sorted = [...filteredRows].sort((a, b) => {
       if (!sortConfig.key) {
+        const na = parseFloat(a.lotNumero) || 0;
+        const nb = parseFloat(b.lotNumero) || 0;
+        if (na !== nb) return na - nb;
         return a.decomposition.localeCompare(b.decomposition, "fr");
       }
       let aVal, bVal;
@@ -568,8 +575,10 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                       let done = 0, total = 0;
                       for (const r of rows) {
                         const p = getPonderation(r.key);
+                        const v = getValue(r.key, e.id);
+                        if (v === "N/A") continue;
                         total += p;
-                        if (getValue(r.key, e.id) === "X") done += p;
+                        if (v === "X") done += p;
                       }
                       return total > 0 ? ((done / total) * 100).toFixed(2) + "%" : "—";
                     })()}

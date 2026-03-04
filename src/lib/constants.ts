@@ -42,6 +42,7 @@ export const STATUS_CONFIG: Record<CellStatus, StatusConfig> = {
   "!": { label: "!", cls: "status-alert" },
   NOK: { label: "NOK", cls: "status-nok" },
   i: { label: "i", cls: "status-info" },
+  "N/A": { label: "N/A", cls: "status-na" },
 };
 
 export const STATUS_BADGE_STYLES: Record<string, StatusBadgeStyle> = {
@@ -49,4 +50,5 @@ export const STATUS_BADGE_STYLES: Record<string, StatusBadgeStyle> = {
   "!": { background: "var(--warning)", color: "#fff" },
   NOK: { background: "var(--danger)", color: "#fff" },
   i: { background: "var(--info)", color: "#fff" },
+  "N/A": { background: "var(--text-tertiary)", color: "#fff" },
 };

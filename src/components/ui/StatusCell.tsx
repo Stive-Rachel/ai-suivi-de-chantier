@@ -2,7 +2,7 @@ import { memo } from "react";
 import { STATUS_CONFIG } from "../../lib/constants";
 
 export default memo(function StatusCell({ value, onChange }) {
-  const statuses = ["", "X", "!", "NOK", "i"];
+  const statuses = ["", "X", "!", "NOK", "i", "N/A"];
   const idx = statuses.indexOf(value || "");
   const next = () => onChange(statuses[(idx + 1) % statuses.length]);
   const cfg = STATUS_CONFIG[value || ""];

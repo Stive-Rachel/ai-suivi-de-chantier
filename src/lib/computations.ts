@@ -41,10 +41,13 @@ export function computeDetailedProgress(project: Project): DetailedProgress {
         for (const decomp of lot.decompositions) {
           const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
           const pond = trackingData[key]?._ponderation ?? 1;
-          totalPondWeighted += pond * allEntities.length;
+          let naCount = 0;
           for (const eId of allEntities) {
-            if (trackingData[key]?.[eId]?.status === "X") doneWeighted += pond;
+            const status = trackingData[key]?.[eId]?.status;
+            if (status === "N/A") naCount++;
+            else if (status === "X") doneWeighted += pond;
           }
+          totalPondWeighted += pond * (allEntities.length - naCount);
         }
       }
 
@@ -108,14 +111,20 @@ export function calcEntityProgress(lots: LotDecomp[], trackType: string, entityI
     for (const decomp of lot.decompositions) {
       const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
       const pond = t[key]?._ponderation ?? 1;
-      totalPond += pond;
 
       let done = 0;
+      let naCount = 0;
       for (const eId of entityIds) {
-        if (t[key]?.[eId]?.status === "X") done++;
+        const status = t[key]?.[eId]?.status;
+        if (status === "X") done++;
+        else if (status === "N/A") naCount++;
       }
-      const progress = (done / entityIds.length) * 100;
-      weightedProgress += progress * pond;
+      const activeCount = entityIds.length - naCount;
+      if (activeCount > 0) {
+        totalPond += pond;
+        const progress = (done / activeCount) * 100;
+        weightedProgress += progress * pond;
+      }
     }
   }
 
