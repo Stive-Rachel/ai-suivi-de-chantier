@@ -19,7 +19,8 @@ export default function DashboardTab({ project }) {
   const nbLogActive = logCounts.active;
   const nbLogExc = logCounts.exceptions;
 
-  // Status distribution
+  // Status distribution (excludes exception logements)
+  const exceptions = project.exceptions || {};
   const statusStats = useMemo(() => {
     let done = 0, alerts = 0, noks = 0, empty = 0;
     for (const trackType of ["logements", "batiments"]) {
@@ -28,6 +29,7 @@ export default function DashboardTab({ project }) {
         if (rowKey.startsWith("_")) continue;
         for (const [entityId, cell] of Object.entries(t[rowKey])) {
           if (entityId.startsWith("_")) continue;
+          if (trackType === "logements" && exceptions[entityId]) continue;
           const s = cell?.status;
           if (s === "X") done++;
           else if (s === "!") alerts++;
@@ -37,7 +39,7 @@ export default function DashboardTab({ project }) {
       }
     }
     return { done, alerts, noks, empty, total: done + alerts + noks + empty };
-  }, [project.tracking]);
+  }, [project.tracking, exceptions]);
 
   // INT/EXT weighted averages
   const totalMontantInt = lotProgressInt.reduce((s, lp) => s + lp.montant, 0);

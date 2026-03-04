@@ -63,6 +63,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
       } else {
         exc[entityId] = true;
       }
+      supaSync?.updateFields?.({ exceptions: exc });
       return { ...p, exceptions: exc };
     });
   };

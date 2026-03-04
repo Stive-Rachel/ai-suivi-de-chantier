@@ -22,6 +22,7 @@ export default function MoneyInput({ value, onChange, variant = "inline" }) {
         }}
         onKeyDown={(e) => {
           if (e.key === "Enter") e.target.blur();
+          if (e.key === "Escape") { setEditing(false); }
         }}
       />
     );

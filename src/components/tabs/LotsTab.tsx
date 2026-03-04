@@ -247,7 +247,7 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                       </td>
                       <td className="cell-right cell-mono cell-muted col-int">{pctInt.toFixed(0)}%</td>
                       <td className="cell-center">
-                        <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeLot(i)}>
+                        <button className="delete-btn" onClick={() => removeLot(i)}>
                           <Icon name="trash" size={14} />
                         </button>
                       </td>
@@ -340,7 +340,7 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                               {totalGlobal > 0 ? ((subLot.montant || 0) / totalGlobal * 100).toFixed(2) + "%" : "—"}
                             </td>
                             <td className="cell-center" onClick={(e) => e.stopPropagation()}>
-                              <button className="delete-btn" style={{ opacity: 1 }} onClick={() => {
+                              <button className="delete-btn" onClick={() => {
                                 if (!confirm(`Supprimer "${subLot.nomDecomp || subLot.nom}" ?`)) return;
                                 const field = decompModal.type === "ext" ? "lotsExt" : "lotsInt";
                                 updateProjectAndSyncDecomp((p) => {
@@ -372,7 +372,7 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                                           }
                                         }}
                                       />
-                                      <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeDecomposition(decompModal.lotIndex, decompModal.type, si, di)}>
+                                      <button className="delete-btn" onClick={() => removeDecomposition(decompModal.lotIndex, decompModal.type, si, di)}>
                                         <Icon name="trash" size={11} />
                                       </button>
                                     </div>

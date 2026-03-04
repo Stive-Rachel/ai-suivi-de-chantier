@@ -23,6 +23,7 @@ const ExportTab = lazy(() => import("./tabs/ExportTab"));
 const GanttTab = lazy(() => import("./tabs/GanttTab"));
 const PhotosTab = lazy(() => import("./tabs/PhotosTab"));
 const PlanningTab = lazy(() => import("./tabs/PlanningTab"));
+const HelpTab = lazy(() => import("./tabs/HelpTab"));
 
 function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
@@ -88,6 +89,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
     { key: "photos", label: "Photos", icon: "camera" },
     { key: "export", label: "Export", icon: "download" },
     { key: "dashboard", label: "Tableau de bord", icon: "chart" },
+    { key: "help", label: "Aide", icon: "help" },
   ], []);
 
   // Keyboard shortcuts: digits 1-9 switch tabs, 0 for 10th tab
@@ -165,6 +167,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           {activeTab === "planning-logements" && <PlanningTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "photos" && <PhotosTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "export" && <ExportTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
+          {activeTab === "help" && <HelpTab />}
         </Suspense>
       </div>
 
