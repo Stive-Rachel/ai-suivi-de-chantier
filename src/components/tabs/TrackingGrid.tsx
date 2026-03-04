@@ -436,7 +436,8 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
           <tbody>
             {sortedRows.map((row) => (
               <tr key={row.key}>
-                <td className="sticky-col decomp-cell" title={row.decomposition}>
+                <td className="sticky-col decomp-cell" title={`${row.lotNumero} - ${row.lotNom} — ${row.decomposition}`}>
+                  <span className="decomp-lot-tag">{row.lotNumero}</span>
                   {row.decomposition}
                 </td>
                 {visibleCols.tache && (
