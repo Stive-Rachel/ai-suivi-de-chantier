@@ -73,7 +73,7 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
 
       if (insertError) throw insertError;
 
-      setSuccess(`Invitation envoyee a ${email.trim()}.`);
+      setSuccess(`Invitation créée pour ${email.trim()}. Prévenez cette personne de se rendre sur le site et de cliquer "Première connexion".`);
       setEmail("");
       setRole("client");
       setSelectedProjects([]);
