@@ -93,12 +93,6 @@ DROP POLICY IF EXISTS "users_own_tracking_meta" ON tracking_meta;
 DROP POLICY IF EXISTS "admin_all_tracking_meta" ON tracking_meta;
 DROP POLICY IF EXISTS "client_select_tracking_meta" ON tracking_meta;
 
--- project_photos
-DROP POLICY IF EXISTS "users_own_project_photos" ON project_photos;
-DROP POLICY IF EXISTS "admin_all_project_photos" ON project_photos;
-DROP POLICY IF EXISTS "client_select_project_photos" ON project_photos;
-DROP POLICY IF EXISTS "client_insert_project_photos" ON project_photos;
-
 -- user_profiles
 DROP POLICY IF EXISTS "users_read_own_profile" ON user_profiles;
 DROP POLICY IF EXISTS "admin_read_all_profiles" ON user_profiles;
@@ -205,30 +199,7 @@ CREATE POLICY "client_select_tracking_meta" ON tracking_meta
   );
 
 -- ---------------------------------------------------------------
--- 5g. project_photos
--- ---------------------------------------------------------------
-
-CREATE POLICY "admin_all_project_photos" ON project_photos
-  FOR ALL
-  USING (public.is_admin())
-  WITH CHECK (public.is_admin());
-
--- Client : SELECT sur ses projets
-CREATE POLICY "client_select_project_photos" ON project_photos
-  FOR SELECT
-  USING (
-    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
-  );
-
--- Client : INSERT sur ses projets uniquement
-CREATE POLICY "client_insert_project_photos" ON project_photos
-  FOR INSERT
-  WITH CHECK (
-    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
-  );
-
--- ---------------------------------------------------------------
--- 5h. user_profiles
+-- 5g. user_profiles
 -- ---------------------------------------------------------------
 
 -- Chaque utilisateur peut lire son propre profil
