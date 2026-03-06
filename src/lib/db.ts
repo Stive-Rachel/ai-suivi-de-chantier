@@ -7,6 +7,7 @@ const DB_KEY = "construction_tracker_v1";
 function migrateProject(p: any): Project {
   const seed = initialData.projects.find((s) => s.id === p.id);
 
+  // Only create lots array if it doesn't exist at all
   if (!p.lots) {
     if (seed && seed.lots) {
       p.lots = JSON.parse(JSON.stringify(seed.lots));
@@ -21,30 +22,19 @@ function migrateProject(p: any): Project {
       });
     }
   }
-  if (seed && seed.lots && p.lots.every((l: any) => !l.montantMarche && !l.montantExt && !l.montantInt)) {
-    p.lots = JSON.parse(JSON.stringify(seed.lots));
-  }
+
+  // Only seed lotsExt/lotsInt if completely missing
   if (seed) {
-    const needsSync = (arr: any[] | undefined, seedArr: any[] | undefined) =>
-      !arr || arr.length === 0 || arr.some((l: any) => l.montant === undefined) ||
-      (seedArr && arr.length !== seedArr.length);
-    if (seed.lotsExt && needsSync(p.lotsExt, seed.lotsExt)) {
-      const existing = new Map((p.lotsExt || []).map((l: any) => [l.trackPrefix, l]));
-      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt)).map((sl: any) => {
-        const ex = existing.get(sl.trackPrefix);
-        return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
-      });
+    if (!p.lotsExt && seed.lotsExt) {
+      p.lotsExt = JSON.parse(JSON.stringify(seed.lotsExt));
     }
-    if (seed.lotsInt && needsSync(p.lotsInt, seed.lotsInt)) {
-      const existing = new Map((p.lotsInt || []).map((l: any) => [l.trackPrefix, l]));
-      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt)).map((sl: any) => {
-        const ex = existing.get(sl.trackPrefix);
-        return ex ? { ...sl, ...ex, montant: sl.montant } : sl;
-      });
+    if (!p.lotsInt && seed.lotsInt) {
+      p.lotsInt = JSON.parse(JSON.stringify(seed.lotsInt));
     }
   }
+
   const def = (field: string, fallback: any) => {
-    if (p[field] === undefined || (p[field] === 0 && seed?.[field as keyof typeof seed])) p[field] = (seed as any)?.[field] ?? fallback;
+    if (p[field] === undefined) p[field] = (seed as any)?.[field] ?? fallback;
   };
   def("montantTotal", 0); def("dateDebutChantier", ""); def("dureeTotale", 0);
   def("montantExt", 0); def("montantInt", 0);
