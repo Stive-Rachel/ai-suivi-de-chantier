@@ -6,6 +6,7 @@ import { useAutoFlush } from "./lib/syncQueue";
 import { replayOperation } from "./lib/dataLayer";
 import Dashboard from "./components/Dashboard";
 import ProjectView from "./components/ProjectView";
+import LoginPage from "./components/LoginPage";
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
@@ -27,7 +28,21 @@ export default function App() {
     return () => document.removeEventListener("keydown", handleKey);
   }, [openProjectId]);
 
-  if (authLoading || loading || !db) {
+  if (authLoading) {
+    return (
+      <div className="app-shell">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--text-tertiary)" }}>
+          Chargement...
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <LoginPage />;
+  }
+
+  if (loading || !db) {
     return (
       <div className="app-shell">
         <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--text-tertiary)" }}>

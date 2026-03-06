@@ -4,6 +4,7 @@ import { DEFAULT_LOTS, DEFAULT_LOTS_INT, DEFAULT_LOTS_EXT } from "../lib/constan
 import { computeProjectProgress, computeDetailedProgress, getLogementCounts } from "../lib/computations";
 import { formatMontant } from "../lib/format";
 import * as dataLayer from "../lib/dataLayer";
+import { useUserRole } from "../lib/useUserRole";
 import initialData from "../initialData.json";
 import Icon from "./ui/Icon";
 import Button from "./ui/Button";
@@ -103,6 +104,7 @@ function ProjectKpis({ project }) {
 }
 
 export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme }) {
+  const { isAdmin, isClient, allowedProjectIds } = useUserRole();
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
@@ -174,9 +176,18 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
     }
   };
 
+  // Filter projects based on role
+  const visibleProjects = useMemo(() => {
+    if (isClient && allowedProjectIds !== null) {
+      const allowed = new Set(allowedProjectIds);
+      return db.projects.filter((p) => allowed.has(p.id));
+    }
+    return db.projects;
+  }, [db.projects, isClient, allowedProjectIds]);
+
   // Global KPIs across all projects
   const globalKpis = useMemo(() => {
-    const projects = db.projects;
+    const projects = visibleProjects;
     const nbProjects = projects.length;
     const nbBatTotal = projects.reduce((s, p) => s + p.batiments.length, 0);
     const nbLogTotal = projects.reduce((s, p) => s + p.batiments.reduce((sb, b) => sb + getLogementNums(b).length, 0), 0);
@@ -220,9 +231,9 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
         : 0;
 
     return { nbProjects, nbBatTotal, nbLogTotal, montantTotal, avgProgress, totalAlerts, totalNoks, totalDone, totalCells };
-  }, [db.projects]);
+  }, [visibleProjects]);
 
-  const hasProjects = db.projects.length > 0;
+  const hasProjects = visibleProjects.length > 0;
 
   return (
     <div className="app-shell">
@@ -237,12 +248,16 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
         <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <SyncStatusBadge />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
-          <Button variant="secondary" onClick={loadDemo}>
-            Charger d&eacute;mo
-          </Button>
-          <Button icon="plus" onClick={() => setShowCreate(true)}>
-            Nouveau projet
-          </Button>
+          {isAdmin && (
+            <>
+              <Button variant="secondary" onClick={loadDemo}>
+                Charger d&eacute;mo
+              </Button>
+              <Button icon="plus" onClick={() => setShowCreate(true)}>
+                Nouveau projet
+              </Button>
+            </>
+          )}
         </div>
       </header>
 
@@ -288,27 +303,33 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
         )}
 
         {/* Project Cards */}
-        {db.projects.length === 0 ? (
+        {visibleProjects.length === 0 ? (
           <div className="empty-state" style={{ animation: "slideInUp 0.5s ease both" }}>
             <div className="empty-state-icon">
               <Icon name="folder" size={32} />
             </div>
             <h3>Aucun projet pour le moment</h3>
-            <p>Cr&eacute;ez votre premier projet ou chargez les donn&eacute;es de d&eacute;mo</p>
-            <div style={{ display: "flex", gap: 10 }}>
-              <Button icon="plus" onClick={() => setShowCreate(true)}>
-                Cr&eacute;er un projet
-              </Button>
-              <Button variant="secondary" onClick={loadDemo}>
-                Charger d&eacute;mo
-              </Button>
-            </div>
+            {isAdmin ? (
+              <>
+                <p>Cr&eacute;ez votre premier projet ou chargez les donn&eacute;es de d&eacute;mo</p>
+                <div style={{ display: "flex", gap: 10 }}>
+                  <Button icon="plus" onClick={() => setShowCreate(true)}>
+                    Cr&eacute;er un projet
+                  </Button>
+                  <Button variant="secondary" onClick={loadDemo}>
+                    Charger d&eacute;mo
+                  </Button>
+                </div>
+              </>
+            ) : (
+              <p>Aucun projet ne vous a encore &eacute;t&eacute; assign&eacute;.</p>
+            )}
           </div>
         ) : (
           <>
-            <h3 className="dashboard-section-title">Mes projets</h3>
+            <h3 className="dashboard-section-title">{isClient ? "Mes projets" : "Tous les projets"}</h3>
             <div className="projects-grid stagger">
-              {db.projects.map((p) => {
+              {visibleProjects.map((p) => {
                 const avgProgress = computeProjectProgress(p);
                 return (
                   <div
@@ -325,16 +346,18 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
                             {p.client && <span>{p.client}</span>}
                           </div>
                         </div>
-                        <button
-                          className="delete-btn"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            deleteProject(p.id);
-                          }}
-                          title="Supprimer"
-                        >
-                          <Icon name="trash" size={14} />
-                        </button>
+                        {isAdmin && (
+                          <button
+                            className="delete-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              deleteProject(p.id);
+                            }}
+                            title="Supprimer"
+                          >
+                            <Icon name="trash" size={14} />
+                          </button>
+                        )}
                       </div>
                       <ProgressBar value={avgProgress} />
                       <ProjectKpis project={p} />

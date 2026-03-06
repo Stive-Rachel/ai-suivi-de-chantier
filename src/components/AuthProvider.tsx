@@ -1,14 +1,54 @@
 import { createContext, useContext, useState, useEffect } from "react";
-import { isSupabaseConfigured } from "../lib/supabaseClient";
-import { getSession, onAuthChange, signInAnonymously } from "../lib/auth";
+import { isSupabaseConfigured, supabase } from "../lib/supabaseClient";
+import { getSession, onAuthChange, signOut as authSignOut } from "../lib/auth";
 
-const AuthContext = createContext({ user: null, loading: true });
+export interface UserProfile {
+  user_id: string;
+  email: string;
+  display_name: string;
+  role: "admin" | "client";
+}
+
+interface AuthContextType {
+  user: any;
+  profile: UserProfile | null;
+  loading: boolean;
+  signOut: () => Promise<void>;
+}
+
+const AuthContext = createContext<AuthContextType>({
+  user: null,
+  profile: null,
+  loading: true,
+  signOut: async () => {},
+});
 
 export const useAuth = () => useContext(AuthContext);
 
+async function fetchUserProfile(userId: string): Promise<UserProfile | null> {
+  if (!supabase) return null;
+  const { data, error } = await supabase
+    .from("user_profiles")
+    .select("*")
+    .eq("user_id", userId)
+    .single();
+  if (error) {
+    console.error("Failed to fetch user profile:", error);
+    return null;
+  }
+  return data as UserProfile;
+}
+
 export default function AuthProvider({ children }) {
   const [user, setUser] = useState(null);
+  const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const handleSignOut = async () => {
+    await authSignOut();
+    setUser(null);
+    setProfile(null);
+  };
 
   useEffect(() => {
     if (!isSupabaseConfigured()) {
@@ -23,17 +63,25 @@ export default function AuthProvider({ children }) {
         const session = await getSession();
         if (session?.user) {
           setUser(session.user);
-        } else {
-          const u = await signInAnonymously();
-          setUser(u);
+          const p = await fetchUserProfile(session.user.id);
+          setProfile(p);
         }
+        // No session = user stays null, LoginPage will be shown
       } catch (err) {
         console.error("Auth init failed:", err);
       } finally {
         setLoading(false);
       }
 
-      unsubscribe = onAuthChange(setUser);
+      unsubscribe = onAuthChange(async (authUser) => {
+        setUser(authUser);
+        if (authUser) {
+          const p = await fetchUserProfile(authUser.id);
+          setProfile(p);
+        } else {
+          setProfile(null);
+        }
+      });
     }
 
     init();
@@ -41,7 +89,7 @@ export default function AuthProvider({ children }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, loading }}>
+    <AuthContext.Provider value={{ user, profile, loading, signOut: handleSignOut }}>
       {children}
     </AuthContext.Provider>
   );

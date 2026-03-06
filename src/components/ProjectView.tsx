@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from "react
 import { saveDB } from "../lib/db";
 import { computeProjectProgress } from "../lib/computations";
 import * as dataLayer from "../lib/dataLayer";
+import { useUserRole } from "../lib/useUserRole";
 import Button from "./ui/Button";
 import Tabs from "./ui/Tabs";
 import ProgressBar from "./ui/ProgressBar";
@@ -24,13 +25,15 @@ const GanttTab = lazy(() => import("./tabs/GanttTab"));
 const PhotosTab = lazy(() => import("./tabs/PhotosTab"));
 const PlanningTab = lazy(() => import("./tabs/PlanningTab"));
 const HelpTab = lazy(() => import("./tabs/HelpTab"));
+const InviteUsersPanel = lazy(() => import("./InviteUsersPanel"));
 
 function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
 }
 
 export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: any) {
-  const [activeTab, setActiveTab] = useState("setup");
+  const { isClient } = useUserRole();
+  const [activeTab, setActiveTab] = useState(isClient ? "logements" : "setup");
   const [alertOpen, setAlertOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(() => {
     const isBergevin = project.name?.toLowerCase().includes("bergevin");
@@ -75,22 +78,32 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
 
   const alertCounts = useMemo(() => countAlerts(currentProject), [currentProject]);
 
-  const tabs = useMemo(() => [
-    { key: "setup", label: "Configuration", icon: "settings" },
-    { key: "batiments-config", label: "Bâtiments", icon: "building" },
-    { key: "lots", label: "Lots", icon: "folder" },
-    { key: "logements", label: "Suivi INT", icon: "home" },
-    { key: "batiments", label: "Suivi EXT", icon: "building" },
-    { key: "recap", label: "Récap", icon: "chart" },
-    { key: "recap-av", label: "Récap Av.", icon: "chart" },
-    { key: "avancement", label: "Avancement", icon: "chart" },
-    { key: "gantt", label: "Planning", icon: "calendar" },
-    { key: "planning-logements", label: "Cibles Log.", icon: "target" },
-    { key: "photos", label: "Photos", icon: "camera" },
-    { key: "export", label: "Export", icon: "download" },
-    { key: "dashboard", label: "Tableau de bord", icon: "chart" },
-    { key: "help", label: "Aide", icon: "help" },
-  ], []);
+  // Tabs hidden for clients: Configuration, Batiments, Lots
+  const ADMIN_ONLY_TABS = new Set(["setup", "batiments-config", "lots", "users"]);
+
+  const tabs = useMemo(() => {
+    const allTabs = [
+      { key: "setup", label: "Configuration", icon: "settings" },
+      { key: "batiments-config", label: "Bâtiments", icon: "building" },
+      { key: "lots", label: "Lots", icon: "folder" },
+      { key: "logements", label: "Suivi INT", icon: "home" },
+      { key: "batiments", label: "Suivi EXT", icon: "building" },
+      { key: "recap", label: "Récap", icon: "chart" },
+      { key: "recap-av", label: "Récap Av.", icon: "chart" },
+      { key: "avancement", label: "Avancement", icon: "chart" },
+      { key: "gantt", label: "Planning", icon: "calendar" },
+      { key: "planning-logements", label: "Cibles Log.", icon: "target" },
+      { key: "photos", label: "Photos", icon: "camera" },
+      { key: "export", label: "Export", icon: "download" },
+      { key: "dashboard", label: "Tableau de bord", icon: "chart" },
+      { key: "users", label: "Utilisateurs", icon: "settings" },
+      { key: "help", label: "Aide", icon: "help" },
+    ];
+    if (isClient) {
+      return allTabs.filter((t) => !ADMIN_ONLY_TABS.has(t.key));
+    }
+    return allTabs;
+  }, [isClient]);
 
   // Keyboard shortcuts: digits 1-9 switch tabs, 0 for 10th tab
   useEffect(() => {
@@ -160,17 +173,18 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
         {activeTab === "setup" && <SetupTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "batiments-config" && <BatimentsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "lots" && <LotsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
-        {activeTab === "logements" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="logements" />}
-        {activeTab === "batiments" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="batiments" />}
+        {activeTab === "logements" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="logements" readOnly={isClient} />}
+        {activeTab === "batiments" && <TrackingGrid project={currentProject} updateProject={updateProject} supaSync={supaSync} type="batiments" readOnly={isClient} />}
         <Suspense fallback={<TabLoader />}>
           {activeTab === "dashboard" && <DashboardTab project={currentProject} />}
           {activeTab === "recap" && <RecapTab project={currentProject} />}
           {activeTab === "recap-av" && <RecapAvancementTab project={currentProject} />}
           {activeTab === "avancement" && <AvancementTab project={currentProject} />}
           {activeTab === "gantt" && <GanttTab project={currentProject} />}
-          {activeTab === "planning-logements" && <PlanningTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
+          {activeTab === "planning-logements" && <PlanningTab project={currentProject} updateProject={updateProject} supaSync={supaSync} readOnly={isClient} />}
           {activeTab === "photos" && <PhotosTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
           {activeTab === "export" && <ExportTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
+          {activeTab === "users" && <InviteUsersPanel projects={db.projects} />}
           {activeTab === "help" && <HelpTab />}
         </Suspense>
       </div>
@@ -199,11 +213,13 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
         </div>
       </Modal>
 
-      <QuickEntry
-        project={currentProject}
-        updateProject={updateProject}
-        supaSync={supaSync}
-      />
+      {!isClient && (
+        <QuickEntry
+          project={currentProject}
+          updateProject={updateProject}
+          supaSync={supaSync}
+        />
+      )}
     </div>
   );
 }

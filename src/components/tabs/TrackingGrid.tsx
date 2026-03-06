@@ -15,7 +15,7 @@ const ALL_COLUMNS = [
   { key: "count", label: "Nb. fait", defaultVisible: true },
 ];
 
-export default function TrackingGrid({ project, updateProject, supaSync, type }) {
+export default function TrackingGrid({ project, updateProject, supaSync, type, readOnly = false }) {
   const isLogements = type === "logements";
   const lotsRaw = isLogements ? project.lotsInt : project.lotsExt;
   const lots = useMemo(() => [...(lotsRaw || [])].sort((a, b) => {
@@ -445,7 +445,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                       }}>
                         {e.label}
                       </span>
-                      {isLogements && (
+                      {isLogements && !readOnly && (
                         <button
                           className={`exc-toggle-btn ${isExc ? "exc-active" : ""}`}
                           onClick={(ev) => {
@@ -471,23 +471,25 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                           }} />
                         </button>
                       )}
-                      <button
-                        className="col-toggle-btn"
-                        onClick={() => toggleColumn(e.id)}
-                        title={allDone ? "Décocher toute la colonne" : "Cocher toute la colonne"}
-                        style={{
-                          width: 18, height: 18, borderRadius: 3,
-                          border: `1.5px solid ${allDone ? "var(--success)" : "var(--border-default)"}`,
-                          background: allDone ? "var(--success)" : "var(--bg-default)",
-                          color: allDone ? "#fff" : "var(--text-tertiary)",
-                          cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
-                          fontSize: 11, fontWeight: 700, padding: 0, lineHeight: 1,
-                          flexShrink: 0,
-                          opacity: isExc ? 0.4 : 1,
-                        }}
-                      >
-                        {allDone ? "✓" : ""}
-                      </button>
+                      {!readOnly && (
+                        <button
+                          className="col-toggle-btn"
+                          onClick={() => toggleColumn(e.id)}
+                          title={allDone ? "Décocher toute la colonne" : "Cocher toute la colonne"}
+                          style={{
+                            width: 18, height: 18, borderRadius: 3,
+                            border: `1.5px solid ${allDone ? "var(--success)" : "var(--border-default)"}`,
+                            background: allDone ? "var(--success)" : "var(--bg-default)",
+                            color: allDone ? "#fff" : "var(--text-tertiary)",
+                            cursor: "pointer", display: "inline-flex", alignItems: "center", justifyContent: "center",
+                            fontSize: 11, fontWeight: 700, padding: 0, lineHeight: 1,
+                            flexShrink: 0,
+                            opacity: isExc ? 0.4 : 1,
+                          }}
+                        >
+                          {allDone ? "✓" : ""}
+                        </button>
+                      )}
                     </div>
                   </th>
                 );
@@ -530,6 +532,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                       step={1}
                       value={getPonderation(row.key)}
                       onChange={(e) => setPonderation(row.key, e.target.value)}
+                      readOnly={readOnly}
                       style={{ width: 42, textAlign: "center", padding: "2px 4px", fontSize: 12, border: "1px solid var(--border-default)", borderRadius: 4, background: "var(--bg-default)", color: "var(--text-primary)" }}
                     />
                   </td>
@@ -580,7 +583,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
                         width: colWidths[e.id] || undefined,
                       }}
                     >
-                      <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} />
+                      <StatusCell value={getValue(row.key, e.id)} onChange={(s) => setValue(row.key, e.id, s)} readOnly={readOnly} />
                     </td>
                   );
                 })}

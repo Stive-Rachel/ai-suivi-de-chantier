@@ -103,9 +103,10 @@ interface PlanningTabProps {
   project: Project;
   updateProject: (updater: (p: Project) => Project) => void;
   supaSync: any;
+  readOnly?: boolean;
 }
 
-export default function PlanningTab({ project, updateProject, supaSync }: PlanningTabProps) {
+export default function PlanningTab({ project, updateProject, supaSync, readOnly = false }: PlanningTabProps) {
   const [editingCell, setEditingCell] = useState<number | null>(null);
   const [editValue, setEditValue] = useState("");
   const [extraWeeks, setExtraWeeks] = useState(0);
@@ -418,15 +419,17 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
         <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>
           Debut : {formatDate(startDate)}
         </span>
-        <Button
-          variant="ghost"
-          size="sm"
-          icon="plus"
-          onClick={addMoreWeeks}
-          style={{ marginLeft: "auto" }}
-        >
-          Ajouter des semaines
-        </Button>
+        {!readOnly && (
+          <Button
+            variant="ghost"
+            size="sm"
+            icon="plus"
+            onClick={addMoreWeeks}
+            style={{ marginLeft: "auto" }}
+          >
+            Ajouter des semaines
+          </Button>
+        )}
       </div>
 
       {/* Table */}
@@ -529,7 +532,7 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                       />
                     ) : (
                       <button
-                        onClick={() => handleStartEdit(week.semaine, week.cible)}
+                        onClick={readOnly ? undefined : () => handleStartEdit(week.semaine, week.cible)}
                         style={{
                           display: "inline-flex",
                           alignItems: "center",
@@ -542,16 +545,16 @@ export default function PlanningTab({ project, updateProject, supaSync }: Planni
                           background: week.cible > 0 ? "var(--accent-bg)" : "var(--bg-input)",
                           border: "1px solid transparent",
                           borderRadius: "var(--radius-xs)",
-                          cursor: "pointer",
+                          cursor: readOnly ? "default" : "pointer",
                           transition: "all 0.15s ease",
                         }}
-                        onMouseEnter={(e) => {
+                        onMouseEnter={readOnly ? undefined : (e) => {
                           (e.target as HTMLElement).style.borderColor = "var(--accent)";
                         }}
-                        onMouseLeave={(e) => {
+                        onMouseLeave={readOnly ? undefined : (e) => {
                           (e.target as HTMLElement).style.borderColor = "transparent";
                         }}
-                        title="Cliquer pour modifier"
+                        title={readOnly ? `Cible : ${week.cible || 0}` : "Cliquer pour modifier"}
                       >
                         {week.cible > 0 ? week.cible : "—"}
                       </button>
