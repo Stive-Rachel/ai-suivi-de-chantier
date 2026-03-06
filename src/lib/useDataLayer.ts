@@ -19,14 +19,26 @@ export function useDataLayer(userId) {
     async function init() {
       try {
         if (mode === "supabase" && userId) {
+          // Backup localStorage before any migration attempt
+          const localBackup = loadDB();
+
           // Try migrating localStorage data first
           await migrateLocalStorageToSupabase(userId);
 
           const projects = await loadAllProjects();
           if (!cancelled) {
-            setDb({ projects });
-            // Keep localStorage in sync as backup
-            saveDB({ projects });
+            if (projects.length > 0) {
+              setDb({ projects });
+              // Keep localStorage in sync as backup
+              saveDB({ projects });
+            } else if (localBackup?.projects?.length) {
+              // Supabase is empty but we had local data — keep local data safe
+              console.warn("Supabase returned empty but local data exists, keeping local data");
+              setDb(localBackup);
+              saveDB(localBackup);
+            } else {
+              setDb({ projects });
+            }
           }
         } else {
           // Fallback: localStorage (mode local, or supabase without userId yet)
