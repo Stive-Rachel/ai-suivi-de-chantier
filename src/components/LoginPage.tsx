@@ -47,7 +47,20 @@ export default function LoginPage() {
           await handleCreateAccount();
         }
       } else {
-        await signInWithPassword(email, password);
+        const result = await signInWithPassword(email, password);
+        // Vérifier que l'utilisateur a un profil (a été invité)
+        const userId = result?.user?.id;
+        if (userId && supabase) {
+          const { data: profile } = await supabase
+            .from("user_profiles")
+            .select("role")
+            .eq("user_id", userId)
+            .single();
+          if (!profile) {
+            await supabase.auth.signOut();
+            throw new Error("Votre compte n'est pas autorisé. Contactez votre administrateur.");
+          }
+        }
       }
     } catch (err: any) {
       setError(err?.message || "Une erreur est survenue.");
@@ -89,6 +102,19 @@ export default function LoginPage() {
     }
 
     const trimmedEmail = email.trim().toLowerCase();
+
+    // Vérification côté serveur : seuls les emails invités peuvent s'inscrire
+    const { data: invCheck } = await supabase
+      .from("invitations")
+      .select("id")
+      .eq("email", trimmedEmail)
+      .eq("accepted", false)
+      .limit(1);
+
+    if (!invCheck || invCheck.length === 0) {
+      throw new Error("Aucune invitation valide pour cet email.");
+    }
+
     const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: trimmedEmail,
       password,
@@ -97,7 +123,7 @@ export default function LoginPage() {
     if (signUpError) throw signUpError;
 
     const newUserId = signUpData?.user?.id;
-    if (newUserId && invitationFound) {
+    if (newUserId) {
       // Apply invitation via SECURITY DEFINER function (bypasses RLS)
       await supabase.rpc("apply_invitation", {
         _user_id: newUserId,

@@ -1,23 +1,10 @@
 import { supabase } from "./supabaseClient";
 
-export async function signInAnonymously() {
-  if (!supabase) return null;
-  const { data, error } = await supabase.auth.signInAnonymously();
-  if (error) throw error;
-  return data.user;
-}
-
-export async function signInWithEmail(email) {
-  if (!supabase) return null;
-  const { error } = await supabase.auth.signInWithOtp({ email });
-  if (error) throw error;
-}
-
 export async function signInWithPassword(email: string, password: string) {
   if (!supabase) return null;
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });
   if (error) throw error;
-  return data.user;
+  return data;
 }
 
 export async function resetPassword(email: string) {
