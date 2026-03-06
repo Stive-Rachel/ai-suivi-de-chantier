@@ -1,4 +1,4 @@
-import MoneyInput from "../ui/MoneyInput";
+import { formatMontant } from "../../lib/format";
 
 export default function SetupTab({ project, updateProject, supaSync }) {
   const updateField = (field, value) => {
@@ -7,6 +7,11 @@ export default function SetupTab({ project, updateProject, supaSync }) {
   };
 
   const totalLogements = project.batiments.reduce((s, b) => s + (b.nbLogements || 0), 0);
+
+  // Compute montants from lots decompositions
+  const montantExt = (project.lotsExt || []).reduce((s, d) => s + (d.montant || 0), 0);
+  const montantInt = (project.lotsInt || []).reduce((s, d) => s + (d.montant || 0), 0);
+  const montantTotal = montantExt + montantInt;
 
   return (
     <div className="setup-content-wide" style={{ animation: "slideInUp 0.4s ease both" }}>
@@ -32,7 +37,7 @@ export default function SetupTab({ project, updateProject, supaSync }) {
           </div>
           <div className="param-field">
             <label>Montant des travaux (€)</label>
-            <MoneyInput variant="field" value={project.montantTotal} onChange={(v) => updateField("montantTotal", v)} />
+            <input className="input-field" readOnly value={formatMontant(montantTotal)} />
           </div>
           <div className="param-field">
             <label>Date de début de chantier</label>
@@ -44,11 +49,11 @@ export default function SetupTab({ project, updateProject, supaSync }) {
           </div>
           <div className="param-field">
             <label>Montant travaux extérieurs (€)</label>
-            <MoneyInput variant="field" value={project.montantExt} onChange={(v) => updateField("montantExt", v)} />
+            <input className="input-field" readOnly value={formatMontant(montantExt)} />
           </div>
           <div className="param-field">
             <label>Montant travaux intérieurs (€)</label>
-            <MoneyInput variant="field" value={project.montantInt} onChange={(v) => updateField("montantInt", v)} />
+            <input className="input-field" readOnly value={formatMontant(montantInt)} />
           </div>
           <div className="param-field">
             <label>Durée travaux extérieurs (mois)</label>
