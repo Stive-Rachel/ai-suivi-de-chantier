@@ -3,6 +3,7 @@ import { saveDB } from "../lib/db";
 import { computeProjectProgress } from "../lib/computations";
 import * as dataLayer from "../lib/dataLayer";
 import { useUserRole } from "../lib/useUserRole";
+import { useAuth } from "./AuthProvider";
 import Button from "./ui/Button";
 import Tabs from "./ui/Tabs";
 import ProgressBar from "./ui/ProgressBar";
@@ -33,6 +34,7 @@ function TabLoader() {
 
 export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: any) {
   const { isClient } = useUserRole();
+  const { profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState(isClient ? "logements" : "setup");
   const [alertOpen, setAlertOpen] = useState(false);
   const [disclaimerOpen, setDisclaimerOpen] = useState(() => {
@@ -164,6 +166,9 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           {mode === "local" && (
             <span className="connection-badge local" title="Mode local (localStorage)">local</span>
           )}
+          <Button variant="ghost" size="sm" onClick={signOut}>
+            Déconnexion
+          </Button>
         </div>
       </header>
 

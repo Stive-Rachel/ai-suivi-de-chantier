@@ -5,6 +5,7 @@ import { computeProjectProgress, computeDetailedProgress, getLogementCounts } fr
 import { formatMontant } from "../lib/format";
 import * as dataLayer from "../lib/dataLayer";
 import { useUserRole } from "../lib/useUserRole";
+import { useAuth } from "./AuthProvider";
 import initialData from "../initialData.json";
 import Icon from "./ui/Icon";
 import Button from "./ui/Button";
@@ -105,6 +106,7 @@ function ProjectKpis({ project }) {
 
 export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme }) {
   const { isAdmin, isClient, allowedProjectIds } = useUserRole();
+  const { profile, signOut } = useAuth();
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
@@ -248,6 +250,10 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
         <div className="header-actions" style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <SyncStatusBadge />
           <ThemeToggle theme={theme} onToggle={toggleTheme} />
+          <span style={{ fontSize: 12, color: "var(--text-tertiary)" }}>{profile?.email}</span>
+          <Button variant="ghost" size="sm" onClick={signOut}>
+            Déconnexion
+          </Button>
           {isAdmin && (
             <>
               <Button variant="secondary" onClick={loadDemo}>
