@@ -64,7 +64,17 @@ export function loadDB(): DB {
 }
 
 export function saveDB(db: DB): void {
-  localStorage.setItem(DB_KEY, JSON.stringify(db));
+  const withTimestamp = { ...db, _lastModified: Date.now() };
+  localStorage.setItem(DB_KEY, JSON.stringify(withTimestamp));
+}
+
+export function getLocalTimestamp(): number {
+  try {
+    const raw = JSON.parse(localStorage.getItem(DB_KEY) || "{}");
+    return raw._lastModified || 0;
+  } catch {
+    return 0;
+  }
 }
 
 export function generateId(): string {

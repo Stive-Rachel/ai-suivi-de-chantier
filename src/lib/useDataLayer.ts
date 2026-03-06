@@ -2,8 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
-import { loadDB, saveDB } from "./db";
-import { loadAllProjects } from "./dataLayer";
+import { loadDB, saveDB, getLocalTimestamp } from "./db";
+import { loadAllProjects, fullProjectSync } from "./dataLayer";
 import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
 
 export function useDataLayer(userId) {
@@ -19,26 +19,38 @@ export function useDataLayer(userId) {
     async function init() {
       try {
         if (mode === "supabase" && userId) {
-          // SAFETY: always backup before any Supabase operation
           backupLocalData();
-          const localBackup = loadDB();
+          const localData = loadDB();
+          const localTimestamp = getLocalTimestamp();
 
-          // Try migrating localStorage data first
           await migrateLocalStorageToSupabase(userId);
 
           const projects = await loadAllProjects();
           if (!cancelled) {
             if (projects.length > 0) {
+              // If local data is more recent, push it to Supabase instead of overwriting
+              if (localData?.projects?.length && localTimestamp > 0) {
+                const supabaseTimestamp = projects.reduce((max, p) => {
+                  const t = new Date(p.updatedAt || p.createdAt || 0).getTime();
+                  return t > max ? t : max;
+                }, 0);
+
+                if (localTimestamp > supabaseTimestamp) {
+                  console.warn("[DataLayer] Local data is newer than Supabase, pushing local data");
+                  setDb(localData);
+                  for (const p of localData.projects) {
+                    fullProjectSync(p, userId).catch(console.error);
+                  }
+                  return;
+                }
+              }
+
               setDb({ projects });
-              // Keep localStorage in sync as backup
               saveDB({ projects });
-            } else if (localBackup?.projects?.length) {
-              // SAFETY: Supabase is empty but we had local data — never wipe it
+            } else if (localData?.projects?.length) {
               console.warn("Supabase returned empty but local data exists, keeping local data");
-              setDb(localBackup);
-              // Don't call saveDB — it's already there
+              setDb(localData);
             } else {
-              // Try restoring from backup in case localStorage was wiped
               const restored = restoreFromBackup();
               if (restored?.projects?.length) {
                 console.warn("Restored data from backup");
@@ -49,7 +61,6 @@ export function useDataLayer(userId) {
             }
           }
         } else {
-          // Fallback: localStorage (mode local, or supabase without userId yet)
           if (!cancelled) setDb(loadDB());
         }
       } catch (err) {
@@ -57,7 +68,6 @@ export function useDataLayer(userId) {
         if (!cancelled) {
           setError(err);
           setMode("local");
-          // Try main localStorage first, then backup
           const localData = loadDB();
           if (localData?.projects?.length) {
             setDb(localData);

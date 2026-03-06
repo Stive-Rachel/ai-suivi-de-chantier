@@ -33,6 +33,7 @@ export function rowToProject(row, batiments, lots, lotsDecomp, tracking) {
     location: row.location || "",
     client: row.client || "",
     createdAt: row.created_at,
+    updatedAt: row.updated_at || row.created_at,
     montantTotal: row.montant_total || 0,
     montantExt: row.montant_ext || 0,
     montantInt: row.montant_int || 0,
