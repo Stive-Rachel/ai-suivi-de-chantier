@@ -74,6 +74,36 @@ export default function DashboardTab({ project }) {
     ],
   }));
 
+  // Count logements fully done (all INT tasks completed for that logement)
+  const logementsDone = useMemo(() => {
+    const intLots = project.lotsInt || [];
+    const trackingLog = project.tracking?.logements || {};
+    if (intLots.length === 0) return 0;
+
+    // Build list of all task keys
+    const taskKeys = [];
+    for (const lot of intLots) {
+      for (const decomp of lot.decompositions) {
+        taskKeys.push(`${lot.trackPrefix || lot.numero}-${decomp}`);
+      }
+    }
+    if (taskKeys.length === 0) return 0;
+
+    let done = 0;
+    for (const bat of project.batiments) {
+      for (const num of getLogementNums(bat)) {
+        const eId = `${bat.id}_log_${num}`;
+        if (exceptions[eId]) continue;
+        const allDone = taskKeys.every((key) => {
+          const status = trackingLog[key]?.[eId]?.status;
+          return status === "X" || status === "N/A";
+        });
+        if (allDone) done++;
+      }
+    }
+    return done;
+  }, [project]);
+
   const donutColor = avgProgress >= 75 ? "var(--success)" : avgProgress >= 40 ? "var(--warning)" : "var(--danger)";
 
   return (
@@ -118,6 +148,20 @@ export default function DashboardTab({ project }) {
               {nbLog > 1 ? "Logements" : "Logement"}
               {nbLogExc > 0 && ` (${nbLogExc} exc.)`}
             </span>
+          </div>
+        </div>
+        <div className="dtab-kpi">
+          <Icon name="check" size={16} />
+          <div>
+            <span className="dtab-kpi-value" style={{ color: "var(--success)" }}>{logementsDone}</span>
+            <span className="dtab-kpi-label">Terminés</span>
+          </div>
+        </div>
+        <div className="dtab-kpi">
+          <Icon name="alert" size={16} />
+          <div>
+            <span className="dtab-kpi-value" style={{ color: "var(--danger)" }}>{nbLogActive - logementsDone}</span>
+            <span className="dtab-kpi-label">Non terminés</span>
           </div>
         </div>
       </div>
