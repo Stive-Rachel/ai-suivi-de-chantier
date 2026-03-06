@@ -15,9 +15,17 @@ export default function LotsTab({ project, updateProject, supaSync }) {
   const [expandedDecomp, setExpandedDecomp] = useState(null);
 
   const lots = project.lots || [];
-  const totalMarche = lots.reduce((s, l) => s + (l.montantMarche || 0), 0);
-  const totalExt = lots.reduce((s, l) => s + (l.montantExt || 0), 0);
-  const totalInt = lots.reduce((s, l) => s + (l.montantInt || 0), 0);
+
+  // Compute montants from decompositions
+  const computedMontants = (lot) => {
+    const ext = (project.lotsExt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
+    const int = (project.lotsInt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
+    return { montantExt: ext, montantInt: int, montantMarche: ext + int };
+  };
+
+  const totalMarche = lots.reduce((s, l) => s + computedMontants(l).montantMarche, 0);
+  const totalExt = lots.reduce((s, l) => s + computedMontants(l).montantExt, 0);
+  const totalInt = lots.reduce((s, l) => s + computedMontants(l).montantInt, 0);
 
   // Wrapper: sync lots to Supabase after any lots change
   const updateProjectAndSyncLots = (updater) => {
@@ -28,11 +36,22 @@ export default function LotsTab({ project, updateProject, supaSync }) {
     });
   };
 
+  // Recompute lot montants from decompositions
+  const recomputeLotMontants = (p) => {
+    const updatedLots = (p.lots || []).map((lot) => {
+      const ext = (p.lotsExt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
+      const int = (p.lotsInt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
+      return { ...lot, montantExt: ext, montantInt: int, montantMarche: ext + int };
+    });
+    return { ...p, lots: updatedLots };
+  };
+
   // Wrapper: sync decomps to Supabase after any decomp change
   const updateProjectAndSyncDecomp = (updater) => {
     updateProject((p) => {
-      const result = updater(p);
+      const result = recomputeLotMontants(updater(p));
       supaSync?.syncLotsDecomp(result.lotsInt, result.lotsExt);
+      supaSync?.syncLots(result.lots);
       return result;
     });
   };
@@ -213,9 +232,10 @@ export default function LotsTab({ project, updateProject, supaSync }) {
               </thead>
               <tbody>
                 {lots.map((lot, i) => {
-                  const pctMarche = totalMarche > 0 ? ((lot.montantMarche || 0) / totalMarche * 100) : 0;
-                  const pctExt = totalExt > 0 ? ((lot.montantExt || 0) / totalExt * 100) : 0;
-                  const pctInt = totalInt > 0 ? ((lot.montantInt || 0) / totalInt * 100) : 0;
+                  const cm = computedMontants(lot);
+                  const pctMarche = totalMarche > 0 ? (cm.montantMarche / totalMarche * 100) : 0;
+                  const pctExt = totalExt > 0 ? (cm.montantExt / totalExt * 100) : 0;
+                  const pctInt = totalInt > 0 ? (cm.montantInt / totalInt * 100) : 0;
                   const nbDecompExt = project.lotsExt.filter((l) => l.numero === lot.numero).length;
                   const nbDecompInt = project.lotsInt.filter((l) => l.numero === lot.numero).length;
                   return (
@@ -224,27 +244,21 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                       <td>
                         <input className="inline-edit" value={lot.nom} onChange={(e) => updateLotField(i, "nom", e.target.value)} />
                       </td>
-                      <td className="cell-right cell-mono">
-                        <MoneyInput value={lot.montantMarche} onChange={(v) => updateLotField(i, "montantMarche", v)} />
-                      </td>
+                      <td className="cell-right cell-mono">{formatMontant(cm.montantMarche)}</td>
                       <td className="cell-right cell-mono cell-muted">{pctMarche.toFixed(0)}%</td>
                       <td className="cell-center col-ext">
                         <button className="decomp-count-btn" onClick={() => setDecompModal({ lotIndex: i, type: "ext" })}>
                           {nbDecompExt}
                         </button>
                       </td>
-                      <td className="cell-right col-ext cell-mono">
-                        <MoneyInput value={lot.montantExt} onChange={(v) => updateLotField(i, "montantExt", v)} />
-                      </td>
+                      <td className="cell-right col-ext cell-mono">{formatMontant(cm.montantExt)}</td>
                       <td className="cell-right cell-mono cell-muted col-ext">{pctExt.toFixed(0)}%</td>
                       <td className="cell-center col-int">
                         <button className="decomp-count-btn" onClick={() => setDecompModal({ lotIndex: i, type: "int" })}>
                           {nbDecompInt}
                         </button>
                       </td>
-                      <td className="cell-right col-int cell-mono">
-                        <MoneyInput value={lot.montantInt} onChange={(v) => updateLotField(i, "montantInt", v)} />
-                      </td>
+                      <td className="cell-right col-int cell-mono">{formatMontant(cm.montantInt)}</td>
                       <td className="cell-right cell-mono cell-muted col-int">{pctInt.toFixed(0)}%</td>
                       <td className="cell-center">
                         <button className="delete-btn" onClick={() => removeLot(i)}>
