@@ -1387,6 +1387,9 @@ body {
 .decomp-table tbody tr.decomp-row:hover td {
   background: var(--accent-bg);
 }
+.decomp-table tbody tr:hover .delete-btn {
+  opacity: 1;
+}
 .decomp-table tbody tr.decomp-row-expanded td {
   background: var(--bg-elevated);
   border-bottom-color: transparent;
