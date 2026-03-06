@@ -19,27 +19,7 @@ export default function DashboardTab({ project }) {
   const nbLogActive = logCounts.active;
   const nbLogExc = logCounts.exceptions;
 
-  // Status distribution (excludes exception logements)
   const exceptions = project.exceptions || {};
-  const statusStats = useMemo(() => {
-    let done = 0, alerts = 0, noks = 0, empty = 0;
-    for (const trackType of ["logements", "batiments"]) {
-      const t = project.tracking?.[trackType] || {};
-      for (const rowKey of Object.keys(t)) {
-        if (rowKey.startsWith("_")) continue;
-        for (const [entityId, cell] of Object.entries(t[rowKey])) {
-          if (entityId.startsWith("_")) continue;
-          if (trackType === "logements" && exceptions[entityId]) continue;
-          const s = cell?.status;
-          if (s === "X") done++;
-          else if (s === "!") alerts++;
-          else if (s === "NOK") noks++;
-          else empty++;
-        }
-      }
-    }
-    return { done, alerts, noks, empty, total: done + alerts + noks + empty };
-  }, [project.tracking, exceptions]);
 
   // INT/EXT weighted averages
   const totalMontantInt = lotProgressInt.reduce((s, lp) => s + lp.montant, 0);
@@ -182,48 +162,30 @@ export default function DashboardTab({ project }) {
         </div>
 
         <div className="chart-card">
-          <h4 className="chart-card-title">Répartition des statuts</h4>
+          <h4 className="chart-card-title">Logements terminés</h4>
           <div className="chart-card-body chart-center">
             <MultiDonut
               size={150}
               strokeWidth={14}
               segments={[
-                { value: statusStats.done, color: "var(--success)", label: "Fait" },
-                { value: statusStats.alerts, color: "var(--warning)", label: "Alerte" },
-                { value: statusStats.noks, color: "var(--danger)", label: "NOK" },
-                { value: statusStats.empty, color: "var(--border-default)", label: "Vide" },
+                { value: logementsDone, color: "var(--success)", label: "Terminés" },
+                { value: nbLogActive - logementsDone, color: "var(--border-default)", label: "Non terminés" },
               ].filter((s) => s.value > 0)}
             >
               <span className="donut-chart-value">
-                {statusStats.total > 0 ? ((statusStats.done / statusStats.total) * 100).toFixed(2) : 0}%
+                {nbLogActive > 0 ? ((logementsDone / nbLogActive) * 100).toFixed(1) : 0}%
               </span>
-              <span className="donut-chart-label">complété</span>
+              <span className="donut-chart-label">terminés</span>
             </MultiDonut>
             <div className="chart-legend">
-              {statusStats.done > 0 && (
-                <span className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ background: "var(--success)" }} />
-                  {statusStats.done} fait
-                </span>
-              )}
-              {statusStats.alerts > 0 && (
-                <span className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ background: "var(--warning)" }} />
-                  {statusStats.alerts} alertes
-                </span>
-              )}
-              {statusStats.noks > 0 && (
-                <span className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ background: "var(--danger)" }} />
-                  {statusStats.noks} NOK
-                </span>
-              )}
-              {statusStats.empty > 0 && (
-                <span className="chart-legend-item">
-                  <span className="chart-legend-dot" style={{ background: "var(--border-default)" }} />
-                  {statusStats.empty} vide
-                </span>
-              )}
+              <span className="chart-legend-item">
+                <span className="chart-legend-dot" style={{ background: "var(--success)" }} />
+                {logementsDone} terminés
+              </span>
+              <span className="chart-legend-item">
+                <span className="chart-legend-dot" style={{ background: "var(--border-default)" }} />
+                {nbLogActive - logementsDone} non terminés
+              </span>
             </div>
           </div>
         </div>
