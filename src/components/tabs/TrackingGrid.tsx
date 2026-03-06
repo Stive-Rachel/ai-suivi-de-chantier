@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef, useEffect, useCallback } from "react";
 import { getLogementNums } from "../../lib/db";
 import { STATUS_BADGE_STYLES } from "../../lib/constants";
 import { useColumnResize } from "../../lib/useColumnResize";
@@ -24,6 +24,45 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
     if (na !== nb) return na - nb;
     return (a.nom || "").localeCompare(b.nom || "");
   }), [lotsRaw]);
+
+  // Top scrollbar mirror refs
+  const topScrollRef = useRef(null);
+  const topScrollInner = useRef(null);
+  const mainScrollRef = useRef(null);
+  const syncing = useRef(false);
+
+  // Sync top scrollbar width with table width
+  useEffect(() => {
+    const main = mainScrollRef.current;
+    if (!main || !topScrollInner.current) return;
+    const updateWidth = () => {
+      if (topScrollInner.current) {
+        topScrollInner.current.style.width = main.scrollWidth + "px";
+      }
+    };
+    updateWidth();
+    const ro = new ResizeObserver(updateWidth);
+    ro.observe(main);
+    return () => ro.disconnect();
+  });
+
+  const handleTopScroll = useCallback(() => {
+    if (syncing.current) return;
+    syncing.current = true;
+    if (mainScrollRef.current && topScrollRef.current) {
+      mainScrollRef.current.scrollLeft = topScrollRef.current.scrollLeft;
+    }
+    syncing.current = false;
+  }, []);
+
+  const handleMainScroll = useCallback(() => {
+    if (syncing.current) return;
+    syncing.current = true;
+    if (topScrollRef.current && mainScrollRef.current) {
+      topScrollRef.current.scrollLeft = mainScrollRef.current.scrollLeft;
+    }
+    syncing.current = false;
+  }, []);
 
   const [filters, setFilters] = useState({ statusFilter: "all", searchText: "" });
   const [sortConfig, setSortConfig] = useState({ key: null, direction: "asc" });
@@ -320,7 +359,21 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
         </div>
       )}
 
-      <div className="tracking-table-scroll" style={{ overflow: "auto", maxHeight: "calc(100vh - 240px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
+      {/* Top scrollbar mirror */}
+      <div
+        ref={topScrollRef}
+        onScroll={handleTopScroll}
+        style={{ overflowX: "auto", overflowY: "hidden", marginBottom: -1 }}
+      >
+        <div ref={topScrollInner} style={{ height: 1 }} />
+      </div>
+
+      <div
+        ref={mainScrollRef}
+        onScroll={handleMainScroll}
+        className="tracking-table-scroll"
+        style={{ overflow: "auto", maxHeight: "calc(100vh - 240px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}
+      >
         <table className="tracking-table" role="grid" aria-label="Grille de suivi">
           <thead>
             {isLogements && (
