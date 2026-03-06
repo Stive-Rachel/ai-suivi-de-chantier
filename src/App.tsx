@@ -14,6 +14,11 @@ export default function App() {
   const [openProjectId, setOpenProjectId] = useState(null);
   const { theme, toggleTheme } = useTheme();
 
+  // Reset to home when user changes (login/logout)
+  useEffect(() => {
+    setOpenProjectId(null);
+  }, [user?.id]);
+
   // Auto-flush sync queue when coming back online
   useAutoFlush(useCallback(replayOperation, []));
 
