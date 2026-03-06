@@ -121,12 +121,11 @@ export default function RecapAvancementTab({ project }) {
             </thead>
             <tbody>
               {sortedData.map((r, i) => {
-                const isLow = r.avancement < avgAv * 0.5 && avgAv > 0 && r.avancement < 100;
                 return (
-                  <tr key={i} className={isLow ? "row-retard" : ""}>
+                  <tr key={i}>
                     <td style={{ fontSize: 12 }}>{r.label}</td>
                     <td
-                      className={`cell-right cell-mono ${isLow ? "val-retard" : ""}`}
+                      className="cell-right cell-mono"
                       style={{ fontSize: 12 }}
                       data-tooltip={r.tooltipAv}
                     >
