@@ -176,7 +176,7 @@ export async function syncBatiments(projectId, batiments) {
   if (!isSupabaseConfigured()) return;
 
   // Delete all then re-insert (simplest for reorder/add/remove)
-  await supabase.from("batiments").delete().eq("project_id", projectId);
+  throwIfError(await supabase.from("batiments").delete().eq("project_id", projectId));
   if (batiments.length) {
     const rows = batiments.map((b, i) => batimentToRow(b, projectId, i));
     throwIfError(await supabase.from("batiments").upsert(rows));
@@ -188,7 +188,7 @@ export async function syncBatiments(projectId, batiments) {
 export async function syncLots(projectId, lots) {
   if (!isSupabaseConfigured()) return;
 
-  await supabase.from("lots").delete().eq("project_id", projectId);
+  throwIfError(await supabase.from("lots").delete().eq("project_id", projectId));
   if (lots.length) {
     const rows = lots.map((l, i) => lotToRow(l, projectId, i));
     throwIfError(await supabase.from("lots").upsert(rows));
@@ -200,7 +200,7 @@ export async function syncLots(projectId, lots) {
 export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
   if (!isSupabaseConfigured()) return;
 
-  await supabase.from("lots_decomp").delete().eq("project_id", projectId);
+  throwIfError(await supabase.from("lots_decomp").delete().eq("project_id", projectId));
   const rows = [];
   (lotsInt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "int", projectId, i)));
   (lotsExt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "ext", projectId, i)));
