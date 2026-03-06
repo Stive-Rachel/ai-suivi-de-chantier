@@ -4,7 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
 import { loadDB, saveDB } from "./db";
 import { loadAllProjects } from "./dataLayer";
-import { migrateLocalStorageToSupabase } from "./migration";
+import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
 
 export function useDataLayer(userId) {
   const [db, setDb] = useState(null);
@@ -19,7 +19,8 @@ export function useDataLayer(userId) {
     async function init() {
       try {
         if (mode === "supabase" && userId) {
-          // Backup localStorage before any migration attempt
+          // SAFETY: always backup before any Supabase operation
+          backupLocalData();
           const localBackup = loadDB();
 
           // Try migrating localStorage data first
@@ -32,12 +33,19 @@ export function useDataLayer(userId) {
               // Keep localStorage in sync as backup
               saveDB({ projects });
             } else if (localBackup?.projects?.length) {
-              // Supabase is empty but we had local data — keep local data safe
+              // SAFETY: Supabase is empty but we had local data — never wipe it
               console.warn("Supabase returned empty but local data exists, keeping local data");
               setDb(localBackup);
-              saveDB(localBackup);
+              // Don't call saveDB — it's already there
             } else {
-              setDb({ projects });
+              // Try restoring from backup in case localStorage was wiped
+              const restored = restoreFromBackup();
+              if (restored?.projects?.length) {
+                console.warn("Restored data from backup");
+                setDb(restored);
+              } else {
+                setDb({ projects });
+              }
             }
           }
         } else {
@@ -49,7 +57,14 @@ export function useDataLayer(userId) {
         if (!cancelled) {
           setError(err);
           setMode("local");
-          setDb(loadDB());
+          // Try main localStorage first, then backup
+          const localData = loadDB();
+          if (localData?.projects?.length) {
+            setDb(localData);
+          } else {
+            const restored = restoreFromBackup();
+            setDb(restored || loadDB());
+          }
         }
       } finally {
         if (!cancelled) setLoading(false);
