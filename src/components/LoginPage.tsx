@@ -82,22 +82,30 @@ export default function LoginPage() {
     if (!supabase) throw new Error("Le service n'est pas disponible.");
 
     if (password.length < 6) {
-      throw new Error("Le mot de passe doit contenir au moins 6 caracteres.");
+      throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
     }
     if (password !== passwordConfirm) {
       throw new Error("Les mots de passe ne correspondent pas.");
     }
 
     const trimmedEmail = email.trim().toLowerCase();
-    const { error: signUpError } = await supabase.auth.signUp({
+    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
       email: trimmedEmail,
       password,
     });
 
     if (signUpError) throw signUpError;
 
-    // The trigger handle_new_user will apply the invitation role + project_members
-    setSuccess("Compte cree avec succes ! Vous pouvez maintenant vous connecter.");
+    const newUserId = signUpData?.user?.id;
+    if (newUserId && invitationFound) {
+      // Apply invitation via SECURITY DEFINER function (bypasses RLS)
+      await supabase.rpc("apply_invitation", {
+        _user_id: newUserId,
+        _email: trimmedEmail,
+      });
+    }
+
+    setSuccess("Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
     setMode("login");
     setPassword("");
     setPasswordConfirm("");
