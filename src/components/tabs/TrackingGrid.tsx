@@ -320,7 +320,7 @@ export default function TrackingGrid({ project, updateProject, supaSync, type })
         </div>
       )}
 
-      <div className="tracking-table-scroll" style={{ overflowX: "auto", overflowY: "auto", maxHeight: "calc(100vh - 240px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
+      <div className="tracking-table-scroll" style={{ overflow: "auto", maxHeight: "calc(100vh - 240px)", borderRadius: "var(--radius-md)", border: "1px solid var(--border-default)" }}>
         <table className="tracking-table" role="grid" aria-label="Grille de suivi">
           <thead>
             {isLogements && (

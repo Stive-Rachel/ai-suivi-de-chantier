@@ -579,6 +579,36 @@ body {
 
 /* ═══════ TRACKING TABLE ═══════ */
 
+.tracking-table-scroll {
+  overflow: auto !important;
+  scrollbar-gutter: stable;
+}
+
+/* Always show horizontal scrollbar */
+.tracking-table-scroll::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+.tracking-table-scroll::-webkit-scrollbar-track {
+  background: var(--bg-raised);
+  border-radius: 5px;
+}
+.tracking-table-scroll::-webkit-scrollbar-thumb {
+  background: var(--border-strong, #bbb);
+  border-radius: 5px;
+}
+.tracking-table-scroll::-webkit-scrollbar-thumb:hover {
+  background: var(--text-tertiary, #999);
+}
+
+/* Firefox: always show scrollbar */
+@supports (scrollbar-width: thin) {
+  .tracking-table-scroll {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border-strong, #bbb) var(--bg-raised);
+  }
+}
+
 .tracking-table {
   border-collapse: separate;
   border-spacing: 0;
