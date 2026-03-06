@@ -18,6 +18,23 @@ import { enqueue } from "./syncQueue";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
+export async function withRetry(fn: () => Promise<void>): Promise<{ ok: boolean; error?: any }> {
+  try {
+    await fn();
+    return { ok: true };
+  } catch (err) {
+    console.warn("[DataLayer] First attempt failed, retrying in 2s...", err);
+    await new Promise((r) => setTimeout(r, 2000));
+    try {
+      await fn();
+      return { ok: true };
+    } catch (retryErr) {
+      console.error("[DataLayer] Retry also failed:", retryErr);
+      return { ok: false, error: retryErr };
+    }
+  }
+}
+
 function throwIfError(result) {
   if (result.error) throw result.error;
   return result.data;

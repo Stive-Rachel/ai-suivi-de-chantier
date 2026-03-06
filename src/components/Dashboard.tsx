@@ -107,10 +107,20 @@ function ProjectKpis({ project }) {
 export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme }) {
   const { isAdmin, isClient, allowedProjectIds } = useUserRole();
   const { profile, signOut } = useAuth();
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [showCreate, setShowCreate] = useState(false);
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
   const [newClient, setNewClient] = useState("");
+
+  const safe = (label: string, fn: () => Promise<void>) => {
+    dataLayer.withRetry(fn).then(({ ok }) => {
+      if (!ok) {
+        setSaveError(`Erreur de sauvegarde (${label}). Les modifications sont conservées localement.`);
+        setTimeout(() => setSaveError(null), 8000);
+      }
+    });
+  };
 
   const createProject = () => {
     if (!newName.trim()) return;
@@ -140,7 +150,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
     const updated = { ...db, projects: [...db.projects, project] };
     setDb(updated);
     saveDB(updated);
-    dataLayer.createProjectInDB(project, userId).catch(console.error);
+    safe("création", () => dataLayer.createProjectInDB(project, userId));
     setShowCreate(false);
     setNewName("");
     setNewLocation("");
@@ -152,7 +162,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
     const updated = { ...db, projects: db.projects.filter((p) => p.id !== id) };
     setDb(updated);
     saveDB(updated);
-    dataLayer.deleteProjectFromDB(id).catch(console.error);
+    safe("suppression", () => dataLayer.deleteProjectFromDB(id));
   };
 
   const loadDemo = () => {
@@ -166,14 +176,14 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
       setDb(updated);
       saveDB(updated);
       for (const sp of seedProjects) {
-        dataLayer.fullProjectSync(sp, userId).catch(console.error);
+        safe("sync", () => dataLayer.fullProjectSync(sp, userId));
       }
     } else {
       const updated = { ...db, projects: [...db.projects, ...seedProjects] };
       setDb(updated);
       saveDB(updated);
       for (const sp of seedProjects) {
-        dataLayer.createProjectInDB(sp, userId).catch(console.error);
+        safe("création", () => dataLayer.createProjectInDB(sp, userId));
       }
     }
   };
@@ -266,6 +276,20 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
           )}
         </div>
       </header>
+
+      {saveError && (
+        <div style={{
+          background: "var(--warning, #f59e0b)",
+          color: "#000",
+          padding: "8px 16px",
+          fontSize: 13,
+          fontWeight: 500,
+          textAlign: "center",
+          cursor: "pointer",
+        }} onClick={() => setSaveError(null)}>
+          {saveError}
+        </div>
+      )}
 
       <div className="dashboard-content">
         {/* KPI Summary Bar */}

@@ -37,6 +37,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
   const { profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState(isClient ? "logements" : "setup");
   const [alertOpen, setAlertOpen] = useState(false);
+  const [saveError, setSaveError] = useState<string | null>(null);
   const [disclaimerOpen, setDisclaimerOpen] = useState(() => {
     const isBergevin = project.name?.toLowerCase().includes("bergevin");
     return isBergevin && !localStorage.getItem(`disclaimer-dismissed-${project.id}`);
@@ -56,23 +57,33 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
     [project.id, setDb]
   );
 
-  // Supabase sync helpers — fire-and-forget, localStorage is always saved first
-  const supaSync = useMemo(() => ({
-    updateFields: (fields: any) =>
-      dataLayer.updateProjectFields(project.id, fields).catch(console.error),
-    setTrackingCell: (trackType: string, rowKey: string, entityId: string, status: string) =>
-      dataLayer.setTrackingCell(project.id, trackType, rowKey, entityId, status).catch(console.error),
-    setTrackingMeta: (trackType: string, rowKey: string, meta: any) =>
-      dataLayer.setTrackingMeta(project.id, trackType, rowKey, meta).catch(console.error),
-    syncBatiments: (batiments: any) =>
-      dataLayer.syncBatiments(project.id, batiments).catch(console.error),
-    syncLots: (lots: any) =>
-      dataLayer.syncLots(project.id, lots).catch(console.error),
-    syncLotsDecomp: (lotsInt: any, lotsExt: any) =>
-      dataLayer.syncLotsDecomp(project.id, lotsInt, lotsExt).catch(console.error),
-    fullSync: (p: any) =>
-      dataLayer.fullProjectSync(p, userId).catch(console.error),
-  }), [project.id, userId]);
+  // Supabase sync helpers — fire-and-forget with retry, localStorage is always saved first
+  const supaSync = useMemo(() => {
+    const safe = (label: string, fn: () => Promise<void>) => {
+      dataLayer.withRetry(fn).then(({ ok }) => {
+        if (!ok) {
+          setSaveError(`Erreur de sauvegarde (${label}). Les modifications sont conservées localement.`);
+          setTimeout(() => setSaveError(null), 8000);
+        }
+      });
+    };
+    return {
+      updateFields: (fields: any) =>
+        safe("champs", () => dataLayer.updateProjectFields(project.id, fields)),
+      setTrackingCell: (trackType: string, rowKey: string, entityId: string, status: string) =>
+        safe("cellule", () => dataLayer.setTrackingCell(project.id, trackType, rowKey, entityId, status)),
+      setTrackingMeta: (trackType: string, rowKey: string, meta: any) =>
+        safe("meta", () => dataLayer.setTrackingMeta(project.id, trackType, rowKey, meta)),
+      syncBatiments: (batiments: any) =>
+        safe("batiments", () => dataLayer.syncBatiments(project.id, batiments)),
+      syncLots: (lots: any) =>
+        safe("lots", () => dataLayer.syncLots(project.id, lots)),
+      syncLotsDecomp: (lotsInt: any, lotsExt: any) =>
+        safe("decomp", () => dataLayer.syncLotsDecomp(project.id, lotsInt, lotsExt)),
+      fullSync: (p: any) =>
+        safe("sync", () => dataLayer.fullProjectSync(p, userId)),
+    };
+  }, [project.id, userId]);
 
   const currentProject = db.projects.find((p: any) => p.id === project.id) || project;
 
@@ -171,6 +182,20 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           </Button>
         </div>
       </header>
+
+      {saveError && (
+        <div style={{
+          background: "var(--warning, #f59e0b)",
+          color: "#000",
+          padding: "8px 16px",
+          fontSize: 13,
+          fontWeight: 500,
+          textAlign: "center",
+          cursor: "pointer",
+        }} onClick={() => setSaveError(null)}>
+          {saveError}
+        </div>
+      )}
 
       <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
