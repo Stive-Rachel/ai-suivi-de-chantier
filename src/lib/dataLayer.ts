@@ -150,6 +150,11 @@ export async function deleteProjectFromDB(projectId) {
     return;
   }
 
+  if (shouldEnqueue()) {
+    enqueue({ type: "deleteProjectFromDB", args: [projectId] });
+    return;
+  }
+
   // CASCADE handles child rows
   throwIfError(await supabase.from("projects").delete().eq("id", projectId));
 }
@@ -202,11 +207,16 @@ export async function syncBatiments(projectId, batiments) {
     return;
   }
 
-  // Delete all then re-insert (simplest for reorder/add/remove)
-  throwIfError(await supabase.from("batiments").delete().eq("project_id", projectId));
-  if (batiments.length) {
-    const rows = batiments.map((b, i) => batimentToRow(b, projectId, i));
+  // Upsert first (safe), then delete extras (if upsert fails, old data stays)
+  const rows = batiments.map((b, i) => batimentToRow(b, projectId, i));
+  if (rows.length) {
     throwIfError(await supabase.from("batiments").upsert(rows));
+  }
+  const keepIds = batiments.map((b) => b.id);
+  if (keepIds.length) {
+    throwIfError(await supabase.from("batiments").delete().eq("project_id", projectId).not("id", "in", `(${keepIds.join(",")})`));
+  } else {
+    throwIfError(await supabase.from("batiments").delete().eq("project_id", projectId));
   }
 }
 
@@ -220,10 +230,15 @@ export async function syncLots(projectId, lots) {
     return;
   }
 
-  throwIfError(await supabase.from("lots").delete().eq("project_id", projectId));
-  if (lots.length) {
-    const rows = lots.map((l, i) => lotToRow(l, projectId, i));
-    throwIfError(await supabase.from("lots").upsert(rows));
+  const rows = lots.map((l, i) => lotToRow(l, projectId, i));
+  if (rows.length) {
+    throwIfError(await supabase.from("lots").upsert(rows, { onConflict: "project_id,numero" }));
+  }
+  const keepNumeros = lots.map((l) => l.numero);
+  if (keepNumeros.length) {
+    throwIfError(await supabase.from("lots").delete().eq("project_id", projectId).not("numero", "in", `(${keepNumeros.join(",")})`));
+  } else {
+    throwIfError(await supabase.from("lots").delete().eq("project_id", projectId));
   }
 }
 
@@ -237,12 +252,20 @@ export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
     return;
   }
 
-  throwIfError(await supabase.from("lots_decomp").delete().eq("project_id", projectId));
   const rows = [];
   (lotsInt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "int", projectId, i)));
   (lotsExt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "ext", projectId, i)));
   if (rows.length) {
-    throwIfError(await supabase.from("lots_decomp").upsert(rows));
+    throwIfError(await supabase.from("lots_decomp").upsert(rows, { onConflict: "project_id,type,track_prefix" }));
+  }
+  const keepPrefixes = rows.map((r) => `${r.type}:${r.track_prefix}`);
+  // Delete rows that are no longer in the current list
+  const existing = throwIfError(
+    await supabase.from("lots_decomp").select("id,type,track_prefix").eq("project_id", projectId)
+  );
+  const toDelete = (existing || []).filter((e) => !keepPrefixes.includes(`${e.type}:${e.track_prefix}`)).map((e) => e.id);
+  if (toDelete.length) {
+    throwIfError(await supabase.from("lots_decomp").delete().in("id", toDelete));
   }
 }
 
@@ -314,6 +337,8 @@ export async function replayOperation(type, args) {
       return syncLots(...args);
     case "syncLotsDecomp":
       return syncLotsDecomp(...args);
+    case "deleteProjectFromDB":
+      return deleteProjectFromDB(...args);
     default:
       console.warn("[DataLayer] Unknown replay operation:", type);
   }

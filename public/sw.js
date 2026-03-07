@@ -22,6 +22,9 @@ self.addEventListener("activate", (event) => {
 
 // Fetch strategy
 self.addEventListener("fetch", (event) => {
+  // Ignore non-http(s) schemes (chrome-extension://, etc.)
+  if (!event.request.url.startsWith("http")) return;
+
   const url = new URL(event.request.url);
 
   // Network-first for Supabase API calls
