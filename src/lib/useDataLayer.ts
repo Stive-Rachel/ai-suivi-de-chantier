@@ -87,12 +87,17 @@ export function useDataLayer(userId) {
     return () => { cancelled = true; };
   }, [userId, mode]);
 
-  // Reload from Supabase (respects local timestamp)
+  // Reload from Supabase (respects local timestamp, never overwrites with empty)
   const reload = useCallback(async () => {
     if (mode !== "supabase") return;
     try {
       const localTimestamp = getLocalTimestamp();
       const projects = await loadAllProjects();
+      // Never overwrite local data with an empty result
+      if (!projects.length) {
+        console.warn("[DataLayer] Reload skipped: Supabase returned empty");
+        return;
+      }
       // Only overwrite if Supabase data is newer than local
       const supabaseTimestamp = projects.reduce((max, p) => {
         const t = new Date(p.updatedAt || p.createdAt || 0).getTime();

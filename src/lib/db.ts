@@ -88,6 +88,10 @@ function tryRestoreBackup(): DB | null {
 }
 
 export function saveDB(db: DB): void {
+  if (!db || !Array.isArray(db.projects)) {
+    console.error("[DB] saveDB refused: invalid data", db);
+    return;
+  }
   const withTimestamp = { ...db, _lastModified: Date.now() };
   localStorage.setItem(DB_KEY, JSON.stringify(withTimestamp));
 }

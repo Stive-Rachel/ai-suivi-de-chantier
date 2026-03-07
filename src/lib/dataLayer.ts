@@ -159,6 +159,11 @@ export async function deleteProjectFromDB(projectId) {
 export async function updateProjectFields(projectId, fields) {
   if (!isSupabaseConfigured()) return; // localStorage handled by caller
 
+  if (shouldEnqueue()) {
+    enqueue({ type: "updateProjectFields", args: [projectId, fields] });
+    return;
+  }
+
   const dbFields = {};
   const fieldMap = {
     name: "name",
@@ -192,6 +197,11 @@ export async function updateProjectFields(projectId, fields) {
 export async function syncBatiments(projectId, batiments) {
   if (!isSupabaseConfigured()) return;
 
+  if (shouldEnqueue()) {
+    enqueue({ type: "syncBatiments", args: [projectId, batiments] });
+    return;
+  }
+
   // Delete all then re-insert (simplest for reorder/add/remove)
   throwIfError(await supabase.from("batiments").delete().eq("project_id", projectId));
   if (batiments.length) {
@@ -205,6 +215,11 @@ export async function syncBatiments(projectId, batiments) {
 export async function syncLots(projectId, lots) {
   if (!isSupabaseConfigured()) return;
 
+  if (shouldEnqueue()) {
+    enqueue({ type: "syncLots", args: [projectId, lots] });
+    return;
+  }
+
   throwIfError(await supabase.from("lots").delete().eq("project_id", projectId));
   if (lots.length) {
     const rows = lots.map((l, i) => lotToRow(l, projectId, i));
@@ -216,6 +231,11 @@ export async function syncLots(projectId, lots) {
 
 export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
   if (!isSupabaseConfigured()) return;
+
+  if (shouldEnqueue()) {
+    enqueue({ type: "syncLotsDecomp", args: [projectId, lotsInt, lotsExt] });
+    return;
+  }
 
   throwIfError(await supabase.from("lots_decomp").delete().eq("project_id", projectId));
   const rows = [];

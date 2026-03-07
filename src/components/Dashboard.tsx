@@ -147,9 +147,11 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
       lotsExt: JSON.parse(JSON.stringify(DEFAULT_LOTS_EXT)),
       tracking: { logements: {}, batiments: {} },
     };
-    const updated = { ...db, projects: [...db.projects, project] };
-    setDb(updated);
-    saveDB(updated);
+    setDb((prev) => {
+      const updated = { ...prev, projects: [...prev.projects, project] };
+      saveDB(updated);
+      return updated;
+    });
     safe("création", () => dataLayer.createProjectInDB(project, userId));
     setShowCreate(false);
     setNewName("");
@@ -159,9 +161,11 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
 
   const deleteProject = (id) => {
     if (!confirm("Supprimer ce projet et toutes ses donn\u00e9es ?")) return;
-    const updated = { ...db, projects: db.projects.filter((p) => p.id !== id) };
-    setDb(updated);
-    saveDB(updated);
+    setDb((prev) => {
+      const updated = { ...prev, projects: prev.projects.filter((p) => p.id !== id) };
+      saveDB(updated);
+      return updated;
+    });
     safe("suppression", () => dataLayer.deleteProjectFromDB(id));
   };
 
@@ -171,17 +175,21 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
     const hasExisting = seedProjects.some((p) => existingIds.has(p.id));
     if (hasExisting) {
       if (!confirm("Le projet de d\u00e9mo existe d\u00e9j\u00e0. Voulez-vous le remplacer avec les donn\u00e9es d'origine ?")) return;
-      const otherProjects = db.projects.filter((p) => !seedProjects.some((s) => s.id === p.id));
-      const updated = { ...db, projects: [...otherProjects, ...seedProjects] };
-      setDb(updated);
-      saveDB(updated);
+      setDb((prev) => {
+        const otherProjects = prev.projects.filter((p) => !seedProjects.some((s) => s.id === p.id));
+        const updated = { ...prev, projects: [...otherProjects, ...seedProjects] };
+        saveDB(updated);
+        return updated;
+      });
       for (const sp of seedProjects) {
         safe("sync", () => dataLayer.fullProjectSync(sp, userId));
       }
     } else {
-      const updated = { ...db, projects: [...db.projects, ...seedProjects] };
-      setDb(updated);
-      saveDB(updated);
+      setDb((prev) => {
+        const updated = { ...prev, projects: [...prev.projects, ...seedProjects] };
+        saveDB(updated);
+        return updated;
+      });
       for (const sp of seedProjects) {
         safe("création", () => dataLayer.createProjectInDB(sp, userId));
       }
