@@ -24,6 +24,8 @@ CREATE TABLE projects (
   date_debut_ext TEXT DEFAULT '',
   semaines_exclues INTEGER DEFAULT 0,
   semaines_travaillees INTEGER DEFAULT 0,
+  exceptions JSONB DEFAULT '{}'::jsonb,
+  planning_logements JSONB DEFAULT '[]'::jsonb,
 
   user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE
 );

@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
 import { loadDB, saveDB, getLocalTimestamp } from "./db";
-import { loadAllProjects, fullProjectSync } from "./dataLayer";
+import { loadAllProjects, fullProjectSync, withRetry } from "./dataLayer";
 import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
 
 export function useDataLayer(userId) {
@@ -39,7 +39,9 @@ export function useDataLayer(userId) {
                   console.warn("[DataLayer] Local data is newer than Supabase, pushing local data");
                   setDb(localData);
                   for (const p of localData.projects) {
-                    fullProjectSync(p, userId).catch(console.error);
+                    withRetry(() => fullProjectSync(p, userId)).then(({ ok }) => {
+                      if (!ok) console.error("[DataLayer] Failed to push local project to Supabase:", p.id);
+                    });
                   }
                   return;
                 }
@@ -85,11 +87,21 @@ export function useDataLayer(userId) {
     return () => { cancelled = true; };
   }, [userId, mode]);
 
-  // Reload from Supabase
+  // Reload from Supabase (respects local timestamp)
   const reload = useCallback(async () => {
     if (mode !== "supabase") return;
     try {
+      const localTimestamp = getLocalTimestamp();
       const projects = await loadAllProjects();
+      // Only overwrite if Supabase data is newer than local
+      const supabaseTimestamp = projects.reduce((max, p) => {
+        const t = new Date(p.updatedAt || p.createdAt || 0).getTime();
+        return t > max ? t : max;
+      }, 0);
+      if (localTimestamp > supabaseTimestamp) {
+        console.warn("[DataLayer] Reload skipped: local data is newer");
+        return;
+      }
       setDb({ projects });
       saveDB({ projects });
     } catch (err) {

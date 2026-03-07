@@ -9,11 +9,16 @@ import { createProjectInDB } from "./dataLayer";
 const MIGRATION_KEY = "construction_tracker_migrated_v1";
 const BACKUP_KEY = "construction_tracker_backup";
 
-/** Create a safety backup of localStorage data before any risky operation */
+/** Create a safety backup of localStorage data before any risky operation.
+ *  Never overwrite a good backup with empty/seed data. */
 export function backupLocalData() {
   const data = loadDB();
   if (data?.projects?.length) {
+    // Only overwrite backup if current data has real projects
     localStorage.setItem(BACKUP_KEY, JSON.stringify(data));
+  } else {
+    // Don't overwrite existing backup with empty data
+    console.warn("[Backup] Skipped: no projects to back up");
   }
 }
 

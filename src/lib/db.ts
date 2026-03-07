@@ -3,6 +3,7 @@ import type { Project, DB, Batiment } from "../types";
 
 // ─── DATA LAYER ──────────────────────────────────────────────────────────────
 const DB_KEY = "construction_tracker_v1";
+const BACKUP_KEY = "construction_tracker_backup";
 
 function migrateProject(p: any): Project {
   const seed = initialData.projects.find((s) => s.id === p.id);
@@ -47,20 +48,43 @@ function migrateProject(p: any): Project {
 export function loadDB(): DB {
   try {
     const raw = JSON.parse(localStorage.getItem(DB_KEY) || "null");
-    if (raw && raw.projects && raw.projects.length > 0) {
+    if (raw && raw.projects) {
+      // Accept empty projects array — user may have deleted all projects
       raw.projects = raw.projects.map(migrateProject);
       return raw;
     }
+    // No data in localStorage — try backup before falling back to initialData
+    const backup = tryRestoreBackup();
+    if (backup) return backup;
     const data = JSON.parse(JSON.stringify(initialData));
     data.projects = data.projects.map(migrateProject);
     saveDB(data);
     return data;
-  } catch {
+  } catch (err) {
+    console.error("[DB] localStorage parse failed, trying backup:", err);
+    // Corrupted JSON — try backup before falling back to initialData
+    const backup = tryRestoreBackup();
+    if (backup) return backup;
     const data = JSON.parse(JSON.stringify(initialData));
     data.projects = data.projects.map(migrateProject);
     saveDB(data);
     return data;
   }
+}
+
+function tryRestoreBackup(): DB | null {
+  try {
+    const backupRaw = localStorage.getItem(BACKUP_KEY);
+    if (!backupRaw) return null;
+    const backup = JSON.parse(backupRaw);
+    if (backup?.projects) {
+      console.warn("[DB] Restored from backup");
+      backup.projects = backup.projects.map(migrateProject);
+      saveDB(backup); // Write restored data back to main key
+      return backup;
+    }
+  } catch {}
+  return null;
 }
 
 export function saveDB(db: DB): void {

@@ -274,7 +274,7 @@ export async function fullProjectSync(project, userId) {
   if (!isSupabaseConfigured()) return;
 
   // Delete existing then re-create
-  await supabase.from("projects").delete().eq("id", project.id);
+  throwIfError(await supabase.from("projects").delete().eq("id", project.id));
   await createProjectInDB(project, userId);
 }
 
