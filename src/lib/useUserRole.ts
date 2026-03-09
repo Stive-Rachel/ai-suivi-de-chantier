@@ -5,7 +5,7 @@ import { supabase, isSupabaseConfigured } from "./supabaseClient";
 export function useUserRole() {
   const { user, profile } = useAuth();
   const role = profile?.role ?? null;
-  const isAdmin = role === "admin" || role === null; // null = no profile yet, default admin
+  const isAdmin = role === "admin"; // null = no profile yet, deny by default
   const isClient = role === "client";
 
   const [allowedProjectIds, setAllowedProjectIds] = useState<string[] | null>(null);

@@ -94,8 +94,8 @@ export default function LoginPage() {
   const handleCreateAccount = async () => {
     if (!supabase) throw new Error("Le service n'est pas disponible.");
 
-    if (password.length < 6) {
-      throw new Error("Le mot de passe doit contenir au moins 6 caractères.");
+    if (password.length < 8) {
+      throw new Error("Le mot de passe doit contenir au moins 8 caractères.");
     }
     if (password !== passwordConfirm) {
       throw new Error("Les mots de passe ne correspondent pas.");
@@ -229,7 +229,7 @@ export default function LoginPage() {
                   className="login-input"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Choisissez un mot de passe (min. 6 caracteres)"
+                  placeholder="Choisissez un mot de passe (min. 8 caracteres)"
                   required
                   autoComplete="new-password"
                 />
