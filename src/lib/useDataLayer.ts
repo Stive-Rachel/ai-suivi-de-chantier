@@ -114,5 +114,22 @@ export function useDataLayer(userId) {
     }
   }, [mode]);
 
-  return { db, setDb, loading, error, mode, reload };
+  // Force push all local projects to Supabase
+  const forceSync = useCallback(async () => {
+    if (mode !== "supabase" || !db?.projects?.length || !userId) return { ok: false, error: "Not configured" };
+    const errors = [];
+    for (const p of db.projects) {
+      try {
+        await fullProjectSync(p, userId);
+        console.log(`[DataLayer] Force sync OK: ${p.id}`);
+      } catch (err) {
+        console.error(`[DataLayer] Force sync FAILED for ${p.id}:`, err);
+        errors.push(`${p.name}: ${err.message || err}`);
+      }
+    }
+    if (errors.length > 0) return { ok: false, error: errors.join("; ") };
+    return { ok: true };
+  }, [mode, db, userId]);
+
+  return { db, setDb, loading, error, mode, reload, forceSync };
 }

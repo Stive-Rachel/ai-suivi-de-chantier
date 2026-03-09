@@ -104,7 +104,7 @@ function ProjectKpis({ project }) {
   );
 }
 
-export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme }) {
+export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme, forceSync }) {
   const { isAdmin, isClient, allowedProjectIds } = useUserRole();
   const { profile, signOut } = useAuth();
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -112,6 +112,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
   const [newName, setNewName] = useState("");
   const [newLocation, setNewLocation] = useState("");
   const [newClient, setNewClient] = useState("");
+  const [syncing, setSyncing] = useState(false);
 
   const safe = (label: string, fn: () => Promise<void>) => {
     dataLayer.withRetry(fn).then(({ ok }) => {
@@ -276,6 +277,25 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
             <>
               <Button variant="secondary" onClick={loadDemo}>
                 Charger d&eacute;mo
+              </Button>
+              <Button
+                variant="secondary"
+                disabled={syncing}
+                onClick={async () => {
+                  if (!forceSync) return;
+                  setSyncing(true);
+                  setSaveError(null);
+                  const result = await forceSync();
+                  setSyncing(false);
+                  if (result.ok) {
+                    setSaveError(null);
+                    alert("Synchronisation réussie !");
+                  } else {
+                    setSaveError(`Erreur synchro: ${result.error}`);
+                  }
+                }}
+              >
+                {syncing ? "Synchro..." : "Forcer synchro"}
               </Button>
               <Button icon="plus" onClick={() => setShowCreate(true)}>
                 Nouveau projet

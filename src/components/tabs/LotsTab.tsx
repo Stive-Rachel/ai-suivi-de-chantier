@@ -16,11 +16,21 @@ export default function LotsTab({ project, updateProject, supaSync }) {
 
   const lots = project.lots || [];
 
-  // Compute montants from decompositions
+  // Compute montants from decompositions, fallback to lot's own stored values
   const computedMontants = (lot) => {
-    const ext = (project.lotsExt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
-    const int = (project.lotsInt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
-    return { montantExt: ext, montantInt: int, montantMarche: ext + int };
+    const decompsExt = (project.lotsExt || []).filter((d) => d.numero === lot.numero);
+    const decompsInt = (project.lotsInt || []).filter((d) => d.numero === lot.numero);
+    const hasDecomps = decompsExt.length > 0 || decompsInt.length > 0;
+    if (hasDecomps) {
+      const ext = decompsExt.reduce((s, d) => s + (d.montant || 0), 0);
+      const int = decompsInt.reduce((s, d) => s + (d.montant || 0), 0);
+      return { montantExt: ext, montantInt: int, montantMarche: ext + int };
+    }
+    return {
+      montantExt: lot.montantExt || 0,
+      montantInt: lot.montantInt || 0,
+      montantMarche: lot.montantMarche || 0,
+    };
   };
 
   const totalMarche = lots.reduce((s, l) => s + computedMontants(l).montantMarche, 0);
@@ -36,12 +46,17 @@ export default function LotsTab({ project, updateProject, supaSync }) {
     });
   };
 
-  // Recompute lot montants from decompositions
+  // Recompute lot montants from decompositions, preserve stored values if no decomps
   const recomputeLotMontants = (p) => {
     const updatedLots = (p.lots || []).map((lot) => {
-      const ext = (p.lotsExt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
-      const int = (p.lotsInt || []).filter((d) => d.numero === lot.numero).reduce((s, d) => s + (d.montant || 0), 0);
-      return { ...lot, montantExt: ext, montantInt: int, montantMarche: ext + int };
+      const decompsExt = (p.lotsExt || []).filter((d) => d.numero === lot.numero);
+      const decompsInt = (p.lotsInt || []).filter((d) => d.numero === lot.numero);
+      if (decompsExt.length > 0 || decompsInt.length > 0) {
+        const ext = decompsExt.reduce((s, d) => s + (d.montant || 0), 0);
+        const int = decompsInt.reduce((s, d) => s + (d.montant || 0), 0);
+        return { ...lot, montantExt: ext, montantInt: int, montantMarche: ext + int };
+      }
+      return lot;
     });
     return { ...p, lots: updatedLots };
   };

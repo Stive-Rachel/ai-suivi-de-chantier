@@ -103,18 +103,29 @@ export async function createProjectInDB(project, userId) {
     return;
   }
 
-  throwIfError(await supabase.from("projects").insert(projectToRow(project, userId)));
+  const errors: string[] = [];
+
+  // Insert project (required — fail fast if this fails)
+  throwIfError(await supabase.from("projects").upsert(projectToRow(project, userId)));
 
   // Insert batiments
   if (project.batiments?.length) {
     const rows = project.batiments.map((b, i) => batimentToRow(b, project.id, i));
-    throwIfError(await supabase.from("batiments").insert(rows));
+    const res = await supabase.from("batiments").upsert(rows);
+    if (res.error) {
+      console.error("[DataLayer] batiments upsert failed:", res.error);
+      errors.push("batiments");
+    }
   }
 
   // Insert lots
   if (project.lots?.length) {
     const rows = project.lots.map((l, i) => lotToRow(l, project.id, i));
-    throwIfError(await supabase.from("lots").insert(rows));
+    const res = await supabase.from("lots").upsert(rows, { onConflict: "project_id,numero" });
+    if (res.error) {
+      console.error("[DataLayer] lots upsert failed:", res.error);
+      errors.push("lots");
+    }
   }
 
   // Insert decomp
@@ -123,7 +134,18 @@ export async function createProjectInDB(project, userId) {
     (arr || []).forEach((d, i) => decompRows.push(lotDecompToRow(d, type, project.id, i)));
   }
   if (decompRows.length) {
-    throwIfError(await supabase.from("lots_decomp").insert(decompRows));
+    console.log(`[DataLayer] Upserting ${decompRows.length} lots_decomp rows for ${project.id}`);
+    const res = await supabase.from("lots_decomp").upsert(decompRows, { onConflict: "project_id,type,track_prefix" });
+    if (res.error) {
+      console.error("[DataLayer] lots_decomp upsert failed:", res.error);
+      console.error("[DataLayer] lots_decomp rows:", JSON.stringify(decompRows.slice(0, 2)));
+      errors.push("lots_decomp");
+    } else {
+      console.log(`[DataLayer] lots_decomp upsert OK: ${decompRows.length} rows`);
+    }
+  } else {
+    console.warn("[DataLayer] No decomp rows to insert for", project.id,
+      "lotsInt:", (project.lotsInt || []).length, "lotsExt:", (project.lotsExt || []).length);
   }
 
   // Insert tracking
@@ -131,12 +153,25 @@ export async function createProjectInDB(project, userId) {
     const { cells, meta } = trackingToRows(project.id, project.tracking);
     if (cells.length) {
       for (let i = 0; i < cells.length; i += 500) {
-        throwIfError(await supabase.from("tracking_cells").upsert(cells.slice(i, i + 500)));
+        const res = await supabase.from("tracking_cells").upsert(cells.slice(i, i + 500));
+        if (res.error) {
+          console.error("[DataLayer] tracking_cells upsert failed:", res.error);
+          errors.push("tracking_cells");
+        }
       }
     }
     if (meta.length) {
-      throwIfError(await supabase.from("tracking_meta").upsert(meta));
+      const res = await supabase.from("tracking_meta").upsert(meta);
+      if (res.error) {
+        console.error("[DataLayer] tracking_meta upsert failed:", res.error);
+        errors.push("tracking_meta");
+      }
     }
+  }
+
+  if (errors.length > 0) {
+    console.error(`[DataLayer] createProjectInDB partial failure: ${errors.join(", ")}`);
+    throw new Error(`Sync partielle: ${errors.join(", ")} en erreur`);
   }
 }
 
@@ -316,8 +351,16 @@ export async function setTrackingMeta(projectId, trackType, rowKey, meta) {
 export async function fullProjectSync(project, userId) {
   if (!isSupabaseConfigured()) return;
 
-  // Delete existing then re-create
-  throwIfError(await supabase.from("projects").delete().eq("id", project.id));
+  console.log(`[DataLayer] fullProjectSync for ${project.id} — lotsInt: ${(project.lotsInt || []).length}, lotsExt: ${(project.lotsExt || []).length}`);
+
+  // Delete child tables first (avoid CASCADE timing issues)
+  await supabase.from("tracking_cells").delete().eq("project_id", project.id);
+  await supabase.from("tracking_meta").delete().eq("project_id", project.id);
+  await supabase.from("lots_decomp").delete().eq("project_id", project.id);
+  await supabase.from("lots").delete().eq("project_id", project.id);
+  await supabase.from("batiments").delete().eq("project_id", project.id);
+  await supabase.from("projects").delete().eq("id", project.id);
+
   await createProjectInDB(project, userId);
 }
 

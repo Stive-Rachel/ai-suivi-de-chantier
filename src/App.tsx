@@ -10,7 +10,7 @@ import LoginPage from "./components/LoginPage";
 
 export default function App() {
   const { user, loading: authLoading } = useAuth();
-  const { db, setDb, loading, mode } = useDataLayer(user?.id);
+  const { db, setDb, loading, mode, forceSync } = useDataLayer(user?.id);
   const [openProjectId, setOpenProjectId] = useState(null);
   const { theme, toggleTheme } = useTheme();
 
@@ -83,6 +83,7 @@ export default function App() {
       onOpenProject={setOpenProjectId}
       theme={theme}
       toggleTheme={toggleTheme}
+      forceSync={forceSync}
     />
   );
 }
