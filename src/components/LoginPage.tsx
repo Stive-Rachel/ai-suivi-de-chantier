@@ -161,6 +161,7 @@ export default function LoginPage() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
+          <img src="/logo.jpeg" alt="Assiste Ingenierie" style={{ width: 80, height: 80, objectFit: "contain", marginBottom: 12 }} />
           <h1 className="login-title">Suivi de Chantier</h1>
           <p className="login-subtitle">{getTitle()}</p>
         </div>

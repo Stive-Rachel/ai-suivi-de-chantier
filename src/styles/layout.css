@@ -27,6 +27,13 @@
   gap: 14px;
 }
 
+.logo-img {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-md);
+  object-fit: contain;
+}
+
 .logo-mark {
   width: 42px;
   height: 42px;

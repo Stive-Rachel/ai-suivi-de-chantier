@@ -261,7 +261,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
     <div className="app-shell">
       <header className="header">
         <div className="logo">
-          <div className="logo-mark">SC</div>
+          <img src="/logo.jpeg" alt="Assiste Ingenierie" className="logo-img" />
           <div className="logo-text">
             <h1>Suivi Chantier</h1>
             <p>Gestion d'avancement multi-projets</p>
