@@ -376,17 +376,88 @@ export async function fullProjectSync(project, userId) {
 
   console.log(`[DataLayer] fullProjectSync for ${project.id} — lotsInt: ${(project.lotsInt || []).length}, lotsExt: ${(project.lotsExt || []).length}`);
 
-  // Delete child tables in parallel (all reference project_id independently)
-  await Promise.all([
-    supabase.from("tracking_cells").delete().eq("project_id", project.id),
-    supabase.from("tracking_meta").delete().eq("project_id", project.id),
-    supabase.from("lots_decomp").delete().eq("project_id", project.id),
-    supabase.from("lots").delete().eq("project_id", project.id),
-    supabase.from("batiments").delete().eq("project_id", project.id),
-  ]);
-  await supabase.from("projects").delete().eq("id", project.id);
+  // Upsert project row first (required for FK constraints)
+  throwIfError(await supabase.from("projects").upsert(projectToRow(project, userId)));
+  console.log(`[DataLayer] Project upserted: ${project.id}`);
 
-  await createProjectInDB(project, userId);
+  // Upsert child tables in parallel (no delete — just overwrite)
+  const tasks = [];
+
+  // Batiments
+  if (project.batiments?.length) {
+    const rows = project.batiments.map((b, i) => batimentToRow(b, project.id, i));
+    tasks.push(
+      supabase.from("batiments").upsert(rows).then((res) => {
+        if (res.error) console.error("[DataLayer] batiments upsert failed:", res.error);
+        else console.log(`[DataLayer] batiments OK: ${rows.length}`);
+      })
+    );
+  }
+
+  // Lots
+  if (project.lots?.length) {
+    const rows = project.lots.map((l, i) => lotToRow(l, project.id, i));
+    tasks.push(
+      supabase.from("lots").upsert(rows, { onConflict: "project_id,numero" }).then((res) => {
+        if (res.error) console.error("[DataLayer] lots upsert failed:", res.error);
+        else console.log(`[DataLayer] lots OK: ${rows.length}`);
+      })
+    );
+  }
+
+  // Lots decomp
+  const decompRows = [];
+  for (const [type, arr] of [["int", project.lotsInt], ["ext", project.lotsExt]]) {
+    (arr || []).forEach((d, i) => decompRows.push(lotDecompToRow(d, type, project.id, i)));
+  }
+  const seenDecomp = new Set();
+  const uniqueDecomp = decompRows.filter((r) => {
+    const key = `${r.type}:${r.track_prefix}`;
+    if (seenDecomp.has(key)) return false;
+    seenDecomp.add(key);
+    return true;
+  });
+  if (uniqueDecomp.length) {
+    tasks.push(
+      supabase.from("lots_decomp").upsert(uniqueDecomp, { onConflict: "project_id,type,track_prefix" }).then((res) => {
+        if (res.error) console.error("[DataLayer] lots_decomp upsert failed:", res.error);
+        else console.log(`[DataLayer] lots_decomp OK: ${uniqueDecomp.length}`);
+      })
+    );
+  }
+
+  // Wait for structure tables before tracking (tracking references row_key from decomp)
+  await Promise.all(tasks);
+
+  // Tracking cells — upsert in parallel batches (no delete)
+  if (project.tracking) {
+    const { cells, meta } = trackingToRows(project.id, project.tracking);
+    console.log(`[DataLayer] Tracking: ${cells.length} cells, ${meta.length} meta`);
+
+    const BATCH = 500;
+    const cellTasks = [];
+    for (let i = 0; i < cells.length; i += BATCH) {
+      const batch = cells.slice(i, i + BATCH);
+      cellTasks.push(
+        supabase.from("tracking_cells").upsert(batch).then((res) => {
+          if (res.error) console.error(`[DataLayer] cells batch failed (${i}):`, res.error);
+          else console.log(`[DataLayer] cells OK: ${i + batch.length}/${cells.length}`);
+        })
+      );
+    }
+    // Run cell batches in parallel (max 4 concurrent)
+    for (let i = 0; i < cellTasks.length; i += 4) {
+      await Promise.all(cellTasks.slice(i, i + 4));
+    }
+
+    if (meta.length) {
+      const res = await supabase.from("tracking_meta").upsert(meta);
+      if (res.error) console.error("[DataLayer] meta upsert failed:", res.error);
+      else console.log(`[DataLayer] meta OK: ${meta.length}`);
+    }
+  }
+
+  console.log(`[DataLayer] fullProjectSync DONE: ${project.id}`);
 }
 
 // ── Replay function for offline sync queue ──────────────────────────────────
