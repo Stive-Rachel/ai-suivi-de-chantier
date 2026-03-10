@@ -286,10 +286,12 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
                   if (!forceSync) return;
                   setSyncing(true);
                   setSaveError(null);
+                  // Clear dirty ops upfront — fullProjectSync replaces everything
+                  clearAllDirty();
                   const result = await forceSync();
                   setSyncing(false);
                   if (result.ok) {
-                    clearAllDirty();
+                    clearAllDirty(); // clear any that accumulated during sync
                     setSaveError(null);
                     alert("Synchronisation réussie !");
                   } else {

@@ -159,8 +159,9 @@ export async function createProjectInDB(project, userId) {
   if (project.tracking) {
     const { cells, meta } = trackingToRows(project.id, project.tracking);
     if (cells.length) {
-      for (let i = 0; i < cells.length; i += 500) {
-        const res = await supabase.from("tracking_cells").upsert(cells.slice(i, i + 500));
+      const BATCH = 2000;
+      for (let i = 0; i < cells.length; i += BATCH) {
+        const res = await supabase.from("tracking_cells").upsert(cells.slice(i, i + BATCH));
         if (res.error) {
           console.error("[DataLayer] tracking_cells upsert failed:", res.error);
           errors.push("tracking_cells");
@@ -368,12 +369,14 @@ export async function fullProjectSync(project, userId) {
 
   console.log(`[DataLayer] fullProjectSync for ${project.id} — lotsInt: ${(project.lotsInt || []).length}, lotsExt: ${(project.lotsExt || []).length}`);
 
-  // Delete child tables first (avoid CASCADE timing issues)
-  await supabase.from("tracking_cells").delete().eq("project_id", project.id);
-  await supabase.from("tracking_meta").delete().eq("project_id", project.id);
-  await supabase.from("lots_decomp").delete().eq("project_id", project.id);
-  await supabase.from("lots").delete().eq("project_id", project.id);
-  await supabase.from("batiments").delete().eq("project_id", project.id);
+  // Delete child tables in parallel (all reference project_id independently)
+  await Promise.all([
+    supabase.from("tracking_cells").delete().eq("project_id", project.id),
+    supabase.from("tracking_meta").delete().eq("project_id", project.id),
+    supabase.from("lots_decomp").delete().eq("project_id", project.id),
+    supabase.from("lots").delete().eq("project_id", project.id),
+    supabase.from("batiments").delete().eq("project_id", project.id),
+  ]);
   await supabase.from("projects").delete().eq("id", project.id);
 
   await createProjectInDB(project, userId);
