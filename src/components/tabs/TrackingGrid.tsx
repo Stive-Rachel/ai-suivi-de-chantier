@@ -425,7 +425,7 @@ export default function TrackingGrid({
                     <td>
                       <input
                         className="task-input"
-                        defaultValue={tracking[row.key]?._tache as string || ""}
+                        defaultValue={(() => { const v = tracking[row.key]?._tache as string || ""; return v === "\\u2014" || v === "\u2014" ? "" : v; })()}
                         onBlur={(e) => {
                           const val = e.target.value;
                           updateProject((p) => {
@@ -437,7 +437,7 @@ export default function TrackingGrid({
                           });
                           supaSync?.setTrackingMeta(type, row.key, { tache: val });
                         }}
-                        placeholder="\u2014"
+                        placeholder="—"
                       />
                     </td>
                   )}

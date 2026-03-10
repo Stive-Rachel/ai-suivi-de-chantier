@@ -42,10 +42,24 @@ export async function generateProjectPDF(project) {
   fillColor(terracotta);
   doc.roundedRect(margin, y, contentW, 28, 3, 3, "F");
 
+  // Logo
+  try {
+    const logoImg = new Image();
+    logoImg.src = "/logo.jpeg";
+    await new Promise((resolve) => {
+      logoImg.onload = resolve;
+      logoImg.onerror = resolve;
+      setTimeout(resolve, 2000);
+    });
+    if (logoImg.complete && logoImg.naturalWidth > 0) {
+      doc.addImage(logoImg, "JPEG", margin + 4, y + 3, 22, 22);
+    }
+  } catch { /* logo optional */ }
+
   doc.setFont("helvetica", "bold");
   doc.setFontSize(16);
   doc.setTextColor(255, 255, 255);
-  doc.text(project.name || "Projet", margin + 8, y + 11);
+  doc.text(project.name || "Projet", margin + 30, y + 11);
 
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
@@ -54,14 +68,14 @@ export async function generateProjectPDF(project) {
     project.client,
   ].filter(Boolean).join(" \u00b7 ");
   if (subtitle) {
-    doc.text(subtitle, margin + 8, y + 19);
+    doc.text(subtitle, margin + 30, y + 19);
   }
 
   // Date
   doc.setFontSize(8);
   doc.text(
     `Genere le ${new Date().toLocaleDateString("fr-FR")}`,
-    margin + 8,
+    margin + 30,
     y + 25
   );
 

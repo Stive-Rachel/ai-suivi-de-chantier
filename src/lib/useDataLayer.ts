@@ -28,28 +28,45 @@ export function useDataLayer(userId) {
           const projects = await loadAllProjects();
           if (!cancelled) {
             if (projects.length > 0) {
-              // Supabase is the source of truth — always use it when available.
-              // Only push local data if there are dirty (unsynced) operations.
+              // Merge strategy: use Supabase structure but fill in local tracking
+              // data when Supabase tracking is empty (handles sync lag).
+              const merged = projects.map((sp) => {
+                const localProject = localData?.projects?.find((lp) => lp.id === sp.id);
+                if (!localProject) return sp;
+
+                // If Supabase has no tracking data but local does, use local tracking
+                const supaTrackingKeys = Object.keys(sp.tracking?.logements || {}).length +
+                  Object.keys(sp.tracking?.batiments || {}).length;
+                const localTrackingKeys = Object.keys(localProject.tracking?.logements || {}).length +
+                  Object.keys(localProject.tracking?.batiments || {}).length;
+
+                if (supaTrackingKeys === 0 && localTrackingKeys > 0) {
+                  console.warn(`[DataLayer] ${sp.id}: Supabase tracking empty, using local (${localTrackingKeys} rows)`);
+                  return { ...sp, tracking: localProject.tracking };
+                }
+
+                return sp;
+              });
+
+              // If there are dirty ops, push local data to fill gaps
               const dirtyCount = getDirtyCount();
               if (dirtyCount > 0 && localData?.projects?.length) {
-                console.warn(`[DataLayer] ${dirtyCount} dirty ops found, pushing local data to Supabase`);
-                setDb(localData);
+                console.warn(`[DataLayer] ${dirtyCount} dirty ops, pushing local data to Supabase`);
                 for (const p of localData.projects) {
                   withRetry(() => fullProjectSync(p, userId)).then(({ ok }) => {
                     if (ok) {
                       clearAllDirty();
                       console.log("[DataLayer] Local data pushed to Supabase OK");
                     } else {
-                      console.error("[DataLayer] Failed to push local project to Supabase:", p.id);
+                      console.error("[DataLayer] Failed to push local project:", p.id);
                     }
                   });
                 }
-                return;
               }
 
-              console.log(`[DataLayer] Loaded ${projects.length} projects from Supabase`);
-              setDb({ projects });
-              saveDB({ projects });
+              console.log(`[DataLayer] Loaded ${merged.length} projects (merged with local tracking)`);
+              setDb({ projects: merged });
+              saveDB({ projects: merged });
             } else if (localData?.projects?.length) {
               console.warn("Supabase returned empty but local data exists, keeping local data");
               setDb(localData);
