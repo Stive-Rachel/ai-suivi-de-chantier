@@ -5,6 +5,7 @@ import App from './App.jsx'
 import AuthProvider from './components/AuthProvider.jsx'
 import { initSentry } from './lib/sentry'
 
+// Init Sentry in background (non-blocking)
 initSentry();
 
 createRoot(document.getElementById('root')).render(

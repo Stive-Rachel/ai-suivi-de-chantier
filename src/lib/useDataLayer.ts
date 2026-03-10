@@ -116,11 +116,12 @@ export function useDataLayer(userId) {
             // Push dirty ops to Supabase in background
             if (getDirtyCount() > 0) {
               console.log(`[DataLayer] ${getDirtyCount()} dirty ops, pushing to Supabase...`);
-              for (const p of merged) {
-                withRetry(() => fullProjectSync(p, userId)).then(({ ok }) => {
-                  if (ok) clearAllDirty();
-                });
-              }
+              Promise.all(merged.map((p) => withRetry(() => fullProjectSync(p, userId)))).then((results) => {
+                if (results.every((r) => r.ok)) {
+                  clearAllDirty();
+                  console.log("[DataLayer] All dirty ops synced successfully");
+                }
+              });
             }
           } else if (localData?.projects?.length) {
             // Supabase empty, keep local and push

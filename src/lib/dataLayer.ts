@@ -160,7 +160,7 @@ export async function createProjectInDB(project, userId) {
     const { cells, meta } = trackingToRows(project.id, project.tracking);
     console.log(`[DataLayer] Tracking for ${project.id}: ${cells.length} cells, ${meta.length} meta rows`);
     if (cells.length) {
-      const BATCH = 2000;
+      const BATCH = 500;
       for (let i = 0; i < cells.length; i += BATCH) {
         const batch = cells.slice(i, i + BATCH);
         const res = await supabase.from("tracking_cells").upsert(batch);

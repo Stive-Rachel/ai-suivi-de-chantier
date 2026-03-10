@@ -5,7 +5,7 @@ import { useTheme } from "./lib/useTheme";
 import { useAutoFlush, getPendingCount } from "./lib/syncQueue";
 import { replayOperation } from "./lib/dataLayer";
 import { getDirtyCount } from "./lib/dirtyTracker";
-import { Sentry } from "./lib/sentry";
+import { getSentry } from "./lib/sentry";
 import Dashboard from "./components/Dashboard";
 import ProjectView from "./components/ProjectView";
 import LoginPage from "./components/LoginPage";
@@ -122,9 +122,13 @@ function AppContent() {
 }
 
 export default function App() {
-  return (
-    <Sentry.ErrorBoundary fallback={<ErrorFallback />}>
-      <AppContent />
-    </Sentry.ErrorBoundary>
-  );
+  const Sentry = getSentry();
+  if (Sentry?.ErrorBoundary) {
+    return (
+      <Sentry.ErrorBoundary fallback={<ErrorFallback />}>
+        <AppContent />
+      </Sentry.ErrorBoundary>
+    );
+  }
+  return <AppContent />;
 }
