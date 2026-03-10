@@ -4,6 +4,7 @@ import { DEFAULT_LOTS, DEFAULT_LOTS_INT, DEFAULT_LOTS_EXT } from "../lib/constan
 import { computeProjectProgress, computeDetailedProgress, getLogementCounts } from "../lib/computations";
 import { formatMontant } from "../lib/format";
 import * as dataLayer from "../lib/dataLayer";
+import { clearAllDirty } from "../lib/dirtyTracker";
 import { useUserRole } from "../lib/useUserRole";
 import { useAuth } from "./AuthProvider";
 import initialData from "../initialData.json";
@@ -288,6 +289,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
                   const result = await forceSync();
                   setSyncing(false);
                   if (result.ok) {
+                    clearAllDirty();
                     setSaveError(null);
                     alert("Synchronisation réussie !");
                   } else {
