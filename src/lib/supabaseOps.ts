@@ -9,6 +9,7 @@ export function projectToRow(project, userId) {
     location: project.location || "",
     client: project.client || "",
     created_at: project.createdAt || new Date().toISOString(),
+    updated_at: new Date().toISOString(),
     montant_total: project.montantTotal || 0,
     montant_ext: project.montantExt || 0,
     montant_int: project.montantInt || 0,

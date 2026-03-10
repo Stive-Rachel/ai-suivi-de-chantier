@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
-import { loadDB, saveDB, getLocalTimestamp } from "./db";
+import { loadDB, saveDB } from "./db";
 import { loadAllProjects, fullProjectSync, withRetry } from "./dataLayer";
 import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
 import { getDirtyCount, clearAllDirty } from "./dirtyTracker";
@@ -22,32 +22,32 @@ export function useDataLayer(userId) {
         if (mode === "supabase" && userId) {
           backupLocalData();
           const localData = loadDB();
-          const localTimestamp = getLocalTimestamp();
 
           await migrateLocalStorageToSupabase(userId);
 
           const projects = await loadAllProjects();
           if (!cancelled) {
             if (projects.length > 0) {
-              // If local data is more recent, push it to Supabase instead of overwriting
-              if (localData?.projects?.length && localTimestamp > 0) {
-                const supabaseTimestamp = projects.reduce((max, p) => {
-                  const t = new Date(p.updatedAt || p.createdAt || 0).getTime();
-                  return t > max ? t : max;
-                }, 0);
-
-                if (localTimestamp > supabaseTimestamp) {
-                  console.warn("[DataLayer] Local data is newer than Supabase, pushing local data");
-                  setDb(localData);
-                  for (const p of localData.projects) {
-                    withRetry(() => fullProjectSync(p, userId)).then(({ ok }) => {
-                      if (!ok) console.error("[DataLayer] Failed to push local project to Supabase:", p.id);
-                    });
-                  }
-                  return;
+              // Supabase is the source of truth — always use it when available.
+              // Only push local data if there are dirty (unsynced) operations.
+              const dirtyCount = getDirtyCount();
+              if (dirtyCount > 0 && localData?.projects?.length) {
+                console.warn(`[DataLayer] ${dirtyCount} dirty ops found, pushing local data to Supabase`);
+                setDb(localData);
+                for (const p of localData.projects) {
+                  withRetry(() => fullProjectSync(p, userId)).then(({ ok }) => {
+                    if (ok) {
+                      clearAllDirty();
+                      console.log("[DataLayer] Local data pushed to Supabase OK");
+                    } else {
+                      console.error("[DataLayer] Failed to push local project to Supabase:", p.id);
+                    }
+                  });
                 }
+                return;
               }
 
+              console.log(`[DataLayer] Loaded ${projects.length} projects from Supabase`);
               setDb({ projects });
               saveDB({ projects });
             } else if (localData?.projects?.length) {
@@ -92,22 +92,13 @@ export function useDataLayer(userId) {
   const reload = useCallback(async () => {
     if (mode !== "supabase") return;
     try {
-      const localTimestamp = getLocalTimestamp();
       const projects = await loadAllProjects();
-      // Never overwrite local data with an empty result
       if (!projects.length) {
         console.warn("[DataLayer] Reload skipped: Supabase returned empty");
         return;
       }
-      // Only overwrite if Supabase data is newer than local
-      const supabaseTimestamp = projects.reduce((max, p) => {
-        const t = new Date(p.updatedAt || p.createdAt || 0).getTime();
-        return t > max ? t : max;
-      }, 0);
-      if (localTimestamp > supabaseTimestamp) {
-        console.warn("[DataLayer] Reload skipped: local data is newer");
-        return;
-      }
+      // Supabase is source of truth — always use it on reload
+      console.log(`[DataLayer] Reload: ${projects.length} projects from Supabase`);
       setDb({ projects });
       saveDB({ projects });
     } catch (err) {

@@ -158,13 +158,18 @@ export async function createProjectInDB(project, userId) {
   // Insert tracking
   if (project.tracking) {
     const { cells, meta } = trackingToRows(project.id, project.tracking);
+    console.log(`[DataLayer] Tracking for ${project.id}: ${cells.length} cells, ${meta.length} meta rows`);
     if (cells.length) {
       const BATCH = 2000;
       for (let i = 0; i < cells.length; i += BATCH) {
-        const res = await supabase.from("tracking_cells").upsert(cells.slice(i, i + BATCH));
+        const batch = cells.slice(i, i + BATCH);
+        const res = await supabase.from("tracking_cells").upsert(batch);
         if (res.error) {
           console.error("[DataLayer] tracking_cells upsert failed:", res.error);
+          console.error("[DataLayer] Sample cell:", JSON.stringify(batch[0]));
           errors.push("tracking_cells");
+        } else {
+          console.log(`[DataLayer] tracking_cells batch OK: ${batch.length} rows (${i + batch.length}/${cells.length})`);
         }
       }
     }
@@ -173,6 +178,8 @@ export async function createProjectInDB(project, userId) {
       if (res.error) {
         console.error("[DataLayer] tracking_meta upsert failed:", res.error);
         errors.push("tracking_meta");
+      } else {
+        console.log(`[DataLayer] tracking_meta OK: ${meta.length} rows`);
       }
     }
   }
