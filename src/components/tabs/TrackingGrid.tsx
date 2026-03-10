@@ -425,7 +425,7 @@ export default function TrackingGrid({
                     <td>
                       <input
                         className="task-input"
-                        defaultValue={(() => { const v = tracking[row.key]?._tache as string || ""; return v === "\\u2014" || v === "\u2014" ? "" : v; })()}
+                        defaultValue={(() => { const v = tracking[row.key]?._tache as string || ""; return (v && v !== "\\u2014" && v !== "\u2014") ? v : row.decomposition; })()}
                         onBlur={(e) => {
                           const val = e.target.value;
                           updateProject((p) => {
