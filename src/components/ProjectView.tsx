@@ -2,6 +2,7 @@ import { useState, useCallback, useMemo, useEffect, lazy, Suspense } from "react
 import { saveDB } from "../lib/db";
 import { computeProjectProgress } from "../lib/computations";
 import * as dataLayer from "../lib/dataLayer";
+import { markDirty, markClean } from "../lib/dirtyTracker";
 import { useUserRole } from "../lib/useUserRole";
 import { useAuth } from "./AuthProvider";
 import Button from "./ui/Button";
@@ -67,8 +68,11 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
   // Supabase sync helpers — fire-and-forget with retry, localStorage is always saved first
   const supaSync = useMemo(() => {
     const safe = (label: string, fn: () => Promise<void>) => {
+      const opId = markDirty(label, project.id);
       dataLayer.withRetry(fn).then(({ ok }) => {
-        if (!ok) {
+        if (ok) {
+          markClean(opId);
+        } else {
           setSaveError(`Erreur de sauvegarde (${label}). Les modifications sont conservées localement.`);
           setTimeout(() => setSaveError(null), 8000);
         }

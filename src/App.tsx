@@ -2,8 +2,9 @@ import { useState, useEffect, useCallback } from "react";
 import { useAuth } from "./components/AuthProvider";
 import { useDataLayer } from "./lib/useDataLayer";
 import { useTheme } from "./lib/useTheme";
-import { useAutoFlush } from "./lib/syncQueue";
+import { useAutoFlush, getPendingCount } from "./lib/syncQueue";
 import { replayOperation } from "./lib/dataLayer";
+import { getDirtyCount } from "./lib/dirtyTracker";
 import { Sentry } from "./lib/sentry";
 import Dashboard from "./components/Dashboard";
 import ProjectView from "./components/ProjectView";
@@ -52,6 +53,18 @@ function AppContent() {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [openProjectId]);
+
+  // Warn before unload if there are unsaved changes
+  useEffect(() => {
+    const handleBeforeUnload = (e) => {
+      if (getDirtyCount() > 0 || getPendingCount() > 0) {
+        e.preventDefault();
+        e.returnValue = "";
+      }
+    };
+    window.addEventListener("beforeunload", handleBeforeUnload);
+    return () => window.removeEventListener("beforeunload", handleBeforeUnload);
+  }, []);
 
   if (authLoading) {
     return (

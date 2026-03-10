@@ -63,3 +63,20 @@
   background: var(--bg-elevated);
   border: 1px solid var(--border-default);
 }
+
+/* Dirty / unsynced warning state */
+.sync-warning {
+  color: var(--warning);
+  background: var(--warning-bg);
+  border: 1px solid var(--warning-border);
+}
+.sync-ok {
+  color: var(--success);
+  background: var(--success-bg);
+  border: 1px solid var(--success-border);
+}
+.sync-indicator .sync-dirty-count {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  margin-left: 4px;
+}

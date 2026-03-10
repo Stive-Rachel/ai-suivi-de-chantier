@@ -1,10 +1,11 @@
 // ─── React Hook: Unified Data Layer ─────────────────────────────────────────
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
 import { loadDB, saveDB, getLocalTimestamp } from "./db";
 import { loadAllProjects, fullProjectSync, withRetry } from "./dataLayer";
 import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
+import { getDirtyCount, clearAllDirty } from "./dirtyTracker";
 
 export function useDataLayer(userId) {
   const [db, setDb] = useState(null);
@@ -130,6 +131,31 @@ export function useDataLayer(userId) {
     if (errors.length > 0) return { ok: false, error: errors.join("; ") };
     return { ok: true };
   }, [mode, db, userId]);
+
+  // Auto-sync every 5 minutes if there are dirty ops
+  const forceSyncRef = useRef(forceSync);
+  forceSyncRef.current = forceSync;
+
+  useEffect(() => {
+    if (mode !== "supabase") return;
+
+    const FIVE_MINUTES = 5 * 60 * 1000;
+
+    const intervalId = setInterval(() => {
+      if (!navigator.onLine || getDirtyCount() === 0) return;
+
+      forceSyncRef.current().then((result) => {
+        if (result.ok) {
+          clearAllDirty();
+          console.log("[AutoSync] Periodic sync completed");
+        } else {
+          console.warn("[AutoSync] Periodic sync failed:", result.error);
+        }
+      });
+    }, FIVE_MINUTES);
+
+    return () => clearInterval(intervalId);
+  }, [mode]);
 
   return { db, setDb, loading, error, mode, reload, forceSync };
 }
