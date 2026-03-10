@@ -104,13 +104,14 @@ function rowToLot(row) {
 // ── Lots Decomp ─────────────────────────────────────────────────────────────
 
 export function lotDecompToRow(lot, type, projectId, index) {
+  const prefix = lot.trackPrefix || lot.numero || `lot_${index}`;
   return {
     project_id: projectId,
     type,
-    numero: lot.numero,
+    numero: lot.numero || `lot_${index}`,
     nom: lot.nom || "",
     nom_decomp: lot.nomDecomp || "",
-    track_prefix: lot.trackPrefix || lot.numero,
+    track_prefix: prefix,
     decompositions: lot.decompositions || [],
     montant: lot.montant || 0,
     sort_order: index,

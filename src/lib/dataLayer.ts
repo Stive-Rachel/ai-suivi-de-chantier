@@ -128,20 +128,27 @@ export async function createProjectInDB(project, userId) {
     }
   }
 
-  // Insert decomp
+  // Insert decomp — deduplicate by (type, track_prefix) to avoid UNIQUE violations
   const decompRows = [];
   for (const [type, arr] of [["int", project.lotsInt], ["ext", project.lotsExt]]) {
     (arr || []).forEach((d, i) => decompRows.push(lotDecompToRow(d, type, project.id, i)));
   }
-  if (decompRows.length) {
-    console.log(`[DataLayer] Upserting ${decompRows.length} lots_decomp rows for ${project.id}`);
-    const res = await supabase.from("lots_decomp").upsert(decompRows, { onConflict: "project_id,type,track_prefix" });
+  const seen = new Set<string>();
+  const uniqueDecompRows = decompRows.filter((r) => {
+    const key = `${r.type}:${r.track_prefix}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+  if (uniqueDecompRows.length) {
+    console.log(`[DataLayer] Upserting ${uniqueDecompRows.length} lots_decomp rows for ${project.id}`);
+    const res = await supabase.from("lots_decomp").upsert(uniqueDecompRows, { onConflict: "project_id,type,track_prefix" });
     if (res.error) {
       console.error("[DataLayer] lots_decomp upsert failed:", res.error);
-      console.error("[DataLayer] lots_decomp rows:", JSON.stringify(decompRows.slice(0, 2)));
+      console.error("[DataLayer] First row sample:", JSON.stringify(uniqueDecompRows[0]));
       errors.push("lots_decomp");
     } else {
-      console.log(`[DataLayer] lots_decomp upsert OK: ${decompRows.length} rows`);
+      console.log(`[DataLayer] lots_decomp upsert OK: ${uniqueDecompRows.length} rows`);
     }
   } else {
     console.warn("[DataLayer] No decomp rows to insert for", project.id,
@@ -290,10 +297,18 @@ export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
   const rows = [];
   (lotsInt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "int", projectId, i)));
   (lotsExt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "ext", projectId, i)));
-  if (rows.length) {
-    throwIfError(await supabase.from("lots_decomp").upsert(rows, { onConflict: "project_id,type,track_prefix" }));
+  // Deduplicate by (type, track_prefix) to avoid UNIQUE violations
+  const seenKeys = new Set<string>();
+  const uniqueRows = rows.filter((r) => {
+    const key = `${r.type}:${r.track_prefix}`;
+    if (seenKeys.has(key)) return false;
+    seenKeys.add(key);
+    return true;
+  });
+  if (uniqueRows.length) {
+    throwIfError(await supabase.from("lots_decomp").upsert(uniqueRows, { onConflict: "project_id,type,track_prefix" }));
   }
-  const keepPrefixes = rows.map((r) => `${r.type}:${r.track_prefix}`);
+  const keepPrefixes = uniqueRows.map((r) => `${r.type}:${r.track_prefix}`);
   // Delete rows that are no longer in the current list
   const existing = throwIfError(
     await supabase.from("lots_decomp").select("id,type,track_prefix").eq("project_id", projectId)
