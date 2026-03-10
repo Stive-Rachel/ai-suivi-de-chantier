@@ -1,0 +1,23 @@
+/* ═══════ CARDS ═══════ */
+
+.card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  transition: all 0.22s ease;
+  box-shadow: var(--shadow-card);
+}
+
+.card:hover {
+  border-color: var(--border-strong);
+}
+
+.card-interactive { cursor: pointer; }
+.card-interactive:hover {
+  transform: translateY(-3px);
+  border-color: rgba(194, 97, 58, 0.25);
+  box-shadow: var(--shadow-card-hover);
+}
+
+.card-body { padding: 24px; }

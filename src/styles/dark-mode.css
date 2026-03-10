@@ -1,0 +1,154 @@
+/* ═══════════════════════════════════════════════════════════════
+   DARK MODE
+   ═══════════════════════════════════════════════════════════════ */
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.light) {
+    --bg-deep: #1a1a1a;
+    --bg-base: #242424;
+    --bg-raised: #2a2a2a;
+    --bg-card: #2d2d2d;
+    --bg-elevated: #333333;
+    --bg-input: #2a2a2a;
+    --bg-hover: #3a3a3a;
+
+    --border-subtle: rgba(255, 255, 255, 0.05);
+    --border-default: rgba(255, 255, 255, 0.08);
+    --border-strong: rgba(255, 255, 255, 0.14);
+
+    --text-primary: #e8e8e8;
+    --text-secondary: #a0a0a0;
+    --text-tertiary: #6a6a6a;
+    --text-inverse: #FFFFFF;
+
+    --accent: #C2613A;
+    --accent-bright: #D4724B;
+    --accent-dim: #B0572F;
+    --accent-bg: rgba(194, 97, 58, 0.10);
+    --accent-bg-strong: rgba(194, 97, 58, 0.18);
+
+    --success: #3DA06A;
+    --success-bg: rgba(61, 160, 106, 0.10);
+    --success-border: rgba(61, 160, 106, 0.25);
+    --warning: #D4A020;
+    --warning-bg: rgba(212, 160, 32, 0.10);
+    --warning-border: rgba(212, 160, 32, 0.25);
+    --danger: #D05050;
+    --danger-bg: rgba(208, 80, 80, 0.10);
+    --danger-border: rgba(208, 80, 80, 0.22);
+    --info: #5090D0;
+    --info-bg: rgba(80, 144, 208, 0.10);
+    --info-border: rgba(80, 144, 208, 0.25);
+
+    --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+    --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.03);
+    --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+
+    color-scheme: dark;
+  }
+}
+
+html.dark {
+  --bg-deep: #1a1a1a;
+  --bg-base: #242424;
+  --bg-raised: #2a2a2a;
+  --bg-card: #2d2d2d;
+  --bg-elevated: #333333;
+  --bg-input: #2a2a2a;
+  --bg-hover: #3a3a3a;
+
+  --border-subtle: rgba(255, 255, 255, 0.05);
+  --border-default: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+
+  --text-primary: #e8e8e8;
+  --text-secondary: #a0a0a0;
+  --text-tertiary: #6a6a6a;
+  --text-inverse: #FFFFFF;
+
+  --accent: #C2613A;
+  --accent-bright: #D4724B;
+  --accent-dim: #B0572F;
+  --accent-bg: rgba(194, 97, 58, 0.10);
+  --accent-bg-strong: rgba(194, 97, 58, 0.18);
+
+  --success: #3DA06A;
+  --success-bg: rgba(61, 160, 106, 0.10);
+  --success-border: rgba(61, 160, 106, 0.25);
+  --warning: #D4A020;
+  --warning-bg: rgba(212, 160, 32, 0.10);
+  --warning-border: rgba(212, 160, 32, 0.25);
+  --danger: #D05050;
+  --danger-bg: rgba(208, 80, 80, 0.10);
+  --danger-border: rgba(208, 80, 80, 0.22);
+  --info: #5090D0;
+  --info-bg: rgba(80, 144, 208, 0.10);
+  --info-border: rgba(80, 144, 208, 0.25);
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.25), 0 1px 2px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3), 0 1px 3px rgba(0, 0, 0, 0.2);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.03);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.3), 0 2px 6px rgba(0, 0, 0, 0.2);
+
+  color-scheme: dark;
+}
+
+/* Dark mode specific overrides */
+html.dark .modal-overlay,
+:root:not(.light) .modal-overlay {
+  background: rgba(0, 0, 0, 0.55);
+}
+
+html.dark [data-tooltip]::after {
+  background: #333;
+  color: #e8e8e8;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+html.dark .row-retard { background: rgba(192, 57, 43, 0.12) !important; }
+html.dark .tracking-table .group-header th { background: #352520; }
+html.dark .tracking-table .group-header th:first-child { background: var(--bg-raised); }
+html.dark .tracking-table .group-header + tr th { box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+html.dark .batiment-retard { background: linear-gradient(135deg, var(--bg-card), rgba(192, 57, 43, 0.1)) !important; }
+
+html.dark .recap-type-int {
+  background: rgba(48, 84, 150, 0.2);
+  color: #7ab0e8;
+}
+
+html.dark .lots-table .col-ext { background: rgba(61, 160, 106, 0.05); }
+html.dark .lots-table thead .col-ext { background: rgba(61, 160, 106, 0.12); }
+html.dark .lots-table tfoot .col-ext { background: rgba(61, 160, 106, 0.08); }
+html.dark .lots-table .col-int { background: rgba(80, 144, 208, 0.05); }
+html.dark .lots-table thead .col-int { background: rgba(80, 144, 208, 0.12); }
+html.dark .lots-table tfoot .col-int { background: rgba(80, 144, 208, 0.08); }
+
+html.dark ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); }
+html.dark ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.25); }
+
+/* ═══════ DARK MODE TOGGLE ═══════ */
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-default);
+  background: var(--bg-base);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  flex-shrink: 0;
+}
+.theme-toggle:hover {
+  background: var(--bg-elevated);
+  color: var(--accent);
+  border-color: var(--border-strong);
+}

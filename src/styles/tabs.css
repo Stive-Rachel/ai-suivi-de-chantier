@@ -1,0 +1,42 @@
+/* ═══════ TABS ═══════ */
+
+.tabs-container {
+  padding: 0 32px;
+  background: var(--bg-base);
+  border-bottom: 1px solid var(--border-default);
+}
+
+.tabs {
+  display: flex;
+  gap: 0;
+  width: fit-content;
+}
+
+.tab-btn {
+  padding: 14px 20px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.18s ease;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  white-space: nowrap;
+  position: relative;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
+}
+
+.tab-btn:hover {
+  color: var(--text-secondary);
+}
+
+.tab-btn.active {
+  color: var(--accent);
+  font-weight: 600;
+  border-bottom-color: var(--accent);
+}

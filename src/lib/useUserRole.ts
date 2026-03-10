@@ -32,7 +32,7 @@ export function useUserRole() {
             console.warn("useUserRole: could not fetch project_members", error);
             setAllowedProjectIds([]);
           } else {
-            setAllowedProjectIds((members || []).map((m: any) => m.project_id));
+            setAllowedProjectIds((members || []).map((m: { project_id: string }) => m.project_id));
           }
         }
       } catch (err) {

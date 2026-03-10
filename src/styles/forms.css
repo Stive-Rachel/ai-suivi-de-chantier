@@ -1,0 +1,104 @@
+/* ═══════ INPUTS ═══════ */
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.input-group label {
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.input-field {
+  padding: 10px 14px;
+  background: var(--bg-base);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px;
+  outline: none;
+  transition: all 0.18s ease;
+  width: 100%;
+}
+
+.input-field:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}
+
+.input-field::placeholder { color: var(--text-tertiary); }
+
+/* Inline edit inputs */
+.inline-edit {
+  background: transparent;
+  border: none;
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  outline: none;
+  width: 100%;
+  padding: 4px 6px;
+  border-radius: var(--radius-xs);
+  transition: all 0.15s ease;
+}
+
+.inline-edit:hover {
+  background: var(--bg-input);
+}
+
+.inline-edit:focus {
+  background: var(--bg-base);
+  box-shadow: 0 0 0 2px var(--accent-bg-strong);
+}
+
+.inline-edit-num {
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  width: 100%;
+}
+
+/* Money display (formatted amounts) */
+.money-display {
+  display: block;
+  text-align: right;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text-primary);
+  padding: 4px 6px;
+  border-radius: var(--radius-xs);
+  cursor: pointer;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.money-display:hover {
+  background: var(--bg-input);
+}
+
+.money-display-field {
+  display: block;
+  padding: 8px 12px;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  background: var(--bg-base);
+  border: 1.5px solid var(--border-strong);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+
+.money-display-field:hover {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-bg);
+}

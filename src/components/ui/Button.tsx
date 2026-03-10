@@ -1,7 +1,14 @@
-import { memo } from "react";
+import { memo, type ButtonHTMLAttributes, type ReactNode } from "react";
 import Icon from "./Icon";
 
-export default memo(function Button({ children, variant = "primary", size = "md", icon, onClick, disabled, className = "", ...props }: any) {
+interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
+  children?: ReactNode;
+  variant?: "primary" | "ghost" | "danger";
+  size?: "sm" | "md" | "lg";
+  icon?: string;
+}
+
+export default memo(function Button({ children, variant = "primary", size = "md", icon, onClick, disabled, className = "", ...props }: ButtonProps) {
   const ariaLabel = !children && icon ? icon : undefined;
   return (
     <button

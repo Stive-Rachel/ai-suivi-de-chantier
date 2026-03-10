@@ -18,7 +18,7 @@ import { enqueue } from "./syncQueue";
 
 // ── Helpers ─────────────────────────────────────────────────────────────────
 
-export async function withRetry(fn: () => Promise<void>): Promise<{ ok: boolean; error?: any }> {
+export async function withRetry(fn: () => Promise<void>): Promise<{ ok: boolean; error?: unknown }> {
   try {
     await fn();
     return { ok: true };

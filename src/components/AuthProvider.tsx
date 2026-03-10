@@ -9,8 +9,13 @@ export interface UserProfile {
   role: "admin" | "client";
 }
 
+interface AuthUser {
+  id: string;
+  email?: string;
+}
+
 interface AuthContextType {
-  user: any;
+  user: AuthUser | null;
   profile: UserProfile | null;
   loading: boolean;
   signOut: () => Promise<void>;
@@ -40,7 +45,7 @@ async function fetchUserProfile(userId: string): Promise<UserProfile | null> {
 }
 
 export default function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState<AuthUser | null>(null);
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [loading, setLoading] = useState(true);
 

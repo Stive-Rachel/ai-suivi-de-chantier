@@ -1,11 +1,11 @@
 import initialData from "../initialData.json";
-import type { Project, DB, Batiment } from "../types";
+import type { Project, DB, Batiment, LotDecomp } from "../types";
 
 // ─── DATA LAYER ──────────────────────────────────────────────────────────────
 const DB_KEY = "construction_tracker_v1";
 const BACKUP_KEY = "construction_tracker_backup";
 
-function migrateProject(p: any): Project {
+function migrateProject(p: Record<string, unknown>): Project {
   const seed = initialData.projects.find((s) => s.id === p.id);
 
   // Only create lots array if it doesn't exist at all
@@ -14,10 +14,10 @@ function migrateProject(p: any): Project {
       p.lots = JSON.parse(JSON.stringify(seed.lots));
     } else {
       const numeros = new Set<string>();
-      [...(p.lotsInt || []), ...(p.lotsExt || [])].forEach((l: any) => numeros.add(l.numero));
+      [...((p.lotsInt as LotDecomp[]) || []), ...((p.lotsExt as LotDecomp[]) || [])].forEach((l: LotDecomp) => numeros.add(l.numero));
       p.lots = [...numeros].map((num) => {
-        const intLots = (p.lotsInt || []).filter((l: any) => l.numero === num);
-        const extLots = (p.lotsExt || []).filter((l: any) => l.numero === num);
+        const intLots = ((p.lotsInt as LotDecomp[]) || []).filter((l: LotDecomp) => l.numero === num);
+        const extLots = ((p.lotsExt as LotDecomp[]) || []).filter((l: LotDecomp) => l.numero === num);
         const nom = (intLots[0] || extLots[0] || {}).nom || "";
         return { numero: num, nom, montantMarche: 0, montantExt: 0, montantInt: 0 };
       });
@@ -34,8 +34,8 @@ function migrateProject(p: any): Project {
     }
   }
 
-  const def = (field: string, fallback: any) => {
-    if (p[field] === undefined) p[field] = (seed as any)?.[field] ?? fallback;
+  const def = (field: string, fallback: string | number) => {
+    if (p[field] === undefined) p[field] = (seed as Record<string, unknown> | undefined)?.[field] ?? fallback;
   };
   def("montantTotal", 0); def("dateDebutChantier", ""); def("dureeTotale", 0);
   def("montantExt", 0); def("montantInt", 0);

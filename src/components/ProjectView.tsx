@@ -15,6 +15,7 @@ import BatimentsTab from "./tabs/BatimentsTab";
 import LotsTab from "./tabs/LotsTab";
 import TrackingGrid from "./tabs/TrackingGrid";
 import QuickEntry from "./QuickEntry";
+import type { Project, DB, Batiment, Lot, LotDecomp } from "../types";
 
 const DashboardTab = lazy(() => import("./tabs/DashboardTab"));
 const RecapTab = lazy(() => import("./tabs/RecapTab"));
@@ -31,7 +32,18 @@ function TabLoader() {
   return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
 }
 
-export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: any) {
+interface ProjectViewProps {
+  project: Project;
+  db: DB;
+  setDb: (updater: (prev: DB) => DB) => void;
+  mode: string;
+  userId: string;
+  onBack: () => void;
+  theme: string;
+  toggleTheme: () => void;
+}
+
+export default function ProjectView({ project, db, setDb, mode, userId, onBack, theme, toggleTheme }: ProjectViewProps) {
   const { isClient } = useUserRole();
   const { profile, signOut } = useAuth();
   const [activeTab, setActiveTab] = useState(isClient ? "logements" : "setup");
@@ -39,11 +51,11 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
   const [saveError, setSaveError] = useState<string | null>(null);
 
   const updateProject = useCallback(
-    (updater: any) => {
-      setDb((prev: any) => {
+    (updater: (p: Project) => Project) => {
+      setDb((prev: DB) => {
         const updated = {
           ...prev,
-          projects: prev.projects.map((p: any) => (p.id === project.id ? updater(p) : p)),
+          projects: prev.projects.map((p: Project) => (p.id === project.id ? updater(p) : p)),
         };
         saveDB(updated);
         return updated;
@@ -63,24 +75,24 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
       });
     };
     return {
-      updateFields: (fields: any) =>
+      updateFields: (fields: Partial<Project>) =>
         safe("champs", () => dataLayer.updateProjectFields(project.id, fields)),
       setTrackingCell: (trackType: string, rowKey: string, entityId: string, status: string) =>
         safe("cellule", () => dataLayer.setTrackingCell(project.id, trackType, rowKey, entityId, status)),
-      setTrackingMeta: (trackType: string, rowKey: string, meta: any) =>
+      setTrackingMeta: (trackType: string, rowKey: string, meta: { ponderation?: number; tache?: string }) =>
         safe("meta", () => dataLayer.setTrackingMeta(project.id, trackType, rowKey, meta)),
-      syncBatiments: (batiments: any) =>
+      syncBatiments: (batiments: Batiment[]) =>
         safe("batiments", () => dataLayer.syncBatiments(project.id, batiments)),
-      syncLots: (lots: any) =>
+      syncLots: (lots: Lot[]) =>
         safe("lots", () => dataLayer.syncLots(project.id, lots)),
-      syncLotsDecomp: (lotsInt: any, lotsExt: any) =>
+      syncLotsDecomp: (lotsInt: LotDecomp[], lotsExt: LotDecomp[]) =>
         safe("decomp", () => dataLayer.syncLotsDecomp(project.id, lotsInt, lotsExt)),
-      fullSync: (p: any) =>
+      fullSync: (p: Project) =>
         safe("sync", () => dataLayer.fullProjectSync(p, userId)),
     };
   }, [project.id, userId]);
 
-  const currentProject = db.projects.find((p: any) => p.id === project.id) || project;
+  const currentProject = db.projects.find((p: Project) => p.id === project.id) || project;
 
   const globalProgress = useMemo(() => computeProjectProgress(currentProject), [currentProject]);
 

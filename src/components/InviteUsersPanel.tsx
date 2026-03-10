@@ -3,6 +3,7 @@ import { supabase, isSupabaseConfigured } from "../lib/supabaseClient";
 import { useUserRole } from "../lib/useUserRole";
 import Button from "./ui/Button";
 import Modal from "./ui/Modal";
+import type { Project } from "../types";
 
 interface Invitation {
   id: string;
@@ -13,7 +14,7 @@ interface Invitation {
   accepted: boolean;
 }
 
-export default function InviteUsersPanel({ projects }: { projects: any[] }) {
+export default function InviteUsersPanel({ projects }: { projects: Project[] }) {
   const { isAdmin } = useUserRole();
   const [invitations, setInvitations] = useState<Invitation[]>([]);
   const [loading, setLoading] = useState(false);
@@ -37,7 +38,7 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
         .order("created_at", { ascending: false });
       if (error) throw error;
       setInvitations(data || []);
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erreur chargement invitations:", err);
     } finally {
       setLoading(false);
@@ -79,8 +80,8 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
       setSelectedProjects([]);
       setShowForm(false);
       fetchInvitations();
-    } catch (err: any) {
-      setError(err?.message || "Erreur lors de la creation de l'invitation.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erreur lors de la creation de l'invitation.");
     } finally {
       setSubmitting(false);
     }
@@ -97,7 +98,7 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
         .eq("id", inv.id);
       if (error) throw error;
       fetchInvitations();
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error("Erreur revocation:", err);
     }
   };
@@ -210,7 +211,7 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
                 {inv.project_ids && inv.project_ids.length > 0 && (
                   <div style={{ marginTop: 4, fontSize: "0.8rem", color: "var(--text-tertiary)" }}>
                     Projets : {inv.project_ids.map((pid) => {
-                      const p = projects.find((pr: any) => pr.id === pid);
+                      const p = projects.find((pr: Project) => pr.id === pid);
                       return p ? p.name : pid;
                     }).join(", ")}
                   </div>
@@ -272,7 +273,7 @@ export default function InviteUsersPanel({ projects }: { projects: any[] }) {
                 borderRadius: 8,
                 padding: 8,
               }}>
-                {projects.map((p: any) => (
+                {projects.map((p: Project) => (
                   <label
                     key={p.id}
                     style={{

@@ -4,11 +4,31 @@ import { useDataLayer } from "./lib/useDataLayer";
 import { useTheme } from "./lib/useTheme";
 import { useAutoFlush } from "./lib/syncQueue";
 import { replayOperation } from "./lib/dataLayer";
+import { Sentry } from "./lib/sentry";
 import Dashboard from "./components/Dashboard";
 import ProjectView from "./components/ProjectView";
 import LoginPage from "./components/LoginPage";
 
-export default function App() {
+function ErrorFallback() {
+  return (
+    <div
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        height: "100vh",
+        gap: "1rem",
+        color: "var(--text-primary)",
+      }}
+    >
+      <p>Une erreur est survenue</p>
+      <button onClick={() => window.location.reload()}>Recharger</button>
+    </div>
+  );
+}
+
+function AppContent() {
   const { user, loading: authLoading } = useAuth();
   const { db, setDb, loading, mode, forceSync } = useDataLayer(user?.id);
   const [openProjectId, setOpenProjectId] = useState(null);
@@ -85,5 +105,13 @@ export default function App() {
       toggleTheme={toggleTheme}
       forceSync={forceSync}
     />
+  );
+}
+
+export default function App() {
+  return (
+    <Sentry.ErrorBoundary fallback={<ErrorFallback />}>
+      <AppContent />
+    </Sentry.ErrorBoundary>
   );
 }

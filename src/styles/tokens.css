@@ -1,0 +1,58 @@
+/* ═══════════════════════════════════════════════════════════════
+   SUIVI CHANTIER — Atelier Blanc Design System
+   Warm light theme · Terracotta accents · Architectural clarity
+   ═══════════════════════════════════════════════════════════════ */
+
+:root {
+  --bg-deep: #F4F1EC;
+  --bg-base: #FFFFFF;
+  --bg-raised: #FAFAF7;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #F7F5F2;
+  --bg-input: #F5F3EF;
+  --bg-hover: #F0EDE8;
+
+  --border-subtle: rgba(0, 0, 0, 0.04);
+  --border-default: rgba(0, 0, 0, 0.08);
+  --border-strong: rgba(0, 0, 0, 0.13);
+
+  --text-primary: #1C1917;
+  --text-secondary: #6B6560;
+  --text-tertiary: #A8A29E;
+  --text-inverse: #FFFFFF;
+
+  --accent: #C2613A;
+  --accent-bright: #D4724B;
+  --accent-dim: #A8522E;
+  --accent-bg: rgba(194, 97, 58, 0.06);
+  --accent-bg-strong: rgba(194, 97, 58, 0.12);
+
+  --success: #2D8B57;
+  --success-bg: rgba(45, 139, 87, 0.07);
+  --success-border: rgba(45, 139, 87, 0.20);
+  --warning: #C88D1A;
+  --warning-bg: rgba(200, 141, 26, 0.07);
+  --warning-border: rgba(200, 141, 26, 0.20);
+  --danger: #C44040;
+  --danger-bg: rgba(196, 64, 64, 0.06);
+  --danger-border: rgba(196, 64, 64, 0.18);
+  --info: #3D7EC7;
+  --info-bg: rgba(61, 126, 199, 0.06);
+  --info-border: rgba(61, 126, 199, 0.20);
+
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  --radius-xs: 6px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04);
+  --shadow-lg: 0 12px 40px rgba(0, 0, 0, 0.08), 0 4px 12px rgba(0, 0, 0, 0.04);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.04), 0 0 0 1px rgba(0, 0, 0, 0.03);
+  --shadow-card-hover: 0 8px 24px rgba(0, 0, 0, 0.08), 0 2px 6px rgba(0, 0, 0, 0.04);
+}

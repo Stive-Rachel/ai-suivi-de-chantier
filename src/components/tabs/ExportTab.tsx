@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { getLogementNums } from "../../lib/db";
 import ExportButton from "../ui/ExportButton";
-import * as XLSX from "xlsx";
 
 export default function ExportTab({ project, updateProject, supaSync }) {
   const [pdfLoading, setPdfLoading] = useState(false);
+  const [xlsxLoading, setXlsxLoading] = useState(false);
 
   const exportPDF = async () => {
     setPdfLoading(true);
@@ -64,36 +64,45 @@ export default function ExportTab({ project, updateProject, supaSync }) {
     URL.revokeObjectURL(url);
   };
 
-  const exportTasksXLSX = () => {
-    const wb = XLSX.utils.book_new();
+  const exportTasksXLSX = async () => {
+    setXlsxLoading(true);
+    try {
+      const XLSX = await import("xlsx");
+      const wb = XLSX.utils.book_new();
 
-    const buildSheet = (lots, trackType, label) => {
-      const trackingData = project.tracking?.[trackType] || {};
-      const rows = [];
-      for (const lot of lots) {
-        for (const decomp of lot.decompositions) {
-          const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
-          rows.push({
-            "N° Lot": lot.numero,
-            "Lot": lot.nom,
-            "Décomposition": lot.nomDecomp || lot.nom,
-            "Tâche": decomp,
-            "Pondération": trackingData[key]?._ponderation || 1,
-            "Description": trackingData[key]?._tache || "",
-          });
+      const buildSheet = (lots, trackType, label) => {
+        const trackingData = project.tracking?.[trackType] || {};
+        const rows = [];
+        for (const lot of lots) {
+          for (const decomp of lot.decompositions) {
+            const key = `${lot.trackPrefix || lot.numero}-${decomp}`;
+            rows.push({
+              "N° Lot": lot.numero,
+              "Lot": lot.nom,
+              "Décomposition": lot.nomDecomp || lot.nom,
+              "Tâche": decomp,
+              "Pondération": trackingData[key]?._ponderation || 1,
+              "Description": trackingData[key]?._tache || "",
+            });
+          }
         }
-      }
-      if (rows.length === 0) rows.push({ "N° Lot": "", "Lot": "Aucune tâche", "Décomposition": "", "Tâche": "", "Pondération": "", "Description": "" });
-      const ws = XLSX.utils.json_to_sheet(rows);
-      // Auto-size columns
-      ws["!cols"] = [{ wch: 8 }, { wch: 30 }, { wch: 25 }, { wch: 35 }, { wch: 12 }, { wch: 30 }];
-      XLSX.utils.book_append_sheet(wb, ws, label);
-    };
+        if (rows.length === 0) rows.push({ "N° Lot": "", "Lot": "Aucune tâche", "Décomposition": "", "Tâche": "", "Pondération": "", "Description": "" });
+        const ws = XLSX.utils.json_to_sheet(rows);
+        // Auto-size columns
+        ws["!cols"] = [{ wch: 8 }, { wch: 30 }, { wch: 25 }, { wch: 35 }, { wch: 12 }, { wch: 30 }];
+        XLSX.utils.book_append_sheet(wb, ws, label);
+      };
 
-    buildSheet(project.lotsInt, "logements", "Tâches INT");
-    buildSheet(project.lotsExt, "batiments", "Tâches EXT");
+      buildSheet(project.lotsInt, "logements", "Tâches INT");
+      buildSheet(project.lotsExt, "batiments", "Tâches EXT");
 
-    XLSX.writeFile(wb, `${project.name}_taches_${new Date().toISOString().slice(0, 10)}.xlsx`);
+      XLSX.writeFile(wb, `${project.name}_taches_${new Date().toISOString().slice(0, 10)}.xlsx`);
+    } catch (err) {
+      console.error("Erreur XLSX:", err);
+      alert("Erreur lors de l'export Excel.");
+    } finally {
+      setXlsxLoading(false);
+    }
   };
 
   const exportJSON = () => {
@@ -139,7 +148,7 @@ export default function ExportTab({ project, updateProject, supaSync }) {
         <div className="export-grid">
           <ExportButton label="Logements (CSV)" desc="Export suivi intérieur" onClick={() => exportCSV("logements")} />
           <ExportButton label="Bâtiments (CSV)" desc="Export suivi extérieur" onClick={() => exportCSV("batiments")} />
-          <ExportButton label="Tâches INT + EXT (Excel)" desc="Liste des tâches par lot" onClick={exportTasksXLSX} />
+          <ExportButton label={xlsxLoading ? "Chargement..." : "Tâches INT + EXT (Excel)"} desc="Liste des tâches par lot" onClick={exportTasksXLSX} />
         </div>
         <div className="export-grid">
           <ExportButton

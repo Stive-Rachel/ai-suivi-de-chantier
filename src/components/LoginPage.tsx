@@ -15,7 +15,7 @@ export default function LoginPage() {
 
   // First login sub-steps: "check" (enter email) -> "create" (enter password)
   const [firstLoginStep, setFirstLoginStep] = useState<"check" | "create">("check");
-  const [invitationFound, setInvitationFound] = useState<any>(null);
+  const [invitationFound, setInvitationFound] = useState<{ role: string; email: string } | null>(null);
 
   const switchMode = (newMode: LoginMode) => {
     setMode(newMode);
@@ -62,8 +62,8 @@ export default function LoginPage() {
           }
         }
       }
-    } catch (err: any) {
-      setError(err?.message || "Une erreur est survenue.");
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Une erreur est survenue.");
     } finally {
       setLoading(false);
     }
