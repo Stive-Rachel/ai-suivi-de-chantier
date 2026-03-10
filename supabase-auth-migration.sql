@@ -123,6 +123,16 @@ CREATE POLICY "client_select_projects" ON projects
     id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
   );
 
+-- Client : UPDATE pour permettre la sync des champs projet
+CREATE POLICY "client_update_projects" ON projects
+  FOR UPDATE
+  USING (
+    id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  );
+
 -- ---------------------------------------------------------------
 -- 5b. batiments
 -- ---------------------------------------------------------------
@@ -183,6 +193,21 @@ CREATE POLICY "client_select_tracking_cells" ON tracking_cells
     project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
   );
 
+CREATE POLICY "client_insert_tracking_cells" ON tracking_cells
+  FOR INSERT
+  WITH CHECK (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "client_update_tracking_cells" ON tracking_cells
+  FOR UPDATE
+  USING (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  );
+
 -- ---------------------------------------------------------------
 -- 5f. tracking_meta
 -- ---------------------------------------------------------------
@@ -195,6 +220,21 @@ CREATE POLICY "admin_all_tracking_meta" ON tracking_meta
 CREATE POLICY "client_select_tracking_meta" ON tracking_meta
   FOR SELECT
   USING (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "client_insert_tracking_meta" ON tracking_meta
+  FOR INSERT
+  WITH CHECK (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  );
+
+CREATE POLICY "client_update_tracking_meta" ON tracking_meta
+  FOR UPDATE
+  USING (
+    project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
+  )
+  WITH CHECK (
     project_id IN (SELECT project_id FROM project_members WHERE user_id = auth.uid())
   );
 
