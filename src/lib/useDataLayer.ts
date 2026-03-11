@@ -93,19 +93,29 @@ export function useDataLayer(userId) {
           if (supaProjects.length > 0) {
             const localProjects = localData?.projects || [];
 
-            // Merge: for each Supabase project, merge tracking with local
-            const merged = supaProjects.map((sp) => {
-              const lp = localProjects.find((l) => l.id === sp.id);
-              if (!lp) return sp;
-              return { ...sp, tracking: mergeTracking(lp.tracking, sp.tracking) };
-            });
+            // Merge: localStorage is PRIMARY, Supabase fills gaps
+            // If local project exists, keep local data + merge tracking
+            // If only in Supabase (no local copy), use Supabase data
+            const merged = [];
+            const seenIds = new Set<string>();
 
-            // Add local-only projects (not yet in Supabase)
+            // First: all local projects, enriched with Supabase tracking
             for (const lp of localProjects) {
-              if (!supaProjects.find((sp) => sp.id === lp.id)) {
+              seenIds.add(lp.id);
+              const sp = supaProjects.find((s) => s.id === lp.id);
+              if (sp) {
+                merged.push({ ...lp, tracking: mergeTracking(lp.tracking, sp.tracking) });
+              } else {
                 merged.push(lp);
                 // Push to Supabase in background
                 withRetry(() => fullProjectSync(lp, userId));
+              }
+            }
+
+            // Then: Supabase-only projects (not in local)
+            for (const sp of supaProjects) {
+              if (!seenIds.has(sp.id)) {
+                merged.push(sp);
               }
             }
 
@@ -161,11 +171,18 @@ export function useDataLayer(userId) {
       if (!supaProjects.length) return;
 
       const localData = loadDB();
-      const merged = supaProjects.map((sp) => {
-        const lp = localData?.projects?.find((l) => l.id === sp.id);
-        if (!lp) return sp;
-        return { ...sp, tracking: mergeTracking(lp.tracking, sp.tracking) };
-      });
+      const localProjects = localData?.projects || [];
+      const merged = [];
+      const seenIds = new Set<string>();
+
+      for (const lp of localProjects) {
+        seenIds.add(lp.id);
+        const sp = supaProjects.find((s) => s.id === lp.id);
+        merged.push(sp ? { ...lp, tracking: mergeTracking(lp.tracking, sp.tracking) } : lp);
+      }
+      for (const sp of supaProjects) {
+        if (!seenIds.has(sp.id)) merged.push(sp);
+      }
 
       console.log(`[DataLayer] Reload merged ${merged.length} projects`);
       setDb({ projects: merged });

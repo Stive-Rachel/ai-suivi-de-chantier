@@ -274,30 +274,30 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
           <Button variant="ghost" size="sm" onClick={signOut}>
             Déconnexion
           </Button>
+          <Button
+            variant="secondary"
+            disabled={syncing}
+            onClick={async () => {
+              if (!forceSync) return;
+              setSyncing(true);
+              setSaveError(null);
+              const result = await forceSync();
+              setSyncing(false);
+              if (result.ok) {
+                clearAllDirty();
+                setSaveError(null);
+                alert("Synchronisation réussie !");
+              } else {
+                setSaveError(`Erreur synchro: ${result.error}`);
+              }
+            }}
+          >
+            {syncing ? "Synchro..." : "Forcer synchro"}
+          </Button>
           {isAdmin && (
             <>
               <Button variant="secondary" onClick={loadDemo}>
                 Charger d&eacute;mo
-              </Button>
-              <Button
-                variant="secondary"
-                disabled={syncing}
-                onClick={async () => {
-                  if (!forceSync) return;
-                  setSyncing(true);
-                  setSaveError(null);
-                  const result = await forceSync();
-                  setSyncing(false);
-                  if (result.ok) {
-                    clearAllDirty();
-                    setSaveError(null);
-                    alert("Synchronisation réussie !");
-                  } else {
-                    setSaveError(`Erreur synchro: ${result.error}`);
-                  }
-                }}
-              >
-                {syncing ? "Synchro..." : "Forcer synchro"}
               </Button>
               <Button icon="plus" onClick={() => setShowCreate(true)}>
                 Nouveau projet
