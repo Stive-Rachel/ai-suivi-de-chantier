@@ -193,12 +193,19 @@ export function useDataLayer(userId) {
   }, [mode]);
 
   // Force push all local projects to Supabase
+  const dbRef = useRef(db);
+  dbRef.current = db;
+
   const forceSync = useCallback(async () => {
-    if (mode !== "supabase" || !db?.projects?.length || !userId) {
+    const currentDb = dbRef.current;
+    if (mode !== "supabase" || !currentDb?.projects?.length || !userId) {
       return { ok: false, error: "Not configured" };
     }
+    // Always read fresh from localStorage to avoid stale closure
+    const freshDb = loadDB();
+    const projectsToSync = freshDb?.projects?.length ? freshDb.projects : currentDb.projects;
     const errors = [];
-    for (const p of db.projects) {
+    for (const p of projectsToSync) {
       try {
         await fullProjectSync(p, userId);
         console.log(`[DataLayer] Force sync OK: ${p.id}`);
@@ -209,7 +216,7 @@ export function useDataLayer(userId) {
     }
     if (errors.length > 0) return { ok: false, error: errors.join("; ") };
     return { ok: true };
-  }, [mode, db, userId]);
+  }, [mode, userId]);
 
   // Auto-sync every 5 minutes if there are dirty ops
   const forceSyncRef = useRef(forceSync);

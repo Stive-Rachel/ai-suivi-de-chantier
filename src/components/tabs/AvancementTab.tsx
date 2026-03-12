@@ -72,9 +72,7 @@ export default function AvancementTab({ project }) {
 
   const { sortConfig, toggleSort, sortedData: sortedLotProgress } = useTableSort(lotProgress);
 
-  const avgProgress = lotProgress.length > 0
-    ? lotProgress.reduce((s, lp) => s + lp.progress, 0) / lotProgress.length
-    : 0;
+  const avgProgress = globalProgress;
 
   return (
     <div className="avancement-content" style={{ animation: "slideInUp 0.4s ease both" }}>

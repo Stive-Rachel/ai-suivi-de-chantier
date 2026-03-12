@@ -82,7 +82,7 @@ export default function DashboardTab({ project }) {
       }
     }
     return done;
-  }, [project]);
+  }, [project, exceptions]);
 
   const donutColor = avgProgress >= 75 ? "var(--success)" : avgProgress >= 40 ? "var(--warning)" : "var(--danger)";
 
