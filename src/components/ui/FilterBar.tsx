@@ -1,5 +1,5 @@
-export default function FilterBar({ filters, onFilterChange }) {
-  const hasFilters = filters.statusFilter !== "all" || filters.searchText;
+export default function FilterBar({ filters, onFilterChange, showEntityFilter = false }) {
+  const hasFilters = filters.statusFilter !== "all" || filters.searchText || filters.entitySearch;
 
   return (
     <div className="filter-bar">
@@ -23,10 +23,21 @@ export default function FilterBar({ filters, onFilterChange }) {
         onChange={(e) => onFilterChange({ ...filters, searchText: e.target.value })}
       />
 
+      {showEntityFilter && (
+        <input
+          className="filter-search"
+          type="text"
+          placeholder="N° logement…"
+          value={filters.entitySearch || ""}
+          onChange={(e) => onFilterChange({ ...filters, entitySearch: e.target.value })}
+          style={{ maxWidth: 120 }}
+        />
+      )}
+
       {hasFilters && (
         <button
           className="btn btn-ghost btn-sm filter-clear"
-          onClick={() => onFilterChange({ statusFilter: "all", searchText: "" })}
+          onClick={() => onFilterChange({ statusFilter: "all", searchText: "", entitySearch: "" })}
         >
           ✕ Effacer
         </button>

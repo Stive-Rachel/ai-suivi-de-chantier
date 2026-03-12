@@ -11,7 +11,7 @@ import TrackingFooter from "./tracking/TrackingFooter";
 import type { Project, ExceptionsMap } from "../../types";
 
 const ALL_COLUMNS: readonly ColumnDef[] = [
-  { key: "tache", label: "Tâches", defaultVisible: true },
+  { key: "tache", label: "Lot", defaultVisible: true },
   { key: "ponderation", label: "Pondération", defaultVisible: true },
   { key: "av", label: "Avancement", defaultVisible: true },
   { key: "avlot", label: "Av/Lot", defaultVisible: true },
@@ -42,6 +42,7 @@ export default function TrackingGrid({
   const [filters, setFilters] = useState<TrackingFilters>({
     statusFilter: "all",
     searchText: "",
+    entitySearch: "",
   });
   const [sortConfig, setSortConfig] = useState<SortConfig>({
     key: null,
@@ -177,6 +178,12 @@ export default function TrackingGrid({
     [updateProject, supaSync, type],
   );
 
+  // --- Filter entities by logement number search ---
+
+  const displayEntities = filters.entitySearch
+    ? entities.filter((e) => e.label.toLowerCase().includes(filters.entitySearch!.toLowerCase()))
+    : entities;
+
   // --- Derived values ---
 
   const visibleRowCount = sortedRows.length;
@@ -199,7 +206,7 @@ export default function TrackingGrid({
   // --- Groups for column headers ---
 
   const groups: Record<string, typeof entities> = {};
-  entities.forEach((e) => {
+  displayEntities.forEach((e) => {
     const g = e.group || e.label;
     if (!groups[g]) groups[g] = [];
     groups[g].push(e);
@@ -267,7 +274,7 @@ export default function TrackingGrid({
                 Décomposition
               </SortableHeader>
               {visibleCols.tache && (
-                <th style={{ width: colWidths._tache || 100, minWidth: 70 }}>Tâches</th>
+                <th style={{ width: colWidths._tache || 100, minWidth: 70 }}>Lot</th>
               )}
               {visibleCols.ponderation && (
                 <SortableHeader
@@ -288,7 +295,7 @@ export default function TrackingGrid({
               {visibleCols.count && (
                 <th style={{ width: 40, textAlign: "center", fontSize: 10 }}>N</th>
               )}
-              {entities.map((e) => {
+              {displayEntities.map((e) => {
                 const isExc = isLogements && exceptions[e.id];
                 const done = getColumnDoneCount(e.id);
                 const allDone = done === rows.length && rows.length > 0;
@@ -422,23 +429,8 @@ export default function TrackingGrid({
                     {row.decomposition}
                   </td>
                   {visibleCols.tache && (
-                    <td>
-                      <input
-                        className="task-input"
-                        defaultValue={(() => { const v = tracking[row.key]?._tache as string || ""; return (v && v !== "\\u2014" && v !== "\u2014") ? v : row.decomposition; })()}
-                        onBlur={(e) => {
-                          const val = e.target.value;
-                          updateProject((p) => {
-                            const t = { ...p.tracking };
-                            if (!t[type]) t[type] = {} as typeof t[typeof type];
-                            if (!t[type][row.key]) t[type][row.key] = {};
-                            t[type][row.key] = { ...t[type][row.key], _tache: val };
-                            return { ...p, tracking: t };
-                          });
-                          supaSync?.setTrackingMeta(type, row.key, { tache: val });
-                        }}
-                        placeholder="—"
-                      />
+                    <td style={{ fontSize: 11, whiteSpace: "nowrap", color: "var(--text-secondary)" }}>
+                      {row.lotNom}
                     </td>
                   )}
                   {visibleCols.ponderation && (
@@ -503,7 +495,7 @@ export default function TrackingGrid({
                       {rs.done}
                     </td>
                   )}
-                  {entities.map((e) => {
+                  {displayEntities.map((e) => {
                     const isExc = isLogements && exceptions[e.id];
                     return (
                       <td
@@ -530,7 +522,7 @@ export default function TrackingGrid({
           <TrackingFooter
             rows={rows}
             rowStats={rowStats}
-            entities={entities}
+            entities={displayEntities}
             isLogements={isLogements}
             exceptions={exceptions}
             visibleCols={visibleCols}

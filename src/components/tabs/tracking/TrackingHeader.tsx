@@ -100,7 +100,7 @@ export default function TrackingHeader({
         </div>
       )}
 
-      <FilterBar filters={filters} onFilterChange={onFilterChange} />
+      <FilterBar filters={filters} onFilterChange={onFilterChange} showEntityFilter={isLogements} />
 
       {visibleRowCount !== totalRowCount && (
         <div className="filter-count" style={{ marginBottom: 8 }}>

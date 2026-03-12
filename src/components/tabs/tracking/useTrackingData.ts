@@ -33,6 +33,7 @@ export interface RowStat {
 export interface TrackingFilters {
   statusFilter: string;
   searchText: string;
+  entitySearch?: string;
 }
 
 export interface SortConfig {
@@ -99,7 +100,7 @@ export function useTrackingData({
         for (const num of getLogementNums(bat)) {
           result.push({
             id: `${bat.id}_log_${num}`,
-            label: `Log ${num}`,
+            label: `${num}`,
             group: bat.name,
           });
         }
