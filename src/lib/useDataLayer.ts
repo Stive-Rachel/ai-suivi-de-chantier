@@ -3,12 +3,13 @@
 // STRATEGY: Supabase is the SOURCE OF TRUTH when online.
 //   - On load: fetch Supabase first, merge with any local-only changes
 //   - On mutation: save to localStorage immediately, push to Supabase async
+//   - Supabase Realtime: listen for changes from other users in real-time
 //   - localStorage serves as offline cache and instant display while fetching
 //
 // This ensures all users always see the latest data from the server.
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import { isSupabaseConfigured } from "./supabaseClient";
+import { supabase, isSupabaseConfigured } from "./supabaseClient";
 import { loadDB, saveDB } from "./db";
 import { loadAllProjects, fullProjectSync, withRetry } from "./dataLayer";
 import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } from "./migration";
@@ -32,16 +33,13 @@ function mergeTracking(remote, local) {
 
     for (const [rowKey, rowData] of Object.entries(localTrack)) {
       if (!result[trackType][rowKey]) {
-        // Row only exists locally (new local row) — keep it
         result[trackType][rowKey] = rowData;
       } else {
         for (const [entityId, cell] of Object.entries(rowData)) {
           const existing = result[trackType][rowKey][entityId];
           if (!existing) {
-            // Cell only exists locally — keep it (likely a dirty offline change)
             result[trackType][rowKey][entityId] = cell;
           }
-          // If both exist, remote wins (already in result)
         }
       }
     }
@@ -68,12 +66,10 @@ export function useDataLayer(userId) {
           backupLocalData();
           await migrateLocalStorageToSupabase(userId);
 
-          // Show local data immediately while fetching Supabase
           if (!cancelled && localData?.projects?.length) {
             setDb(localData);
           }
 
-          // Fetch Supabase — this is the source of truth
           const supaProjects = await loadAllProjects();
           if (cancelled) return;
 
@@ -81,24 +77,19 @@ export function useDataLayer(userId) {
             const localProjects = localData?.projects || [];
             const hasDirtyOps = getDirtyCount() > 0;
 
-            // Build merged list: Supabase is primary
             const merged = [];
             const seenIds = new Set<string>();
 
-            // All Supabase projects, enriched with local-only tracking cells
             for (const sp of supaProjects) {
               seenIds.add(sp.id);
               const lp = localProjects.find((l) => l.id === sp.id);
               if (lp && hasDirtyOps) {
-                // Merge: remote base + local-only cells (dirty offline changes)
                 merged.push({ ...sp, tracking: mergeTracking(sp.tracking, lp.tracking) });
               } else {
-                // No dirty ops — use Supabase data as-is
                 merged.push(sp);
               }
             }
 
-            // Local-only projects (not in Supabase yet) — push them
             for (const lp of localProjects) {
               if (!seenIds.has(lp.id)) {
                 merged.push(lp);
@@ -110,7 +101,6 @@ export function useDataLayer(userId) {
             setDb({ projects: merged });
             saveDB({ projects: merged });
 
-            // Push dirty ops to Supabase in background
             if (hasDirtyOps) {
               console.log(`[DataLayer] ${getDirtyCount()} dirty ops, pushing to Supabase...`);
               Promise.all(merged.map((p) => withRetry(() => fullProjectSync(p, userId)))).then((results) => {
@@ -121,7 +111,6 @@ export function useDataLayer(userId) {
               });
             }
           } else if (localData?.projects?.length) {
-            // Supabase empty but we have local data — push it
             console.warn("[DataLayer] Supabase empty, using local data and pushing");
             setDb(localData);
             for (const p of localData.projects) {
@@ -150,6 +139,49 @@ export function useDataLayer(userId) {
     return () => { cancelled = true; };
   }, [userId, mode]);
 
+  // ── Supabase Realtime: listen for changes from other users ──────────────
+  useEffect(() => {
+    if (mode !== "supabase" || !supabase) return;
+
+    // Debounce: when we receive a realtime event, wait 1s then reload
+    // (groups rapid changes into a single reload)
+    let reloadTimer: ReturnType<typeof setTimeout> | null = null;
+
+    const scheduleReload = () => {
+      if (reloadTimer) clearTimeout(reloadTimer);
+      reloadTimer = setTimeout(async () => {
+        try {
+          const supaProjects = await loadAllProjects();
+          if (supaProjects?.length) {
+            const newDb = { projects: supaProjects };
+            setDb(newDb);
+            saveDB(newDb);
+            console.log("[Realtime] Updated from Supabase");
+          }
+        } catch (err) {
+          console.warn("[Realtime] Reload failed:", err);
+        }
+      }, 1000);
+    };
+
+    const channel = supabase
+      .channel("db-changes")
+      .on("postgres_changes", { event: "*", schema: "public", table: "tracking_cells" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "tracking_meta" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "projects" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "lots_decomp" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "batiments" }, scheduleReload)
+      .on("postgres_changes", { event: "*", schema: "public", table: "lots" }, scheduleReload)
+      .subscribe((status) => {
+        console.log(`[Realtime] Subscription: ${status}`);
+      });
+
+    return () => {
+      if (reloadTimer) clearTimeout(reloadTimer);
+      supabase.removeChannel(channel);
+    };
+  }, [mode]);
+
   // Reload: fetch from Supabase and update
   const reload = useCallback(async () => {
     if (mode !== "supabase") return;
@@ -167,7 +199,6 @@ export function useDataLayer(userId) {
           const lp = localProjects.find((l) => l.id === sp.id);
           return lp ? { ...sp, tracking: mergeTracking(sp.tracking, lp.tracking) } : sp;
         });
-        // Add local-only projects
         for (const lp of localProjects) {
           if (!supaProjects.find((sp) => sp.id === lp.id)) {
             finalProjects.push(lp);
@@ -228,43 +259,25 @@ export function useDataLayer(userId) {
     }
   }, [mode]);
 
-  // Auto-sync: every 30 seconds if there are dirty ops, and every 2 minutes full sync
+  // Safety net: retry dirty ops every 5 minutes (only if individual pushes failed)
   const forceSyncRef = useRef(forceSync);
   forceSyncRef.current = forceSync;
 
   useEffect(() => {
     if (mode !== "supabase") return;
 
-    // Quick sync every 30s for dirty ops
-    const quickInterval = setInterval(() => {
+    const intervalId = setInterval(() => {
       if (!navigator.onLine || getDirtyCount() === 0) return;
 
       forceSyncRef.current().then((result) => {
         if (result.ok) {
           clearAllDirty();
-          console.log("[AutoSync] Quick sync completed");
+          console.log("[AutoSync] Dirty ops synced");
         }
       });
-    }, 30_000);
+    }, 5 * 60 * 1000);
 
-    // Full pull every 2 minutes to catch other users' changes
-    const fullInterval = setInterval(() => {
-      if (!navigator.onLine) return;
-
-      loadAllProjects().then((supaProjects) => {
-        if (supaProjects?.length) {
-          const newDb = { projects: supaProjects };
-          setDb(newDb);
-          saveDB(newDb);
-          console.log("[AutoSync] Full pull completed");
-        }
-      }).catch(() => {});
-    }, 120_000);
-
-    return () => {
-      clearInterval(quickInterval);
-      clearInterval(fullInterval);
-    };
+    return () => clearInterval(intervalId);
   }, [mode]);
 
   return { db, setDb, loading, error, mode, reload, forceSync, forcePull };
