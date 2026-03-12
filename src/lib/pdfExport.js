@@ -49,6 +49,17 @@ export async function generateProjectPDF(project) {
 
   const progressColor = (v) => v >= 75 ? success : v >= 40 ? warning : danger;
 
+  // jsPDF/helvetica can't render narrow no-break spaces used by fr-FR locale
+  const pdfMontant = (v) => {
+    const s = formatMontant(v);
+    // Replace all non-breaking / narrow spaces with normal space
+    return s.replace(/[\u00A0\u202F\u2009]/g, " ");
+  };
+  const pdfMontantCompact = (v) => {
+    const s = formatMontant(v, true);
+    return s.replace(/[\u00A0\u202F\u2009]/g, " ");
+  };
+
   const drawSectionTitle = (title, icon) => {
     checkPage(16);
     // Gold accent line
@@ -273,7 +284,7 @@ export async function generateProjectPDF(project) {
       doc.setFont("helvetica", "normal");
       setColor(gray);
       if (lp.montant > 0) {
-        doc.text(formatMontant(lp.montant, true), colMontant, y + 4, { align: "right" });
+        doc.text(pdfMontantCompact(lp.montant), colMontant, y + 4, { align: "right" });
       }
 
       // Progress bar
@@ -305,7 +316,7 @@ export async function generateProjectPDF(project) {
     doc.setTextColor(255, 255, 255);
     doc.text("TOTAL", colLot + 3, y + 4);
     if (totalMontant > 0) {
-      doc.text(formatMontant(totalMontant, true), colMontant, y + 4, { align: "right" });
+      doc.text(pdfMontantCompact(totalMontant), colMontant, y + 4, { align: "right" });
     }
 
     // Total bar
@@ -389,9 +400,9 @@ export async function generateProjectPDF(project) {
   drawSectionTitle("Recapitulatif financier");
 
   const financials = [
-    { label: "Montant total marche", value: formatMontant(project.montantTotal) },
-    { label: "Montant exterieur", value: formatMontant(project.montantExt) },
-    { label: "Montant interieur", value: formatMontant(project.montantInt) },
+    { label: "Montant total marche", value: pdfMontant(project.montantTotal) },
+    { label: "Montant exterieur", value: pdfMontant(project.montantExt) },
+    { label: "Montant interieur", value: pdfMontant(project.montantInt) },
   ];
 
   // Financial card
