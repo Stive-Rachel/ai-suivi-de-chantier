@@ -1,12 +1,11 @@
 // ─── React Hook: Unified Data Layer ─────────────────────────────────────────
 //
-// STRATEGY: localStorage is the PRIMARY data store. It is always read first
-// and always saved on every mutation. Supabase is a SECONDARY sync layer:
-//   - On load: start with localStorage, then merge newer Supabase data
+// STRATEGY: Supabase is the SOURCE OF TRUTH when online.
+//   - On load: fetch Supabase first, merge with any local-only changes
 //   - On mutation: save to localStorage immediately, push to Supabase async
-//   - On "Forcer synchro": push everything from localStorage to Supabase
+//   - localStorage serves as offline cache and instant display while fetching
 //
-// This guarantees data is NEVER lost on refresh, regardless of Supabase state.
+// This ensures all users always see the latest data from the server.
 
 import { useState, useEffect, useCallback, useRef } from "react";
 import { isSupabaseConfigured } from "./supabaseClient";
@@ -16,43 +15,33 @@ import { migrateLocalStorageToSupabase, backupLocalData, restoreFromBackup } fro
 import { getDirtyCount, clearAllDirty } from "./dirtyTracker";
 
 /**
- * Deep-merge tracking: for each project, take the union of local and remote
- * tracking cells. If a cell exists in both, prefer the non-empty status.
+ * Deep-merge tracking: Supabase (remote) is the base, local fills gaps
+ * for cells that only exist locally (dirty/offline changes).
  */
-function mergeTracking(local, remote) {
+function mergeTracking(remote, local) {
   if (!local && !remote) return { logements: {}, batiments: {} };
-  if (!local) return remote;
   if (!remote) return local;
+  if (!local) return remote;
 
-  const result = JSON.parse(JSON.stringify(local)); // deep copy local as base
+  // Start from remote (source of truth)
+  const result = JSON.parse(JSON.stringify(remote));
 
   for (const trackType of ["logements", "batiments"]) {
-    const remoteTrack = remote[trackType] || {};
+    const localTrack = local[trackType] || {};
     if (!result[trackType]) result[trackType] = {};
 
-    for (const [rowKey, rowData] of Object.entries(remoteTrack)) {
+    for (const [rowKey, rowData] of Object.entries(localTrack)) {
       if (!result[trackType][rowKey]) {
+        // Row only exists locally (new local row) — keep it
         result[trackType][rowKey] = rowData;
       } else {
-        // Merge cells: prefer non-empty status
         for (const [entityId, cell] of Object.entries(rowData)) {
           const existing = result[trackType][rowKey][entityId];
           if (!existing) {
+            // Cell only exists locally — keep it (likely a dirty offline change)
             result[trackType][rowKey][entityId] = cell;
-          } else if (entityId.startsWith("_")) {
-            // Metadata: prefer remote if non-default
-            if (entityId === "_ponderation" && cell && cell !== 1) {
-              result[trackType][rowKey][entityId] = cell;
-            } else if (entityId === "_tache" && cell) {
-              result[trackType][rowKey][entityId] = cell;
-            }
-          } else {
-            // Cell status: prefer remote (other users may have updated)
-            const remoteStatus = cell?.status || "";
-            if (remoteStatus) {
-              result[trackType][rowKey][entityId] = cell;
-            }
           }
+          // If both exist, remote wins (already in result)
         }
       }
     }
@@ -72,7 +61,6 @@ export function useDataLayer(userId) {
     let cancelled = false;
 
     async function init() {
-      // STEP 1: Always load localStorage first — this is the instant, reliable source
       const localData = loadDB();
 
       try {
@@ -80,50 +68,50 @@ export function useDataLayer(userId) {
           backupLocalData();
           await migrateLocalStorageToSupabase(userId);
 
-          // STEP 2: Show local data immediately (no loading delay)
+          // Show local data immediately while fetching Supabase
           if (!cancelled && localData?.projects?.length) {
             setDb(localData);
           }
 
-          // STEP 3: Fetch Supabase data and merge
+          // Fetch Supabase — this is the source of truth
           const supaProjects = await loadAllProjects();
           if (cancelled) return;
 
           if (supaProjects.length > 0) {
             const localProjects = localData?.projects || [];
+            const hasDirtyOps = getDirtyCount() > 0;
 
-            // Merge: localStorage is PRIMARY, Supabase fills gaps
-            // If local project exists, keep local data + merge tracking
-            // If only in Supabase (no local copy), use Supabase data
+            // Build merged list: Supabase is primary
             const merged = [];
             const seenIds = new Set<string>();
 
-            // First: all local projects, enriched with Supabase tracking
-            for (const lp of localProjects) {
-              seenIds.add(lp.id);
-              const sp = supaProjects.find((s) => s.id === lp.id);
-              if (sp) {
-                merged.push({ ...lp, tracking: mergeTracking(lp.tracking, sp.tracking) });
-              } else {
-                merged.push(lp);
-                // Push to Supabase in background
-                withRetry(() => fullProjectSync(lp, userId));
-              }
-            }
-
-            // Then: Supabase-only projects (not in local)
+            // All Supabase projects, enriched with local-only tracking cells
             for (const sp of supaProjects) {
-              if (!seenIds.has(sp.id)) {
+              seenIds.add(sp.id);
+              const lp = localProjects.find((l) => l.id === sp.id);
+              if (lp && hasDirtyOps) {
+                // Merge: remote base + local-only cells (dirty offline changes)
+                merged.push({ ...sp, tracking: mergeTracking(sp.tracking, lp.tracking) });
+              } else {
+                // No dirty ops — use Supabase data as-is
                 merged.push(sp);
               }
             }
 
-            console.log(`[DataLayer] Merged ${merged.length} projects (local + Supabase)`);
+            // Local-only projects (not in Supabase yet) — push them
+            for (const lp of localProjects) {
+              if (!seenIds.has(lp.id)) {
+                merged.push(lp);
+                withRetry(() => fullProjectSync(lp, userId));
+              }
+            }
+
+            console.log(`[DataLayer] Loaded ${merged.length} projects (Supabase primary${hasDirtyOps ? " + local dirty merge" : ""})`);
             setDb({ projects: merged });
             saveDB({ projects: merged });
 
             // Push dirty ops to Supabase in background
-            if (getDirtyCount() > 0) {
+            if (hasDirtyOps) {
               console.log(`[DataLayer] ${getDirtyCount()} dirty ops, pushing to Supabase...`);
               Promise.all(merged.map((p) => withRetry(() => fullProjectSync(p, userId)))).then((results) => {
                 if (results.every((r) => r.ok)) {
@@ -133,8 +121,8 @@ export function useDataLayer(userId) {
               });
             }
           } else if (localData?.projects?.length) {
-            // Supabase empty, keep local and push
-            console.warn("[DataLayer] Supabase empty, using local data");
+            // Supabase empty but we have local data — push it
+            console.warn("[DataLayer] Supabase empty, using local data and pushing");
             setDb(localData);
             for (const p of localData.projects) {
               withRetry(() => fullProjectSync(p, userId));
@@ -162,30 +150,36 @@ export function useDataLayer(userId) {
     return () => { cancelled = true; };
   }, [userId, mode]);
 
-  // Reload: merge Supabase into current local data (never replace)
+  // Reload: fetch from Supabase and update
   const reload = useCallback(async () => {
     if (mode !== "supabase") return;
     try {
       const supaProjects = await loadAllProjects();
       if (!supaProjects.length) return;
 
-      const localData = loadDB();
-      const localProjects = localData?.projects || [];
-      const merged = [];
-      const seenIds = new Set<string>();
+      const hasDirtyOps = getDirtyCount() > 0;
+      let finalProjects;
 
-      for (const lp of localProjects) {
-        seenIds.add(lp.id);
-        const sp = supaProjects.find((s) => s.id === lp.id);
-        merged.push(sp ? { ...lp, tracking: mergeTracking(lp.tracking, sp.tracking) } : lp);
-      }
-      for (const sp of supaProjects) {
-        if (!seenIds.has(sp.id)) merged.push(sp);
+      if (hasDirtyOps) {
+        const localData = loadDB();
+        const localProjects = localData?.projects || [];
+        finalProjects = supaProjects.map((sp) => {
+          const lp = localProjects.find((l) => l.id === sp.id);
+          return lp ? { ...sp, tracking: mergeTracking(sp.tracking, lp.tracking) } : sp;
+        });
+        // Add local-only projects
+        for (const lp of localProjects) {
+          if (!supaProjects.find((sp) => sp.id === lp.id)) {
+            finalProjects.push(lp);
+          }
+        }
+      } else {
+        finalProjects = supaProjects;
       }
 
-      console.log(`[DataLayer] Reload merged ${merged.length} projects`);
-      setDb({ projects: merged });
-      saveDB({ projects: merged });
+      console.log(`[DataLayer] Reload: ${finalProjects.length} projects from Supabase`);
+      setDb({ projects: finalProjects });
+      saveDB({ projects: finalProjects });
     } catch (err) {
       console.error("[DataLayer] Reload failed:", err);
     }
@@ -200,7 +194,6 @@ export function useDataLayer(userId) {
     if (mode !== "supabase" || !currentDb?.projects?.length || !userId) {
       return { ok: false, error: "Not configured" };
     }
-    // Always read fresh from localStorage to avoid stale closure
     const freshDb = loadDB();
     const projectsToSync = freshDb?.projects?.length ? freshDb.projects : currentDb.projects;
     const errors = [];
@@ -217,7 +210,7 @@ export function useDataLayer(userId) {
     return { ok: true };
   }, [mode, userId]);
 
-  // Force pull: replace local data with Supabase data (opposite of forceSync)
+  // Force pull: replace local data with Supabase data
   const forcePull = useCallback(async () => {
     if (mode !== "supabase") return { ok: false, error: "Not configured" };
     try {
