@@ -1,6 +1,67 @@
 import { useState } from "react";
 
+const CHANGELOG = [
+  {
+    version: "1.5.0",
+    date: "12 mars 2026",
+    changes: [
+      {
+        type: "new",
+        title: "Indicateur d'avancement prévu sur le tableau de bord",
+        desc: "Les jauges du Dashboard affichent désormais un trait vertical indiquant l'avancement théorique basé sur les dates du projet (début chantier, durée INT/EXT, cibles logements).",
+      },
+      {
+        type: "new",
+        title: "Avancement par lot dans l'export Excel",
+        desc: "L'export Excel contient 3 nouvelles feuilles : Avancement INT, Avancement EXT et Avancement Bâtiments, avec les montants et pourcentages par lot.",
+      },
+      {
+        type: "new",
+        title: "Rapport PDF entièrement redessiné",
+        desc: "Nouveau design Navy & Or avec KPI cards, tableaux d'avancement par lot avec barres de progression, récapitulatif financier et résumé par bâtiment.",
+      },
+      {
+        type: "new",
+        title: "Menu de navigation en cascade",
+        desc: "Les onglets sont désormais organisés en menus déroulants (Configuration, Analyse, Planning, Outils) pour un accès plus clair et structuré.",
+      },
+      {
+        type: "fix",
+        title: "Correction des calculs d'avancement",
+        desc: "Les statuts N/A sont maintenant correctement exclus du dénominateur dans tous les onglets (Récap, Récap Av., Avancement), alignant les pourcentages avec le Dashboard.",
+      },
+      {
+        type: "fix",
+        title: "Cibles Logements : exceptions et N/A",
+        desc: "Les logements en exception sont désormais exclus du comptage, et les statuts N/A sont traités comme terminés dans le planning.",
+      },
+      {
+        type: "fix",
+        title: "Affichage des montants dans le PDF",
+        desc: "Les montants s'affichent correctement (plus de barres obliques à la place des espaces).",
+      },
+      {
+        type: "improve",
+        title: "Barres de progression améliorées",
+        desc: "Les barres de progression dans Avancement et les graphiques verticaux affichent désormais les pourcentages directement sur la barre.",
+      },
+    ],
+  },
+];
+
+const CHANGE_TYPE_LABELS: Record<string, { label: string; color: string }> = {
+  new: { label: "Nouveau", color: "#22c55e" },
+  fix: { label: "Correction", color: "#f59e0b" },
+  improve: { label: "Amélioration", color: "#3b82f6" },
+};
+
 const SECTIONS = [
+  {
+    id: "changelog",
+    title: "Nouveautés",
+    icon: "🆕",
+    content: [],
+  },
   {
     id: "overview",
     title: "Présentation générale",
@@ -192,7 +253,7 @@ const SECTIONS = [
 ];
 
 export default function HelpTab() {
-  const [activeSection, setActiveSection] = useState("overview");
+  const [activeSection, setActiveSection] = useState("changelog");
   const [expandedQ, setExpandedQ] = useState<string | null>(null);
   const [search, setSearch] = useState("");
 
@@ -273,7 +334,39 @@ export default function HelpTab() {
 
           {/* Content */}
           <div className="help-content">
-            {currentSection && (
+            {currentSection?.id === "changelog" ? (
+              <>
+                <h2 className="help-section-title">
+                  <span>{currentSection.icon}</span> {currentSection.title}
+                </h2>
+                <div className="changelog-list">
+                  {CHANGELOG.map((release) => (
+                    <div key={release.version} className="changelog-release">
+                      <div className="changelog-release-header">
+                        <span className="changelog-version">v{release.version}</span>
+                        <span className="changelog-date">{release.date}</span>
+                      </div>
+                      <div className="changelog-items">
+                        {release.changes.map((change, i) => {
+                          const typeInfo = CHANGE_TYPE_LABELS[change.type] || { label: change.type, color: "#888" };
+                          return (
+                            <div key={i} className="changelog-item">
+                              <span className="changelog-badge" style={{ background: typeInfo.color }}>
+                                {typeInfo.label}
+                              </span>
+                              <div className="changelog-item-content">
+                                <strong>{change.title}</strong>
+                                <p>{change.desc}</p>
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : currentSection && (
               <>
                 <h2 className="help-section-title">
                   <span>{currentSection.icon}</span> {currentSection.title}
@@ -310,7 +403,7 @@ export default function HelpTab() {
       {/* Footer */}
       <div className="help-footer">
         <p>
-          Suivi Chantier v1.0 — Application de suivi d'avancement de chantier
+          Suivi Chantier v1.5.0 — Application de suivi d'avancement de chantier
         </p>
         <p style={{ fontSize: 11, marginTop: 4 }}>
           Données sauvegardées localement. Mode cloud disponible avec Supabase.
