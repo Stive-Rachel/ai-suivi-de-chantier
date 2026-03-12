@@ -78,3 +78,71 @@
   font-weight: 600;
   background: var(--primary-bg-strong);
 }
+
+/* ── Dropdown tabs ── */
+.tab-dropdown {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.tab-dropdown-trigger {
+  gap: 5px;
+}
+
+.tab-chevron {
+  transition: transform 0.2s ease;
+  opacity: 0.5;
+  flex-shrink: 0;
+}
+.tab-chevron-open {
+  transform: rotate(180deg);
+}
+
+.tab-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  min-width: 200px;
+  background: var(--bg-card);
+  border: 1px solid var(--border-default);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg, 0 8px 24px rgba(0,0,0,0.12));
+  padding: 4px;
+  z-index: 50;
+  animation: dropdownIn 0.15s ease;
+}
+
+@keyframes dropdownIn {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: background 0.12s ease, color 0.12s ease;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.tab-dropdown-item:hover {
+  background: var(--primary-bg);
+  color: var(--primary);
+}
+
+.tab-dropdown-item.active {
+  background: var(--primary-bg-strong);
+  color: var(--primary);
+  font-weight: 600;
+}

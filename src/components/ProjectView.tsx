@@ -222,7 +222,18 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
         </div>
       )}
 
-      <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
+      <Tabs
+        tabs={tabs}
+        active={activeTab}
+        onChange={setActiveTab}
+        promoted={["logements", "batiments", "dashboard"]}
+        groups={{
+          config: { label: "Configuration", icon: "settings" },
+          analyse: { label: "Analyse", icon: "chart" },
+          planning: { label: "Planning", icon: "calendar" },
+          outils: { label: "Outils", icon: "download" },
+        }}
+      />
 
       <main className="tab-content" key={activeTab} role="tabpanel">
         {activeTab === "setup" && <SetupTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
