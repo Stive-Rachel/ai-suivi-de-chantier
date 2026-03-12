@@ -259,6 +259,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
 
   return (
     <div className="app-shell">
+      <a href="#main-content" className="skip-link">Aller au contenu principal</a>
       <header className="header">
         <div className="logo">
           <img src="/logo.jpeg" alt="Assiste Ingenierie" className="logo-img" />
@@ -328,7 +329,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
       </header>
 
       {saveError && (
-        <div style={{
+        <div role="alert" style={{
           background: "var(--warning, #f59e0b)",
           color: "#000",
           padding: "8px 16px",
@@ -341,7 +342,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
         </div>
       )}
 
-      <div className="dashboard-content">
+      <main className="dashboard-content" id="main-content">
         {/* KPI Summary Bar */}
         {hasProjects && (
           <div className="kpi-grid" style={{ animation: "slideInUp 0.3s ease both" }}>
@@ -465,7 +466,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
             </div>
           </>
         )}
-      </div>
+      </main>
 
       <Modal open={showCreate} onClose={() => setShowCreate(false)} title="Nouveau projet">
         <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>

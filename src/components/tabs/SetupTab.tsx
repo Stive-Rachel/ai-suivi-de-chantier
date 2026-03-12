@@ -45,7 +45,7 @@ export default function SetupTab({ project, updateProject, supaSync }) {
           </div>
           <div className="param-field">
             <label>Durée totale (mois)</label>
-            <input className="input-field" type="number" min="0" value={project.dureeTotale || ""} onChange={(e) => updateField("dureeTotale", parseInt(e.target.value) || 0)} />
+            <input className="input-field" type="number" inputMode="numeric" min="0" value={project.dureeTotale || ""} onChange={(e) => updateField("dureeTotale", parseInt(e.target.value) || 0)} />
           </div>
           <div className="param-field">
             <label>Montant travaux extérieurs (€)</label>
@@ -57,11 +57,11 @@ export default function SetupTab({ project, updateProject, supaSync }) {
           </div>
           <div className="param-field">
             <label>Durée travaux extérieurs (mois)</label>
-            <input className="input-field" type="number" min="0" value={project.dureeExt || ""} onChange={(e) => updateField("dureeExt", parseInt(e.target.value) || 0)} />
+            <input className="input-field" type="number" inputMode="numeric" min="0" value={project.dureeExt || ""} onChange={(e) => updateField("dureeExt", parseInt(e.target.value) || 0)} />
           </div>
           <div className="param-field">
             <label>Durée travaux intérieurs (mois)</label>
-            <input className="input-field" type="number" min="0" value={project.dureeInt || ""} onChange={(e) => updateField("dureeInt", parseInt(e.target.value) || 0)} />
+            <input className="input-field" type="number" inputMode="numeric" min="0" value={project.dureeInt || ""} onChange={(e) => updateField("dureeInt", parseInt(e.target.value) || 0)} />
           </div>
           <div className="param-field">
             <label>Nombre de bâtiments</label>
@@ -73,11 +73,11 @@ export default function SetupTab({ project, updateProject, supaSync }) {
           </div>
           <div className="param-field">
             <label>Semaines exclues</label>
-            <input className="input-field" type="number" min="0" value={project.semainesExclues || ""} onChange={(e) => updateField("semainesExclues", parseInt(e.target.value) || 0)} />
+            <input className="input-field" type="number" inputMode="numeric" min="0" value={project.semainesExclues || ""} onChange={(e) => updateField("semainesExclues", parseInt(e.target.value) || 0)} />
           </div>
           <div className="param-field">
             <label>Semaines travaillées</label>
-            <input className="input-field" type="number" min="0" value={project.semainesTravaillees || ""} onChange={(e) => updateField("semainesTravaillees", parseInt(e.target.value) || 0)} />
+            <input className="input-field" type="number" inputMode="numeric" min="0" value={project.semainesTravaillees || ""} onChange={(e) => updateField("semainesTravaillees", parseInt(e.target.value) || 0)} />
           </div>
           <div className="param-field">
             <label>Date début travaux intérieurs</label>

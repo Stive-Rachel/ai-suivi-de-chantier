@@ -64,3 +64,57 @@
   font-weight: 500;
   letter-spacing: 0.03em;
 }
+
+/* ═══════ SKELETON LOADER ═══════ */
+
+.skeleton-loader {
+  padding: 40px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  animation: fadeIn 0.2s ease;
+}
+
+.skeleton-line {
+  height: 14px;
+  border-radius: var(--radius-sm);
+  background: linear-gradient(90deg, var(--bg-elevated) 25%, var(--bg-hover) 50%, var(--bg-elevated) 75%);
+  background-size: 200% 100%;
+  animation: skeletonShimmer 1.5s ease-in-out infinite;
+}
+
+.skeleton-line-short { width: 40%; }
+.skeleton-line-medium { width: 65%; }
+.skeleton-line-long { width: 90%; }
+.skeleton-line-full { width: 100%; }
+.skeleton-line-thick { height: 24px; }
+
+@keyframes skeletonShimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* ═══════ REDUCED MOTION ═══════ */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .stagger > * {
+    animation: none;
+    opacity: 1;
+  }
+
+  .grid-loading-cell {
+    animation: none;
+    opacity: 0.5;
+  }
+
+  .skeleton-line {
+    animation: none;
+  }
+}

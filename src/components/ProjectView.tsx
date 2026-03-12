@@ -30,7 +30,16 @@ const HelpTab = lazy(() => import("./tabs/HelpTab"));
 const InviteUsersPanel = lazy(() => import("./InviteUsersPanel"));
 
 function TabLoader() {
-  return <div style={{ padding: 40, textAlign: "center", color: "var(--text-tertiary)" }}>Chargement...</div>;
+  return (
+    <div className="skeleton-loader">
+      <div className="skeleton-line skeleton-line-short skeleton-line-thick" />
+      <div className="skeleton-line skeleton-line-long" />
+      <div className="skeleton-line skeleton-line-medium" />
+      <div className="skeleton-line skeleton-line-full" />
+      <div className="skeleton-line skeleton-line-long" />
+      <div className="skeleton-line skeleton-line-short" />
+    </div>
+  );
 }
 
 interface ProjectViewProps {
@@ -200,7 +209,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
       </header>
 
       {saveError && (
-        <div style={{
+        <div role="alert" style={{
           background: "var(--warning, #f59e0b)",
           color: "#000",
           padding: "8px 16px",
@@ -215,7 +224,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
 
       <Tabs tabs={tabs} active={activeTab} onChange={setActiveTab} />
 
-      <div className="tab-content" key={activeTab} role="tabpanel">
+      <main className="tab-content" key={activeTab} role="tabpanel">
         {activeTab === "setup" && <SetupTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "batiments-config" && <BatimentsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
         {activeTab === "lots" && <LotsTab project={currentProject} updateProject={updateProject} supaSync={supaSync} />}
@@ -233,7 +242,7 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
           {activeTab === "users" && <InviteUsersPanel projects={db.projects} />}
           {activeTab === "help" && <HelpTab />}
         </Suspense>
-      </div>
+      </main>
 
       <AlertPanel project={currentProject} open={alertOpen} onClose={() => setAlertOpen(false)} />
 

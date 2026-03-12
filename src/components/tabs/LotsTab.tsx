@@ -276,7 +276,7 @@ export default function LotsTab({ project, updateProject, supaSync }) {
                       <td className="cell-right col-int cell-mono">{formatMontant(cm.montantInt)}</td>
                       <td className="cell-right cell-mono cell-muted col-int">{pctInt.toFixed(0)}%</td>
                       <td className="cell-center">
-                        <button className="delete-btn" onClick={() => removeLot(i)}>
+                        <button className="delete-btn" onClick={() => removeLot(i)} aria-label={`Supprimer lot ${lots[i]?.numero || i}`}>
                           <Icon name="trash" size={14} />
                         </button>
                       </td>

@@ -253,8 +253,8 @@ export default function LoginPage() {
             </>
           )}
 
-          {error && <div className="login-error">{error}</div>}
-          {success && <div className="login-success">{success}</div>}
+          {error && <div className="login-error" role="alert">{error}</div>}
+          {success && <div className="login-success" role="status">{success}</div>}
 
           <button
             type="submit"

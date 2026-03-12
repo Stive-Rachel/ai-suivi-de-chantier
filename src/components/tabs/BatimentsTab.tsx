@@ -109,7 +109,7 @@ export default function BatimentsTab({ project, updateProject, supaSync }) {
                       />
                     </td>
                     <td className="cell-center">
-                      <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeBatiment(b.id)}>
+                      <button className="delete-btn" style={{ opacity: 1 }} onClick={() => removeBatiment(b.id)} aria-label={`Supprimer ${b.name}`}>
                         <Icon name="trash" size={14} />
                       </button>
                     </td>

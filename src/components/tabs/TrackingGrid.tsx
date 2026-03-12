@@ -343,10 +343,10 @@ export default function TrackingGrid({
                               : "Marquer comme exception (exclu du calcul)"
                           }
                           style={{
-                            width: 26,
-                            height: 14,
-                            borderRadius: 7,
-                            border: `1px solid ${isExc ? "var(--warning)" : "var(--border-default)"}`,
+                            width: 34,
+                            height: 18,
+                            borderRadius: 9,
+                            border: `1.5px solid ${isExc ? "var(--warning)" : "var(--border-default)"}`,
                             background: isExc ? "var(--warning)" : "var(--bg-elevated)",
                             color: isExc ? "#fff" : "var(--text-tertiary)",
                             cursor: "pointer",
@@ -355,7 +355,7 @@ export default function TrackingGrid({
                             justifyContent: isExc ? "flex-end" : "flex-start",
                             fontSize: 8,
                             fontWeight: 600,
-                            padding: "0 2px",
+                            padding: "0 3px",
                             lineHeight: 1,
                             flexShrink: 0,
                             transition: "all 0.2s ease",
@@ -363,8 +363,8 @@ export default function TrackingGrid({
                         >
                           <span
                             style={{
-                              width: 10,
-                              height: 10,
+                              width: 12,
+                              height: 12,
                               borderRadius: "50%",
                               background: isExc ? "#fff" : "var(--text-tertiary)",
                               transition: "all 0.2s ease",
@@ -382,9 +382,9 @@ export default function TrackingGrid({
                               : "Cocher toute la colonne"
                           }
                           style={{
-                            width: 18,
-                            height: 18,
-                            borderRadius: 3,
+                            width: 22,
+                            height: 22,
+                            borderRadius: 4,
                             border: `1.5px solid ${allDone ? "var(--success)" : "var(--border-default)"}`,
                             background: allDone ? "var(--success)" : "var(--bg-default)",
                             color: allDone ? "#fff" : "var(--text-tertiary)",
@@ -392,7 +392,7 @@ export default function TrackingGrid({
                             display: "inline-flex",
                             alignItems: "center",
                             justifyContent: "center",
-                            fontSize: 11,
+                            fontSize: 12,
                             fontWeight: 700,
                             padding: 0,
                             lineHeight: 1,
