@@ -452,6 +452,9 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
                             day: "2-digit",
                             month: "short",
                             year: "numeric",
+                          })} &agrave; {new Date(p.updatedAt).toLocaleTimeString("fr-FR", {
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}</>
                         )}
                       </div>
