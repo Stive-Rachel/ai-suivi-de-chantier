@@ -38,6 +38,16 @@ function formatDate(iso: string): string {
   return `${d}/${m}/${y}`;
 }
 
+/** Returns the ISO week number for a given date string. */
+function getISOWeekNumber(iso: string): number {
+  const date = new Date(iso);
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+  return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
+}
+
 /** Determine how many weeks from project start to today + a buffer. */
 function computeWeekCount(startDate: string): number {
   if (!startDate) return 12;
@@ -189,6 +199,18 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
   const addMoreWeeks = useCallback(() => {
     setExtraWeeks((prev) => prev + 4);
   }, []);
+
+  const deleteWeek = useCallback(
+    (semaine: number) => {
+      updateProject((p) => {
+        const existing = [...(p.planningLogements || [])];
+        const filtered = existing.filter((e) => e.semaine !== semaine);
+        return { ...p, planningLogements: filtered };
+      });
+      supaSync?.updateFields?.({});
+    },
+    [updateProject, supaSync]
+  );
 
   const handleStartEdit = (semaine: number, currentCible: number) => {
     setEditingCell(semaine);
@@ -444,6 +466,7 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
           <thead>
             <tr>
               <th style={{ minWidth: 80, textAlign: "center", fontSize: 12 }}>Semaine</th>
+              <th style={{ minWidth: 60, textAlign: "center", fontSize: 12 }}>N° sem.</th>
               <th style={{ minWidth: 120, textAlign: "center", fontSize: 12 }}>Date debut</th>
               <th style={{ minWidth: 100, textAlign: "center", fontSize: 12 }}>
                 Cible / sem.
@@ -456,6 +479,7 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
               </th>
               <th style={{ minWidth: 200, fontSize: 12 }}>Comparaison</th>
               <th style={{ minWidth: 80, textAlign: "center", fontSize: 12 }}>Ecart</th>
+              {!readOnly && <th style={{ minWidth: 40, textAlign: "center", fontSize: 12 }}></th>}
             </tr>
           </thead>
           <tbody>
@@ -499,6 +523,10 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
                         verticalAlign: "middle",
                       }} />
                     )}
+                  </td>
+
+                  <td style={{ textAlign: "center", fontSize: 11, color: "var(--text-tertiary)", fontFamily: "var(--font-mono)" }}>
+                    {getISOWeekNumber(week.dateDebut)}
                   </td>
 
                   <td style={{ textAlign: "center", fontSize: 12, color: "var(--text-secondary)" }}>
@@ -658,6 +686,30 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
                       <span style={{ color: "var(--text-tertiary)" }}>—</span>
                     )}
                   </td>
+                  {!readOnly && (
+                    <td style={{ textAlign: "center", padding: "2px 4px" }}>
+                      {week.cible > 0 && (
+                        <button
+                          onClick={() => deleteWeek(week.semaine)}
+                          title="Supprimer cette ligne"
+                          style={{
+                            background: "none",
+                            border: "none",
+                            color: "var(--danger)",
+                            cursor: "pointer",
+                            fontSize: 14,
+                            padding: "2px 6px",
+                            borderRadius: 4,
+                            opacity: 0.6,
+                          }}
+                          onMouseEnter={(e) => { (e.target as HTMLElement).style.opacity = "1"; }}
+                          onMouseLeave={(e) => { (e.target as HTMLElement).style.opacity = "0.6"; }}
+                        >
+                          ✕
+                        </button>
+                      )}
+                    </td>
+                  )}
                 </tr>
               );
             })}
@@ -665,6 +717,7 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
           <tfoot>
             <tr style={{ fontWeight: 600, fontSize: 12, background: "var(--bg-raised)" }}>
               <td style={{ textAlign: "center" }}>Total</td>
+              <td></td>
               <td></td>
               <td style={{ textAlign: "center", fontWeight: 700 }}>
                 {weeks.reduce((s, w) => s + w.cible, 0)}
@@ -677,6 +730,7 @@ export default function PlanningTab({ project, updateProject, supaSync, readOnly
               </td>
               <td></td>
               <td></td>
+              {!readOnly && <td></td>}
             </tr>
           </tfoot>
         </table>
