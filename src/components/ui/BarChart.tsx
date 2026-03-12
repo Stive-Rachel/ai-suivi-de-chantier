@@ -90,6 +90,9 @@ export function VerticalBarChart({ data = [], maxValue = 100, barHeight = 200 })
                     style={{ width: barWidth }}
                     title={`${bar.label}: ${bar.value.toFixed(2)}%`}
                   >
+                    {bar.value > 0 && (
+                      <span className="vbar-bar-pct">{Math.round(bar.value)}%</span>
+                    )}
                     <div
                       className="vbar-bar"
                       style={{

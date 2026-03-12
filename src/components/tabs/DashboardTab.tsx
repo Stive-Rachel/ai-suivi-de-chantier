@@ -5,6 +5,15 @@ import DonutChart, { MultiDonut } from "../ui/DonutChart";
 import { HorizontalBarChart, VerticalBarChart } from "../ui/BarChart";
 import Icon from "../ui/Icon";
 
+function getMonday(date: Date): Date {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+}
+
 export default function DashboardTab({ project }) {
   const { lotProgressInt, lotProgressExt, batimentProgress } = useMemo(
     () => computeDetailedProgress(project),
@@ -84,6 +93,49 @@ export default function DashboardTab({ project }) {
     return done;
   }, [project, exceptions]);
 
+  // ── Planned progress (time-based) ──────────────────────────────────────────
+  const planned = useMemo(() => {
+    const now = new Date();
+    const elapsed = (startISO: string, months: number) => {
+      if (!startISO || !months) return null;
+      const start = new Date(startISO);
+      if (isNaN(start.getTime())) return null;
+      const endDate = new Date(start);
+      endDate.setMonth(endDate.getMonth() + months);
+      const total = endDate.getTime() - start.getTime();
+      const done = now.getTime() - start.getTime();
+      if (done <= 0) return 0;
+      return Math.min((done / total) * 100, 100);
+    };
+
+    // Global: from dateDebutChantier over dureeTotale
+    const global = elapsed(project.dateDebutChantier, project.dureeTotale);
+    // INT: from dateDebutInt over dureeInt
+    const int = elapsed(project.dateDebutInt, project.dureeInt);
+    // EXT: from dateDebutExt over dureeExt
+    const ext = elapsed(project.dateDebutExt, project.dureeExt);
+
+    // Logements: from planningLogements cumulative target
+    let logements: number | null = null;
+    const planning = project.planningLogements;
+    if (planning && planning.length > 0 && nbLogActive > 0 && project.dateDebutChantier) {
+      const startMonday = getMonday(new Date(project.dateDebutChantier));
+      const weeksSinceStart = Math.floor((now.getTime() - startMonday.getTime()) / (7 * 24 * 60 * 60 * 1000));
+      // Build cumulative targets
+      let cumul = 0;
+      let cibleAtCurrentWeek = 0;
+      for (const entry of planning) {
+        cumul += entry.cible;
+        if (entry.semaine <= weeksSinceStart + 1) {
+          cibleAtCurrentWeek = cumul;
+        }
+      }
+      logements = Math.min((cibleAtCurrentWeek / nbLogActive) * 100, 100);
+    }
+
+    return { global, int, ext, logements };
+  }, [project, nbLogActive]);
+
   const donutColor = avgProgress >= 75 ? "var(--success)" : avgProgress >= 40 ? "var(--warning)" : "var(--danger)";
 
   return (
@@ -162,31 +214,66 @@ export default function DashboardTab({ project }) {
         </div>
 
         <div className="chart-card">
-          <h4 className="chart-card-title">Logements terminés</h4>
-          <div className="chart-card-body chart-center">
-            <MultiDonut
-              size={150}
-              strokeWidth={14}
-              segments={[
-                { value: logementsDone, color: "var(--success)", label: "Terminés" },
-                { value: nbLogActive - logementsDone, color: "var(--border-default)", label: "Non terminés" },
-              ].filter((s) => s.value > 0)}
-            >
-              <span className="donut-chart-value">
-                {nbLogActive > 0 ? ((logementsDone / nbLogActive) * 100).toFixed(1) : 0}%
-              </span>
-              <span className="donut-chart-label">terminés</span>
-            </MultiDonut>
-            <div className="chart-legend">
-              <span className="chart-legend-item">
-                <span className="chart-legend-dot" style={{ background: "var(--success)" }} />
-                {logementsDone} terminés
-              </span>
-              <span className="chart-legend-item">
-                <span className="chart-legend-dot" style={{ background: "var(--border-default)" }} />
-                {nbLogActive - logementsDone} non terminés
-              </span>
+          <h4 className="chart-card-title">Résumé du projet</h4>
+          <div className="chart-card-body" style={{ display: "flex", flexDirection: "column", gap: 20, padding: "8px 0" }}>
+            {/* Global */}
+            <div className="gauge-row">
+              <div className="gauge-header">
+                <span className="gauge-label">Global</span>
+                <span className="gauge-value">{avgProgress.toFixed(1)}%</span>
+              </div>
+              <div className="gauge-track">
+                <div className="gauge-fill" style={{ width: `${avgProgress}%`, background: donutColor }} />
+                {planned.global !== null && (
+                  <div className="gauge-planned-marker" style={{ left: `${planned.global}%` }} data-tooltip={`Prévu: ${planned.global.toFixed(0)}%`} />
+                )}
+              </div>
             </div>
+            {/* INT */}
+            <div className="gauge-row">
+              <div className="gauge-header">
+                <span className="gauge-label">Intérieur</span>
+                <span className="gauge-value">{avgInt.toFixed(1)}%</span>
+              </div>
+              <div className="gauge-track">
+                <div className="gauge-fill" style={{ width: `${avgInt}%`, background: "var(--accent)" }} />
+                {planned.int !== null && (
+                  <div className="gauge-planned-marker" style={{ left: `${planned.int}%` }} data-tooltip={`Prévu: ${planned.int.toFixed(0)}%`} />
+                )}
+              </div>
+            </div>
+            {/* EXT */}
+            <div className="gauge-row">
+              <div className="gauge-header">
+                <span className="gauge-label">Extérieur</span>
+                <span className="gauge-value">{avgExt.toFixed(1)}%</span>
+              </div>
+              <div className="gauge-track">
+                <div className="gauge-fill" style={{ width: `${avgExt}%`, background: "var(--info)" }} />
+                {planned.ext !== null && (
+                  <div className="gauge-planned-marker" style={{ left: `${planned.ext}%` }} data-tooltip={`Prévu: ${planned.ext.toFixed(0)}%`} />
+                )}
+              </div>
+            </div>
+            {/* Logements */}
+            <div className="gauge-row">
+              <div className="gauge-header">
+                <span className="gauge-label">Logements terminés</span>
+                <span className="gauge-value">{logementsDone}/{nbLogActive}</span>
+              </div>
+              <div className="gauge-track">
+                <div className="gauge-fill" style={{ width: `${nbLogActive > 0 ? (logementsDone / nbLogActive) * 100 : 0}%`, background: "var(--success)" }} />
+                {planned.logements !== null && (
+                  <div className="gauge-planned-marker" style={{ left: `${planned.logements}%` }} data-tooltip={`Prévu: ${planned.logements.toFixed(0)}%`} />
+                )}
+              </div>
+            </div>
+            {(planned.global !== null || planned.int !== null || planned.ext !== null || planned.logements !== null) && (
+              <div className="gauge-legend">
+                <span className="gauge-legend-marker" />
+                <span className="gauge-legend-text">Avancement prévu (temps écoulé)</span>
+              </div>
+            )}
           </div>
         </div>
       </div>

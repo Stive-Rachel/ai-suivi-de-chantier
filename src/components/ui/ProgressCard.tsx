@@ -86,7 +86,14 @@ export default memo(function ProgressCard({ title, items }) {
                   <div
                     className="pc-bar-fill"
                     style={{ width: `${pct}%`, background: color }}
-                  />
+                  >
+                    {pct >= 15 && (
+                      <span className="pc-bar-label">{pct.toFixed(0)}%</span>
+                    )}
+                  </div>
+                  {pct > 0 && pct < 15 && (
+                    <span className="pc-bar-label-outside" style={{ color, left: `calc(${pct}% + 4px)` }}>{pct.toFixed(0)}%</span>
+                  )}
                 </div>
               </div>
             </div>

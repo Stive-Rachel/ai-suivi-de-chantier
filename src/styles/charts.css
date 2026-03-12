@@ -178,6 +178,110 @@
   flex-shrink: 0;
 }
 
+/* Gauge Bars (summary card) */
+.gauge-row {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.gauge-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.gauge-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.gauge-value {
+  font-family: var(--font-mono);
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.5px;
+}
+
+.gauge-track {
+  height: 10px;
+  background: var(--bg-deep);
+  border-radius: 100px;
+  overflow: visible;
+  position: relative;
+}
+
+.gauge-fill {
+  height: 100%;
+  border-radius: 100px;
+  transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  max-width: 100%;
+}
+
+.gauge-planned-marker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 2px;
+  background: var(--text-primary);
+  border-radius: 1px;
+  transform: translateX(-1px);
+  opacity: 0.7;
+  z-index: 2;
+  transition: left 0.6s cubic-bezier(.4,0,.2,1);
+}
+.gauge-planned-marker::before {
+  content: '';
+  position: absolute;
+  top: -3px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 3px solid transparent;
+  border-right: 3px solid transparent;
+  border-top: 4px solid var(--text-primary);
+  opacity: 0.7;
+}
+
+.gauge-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  justify-content: flex-end;
+}
+
+.gauge-legend-marker {
+  width: 2px;
+  height: 12px;
+  background: var(--text-primary);
+  opacity: 0.7;
+  border-radius: 1px;
+  position: relative;
+}
+.gauge-legend-marker::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 0;
+  height: 0;
+  border-left: 2.5px solid transparent;
+  border-right: 2.5px solid transparent;
+  border-top: 3px solid var(--text-primary);
+  opacity: 0.7;
+}
+
+.gauge-legend-text {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  font-weight: 500;
+}
+
 /* Horizontal Bar Chart */
 .hbar-chart {
   display: grid;
@@ -341,7 +445,19 @@
   width: 20px;
   height: 100%;
   display: flex;
-  align-items: flex-end;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.vbar-bar-pct {
+  font-family: var(--font-mono);
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-tertiary);
+  line-height: 1;
+  margin-bottom: 2px;
+  white-space: nowrap;
 }
 
 .vbar-bar {

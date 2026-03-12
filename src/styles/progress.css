@@ -231,10 +231,9 @@
 }
 
 .pc-bar-track {
-  height: 6px;
+  height: 10px;
   background: var(--bg-deep);
   border-radius: 100px;
-  overflow: hidden;
   position: relative;
 }
 
@@ -255,6 +254,34 @@
   height: 100%;
   border-radius: 100px;
   transition: width 0.6s cubic-bezier(.4,0,.2,1);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  overflow: hidden;
+}
+
+/* Label inside the bar */
+.pc-bar-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  color: #fff;
+  padding-right: 5px;
+  line-height: 1;
+  white-space: nowrap;
+  text-shadow: 0 0 2px rgba(0,0,0,0.2);
+}
+
+/* Label outside (for narrow bars) */
+.pc-bar-label-outside {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-family: var(--font-mono);
+  font-size: 9px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .pc-footer {
