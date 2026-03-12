@@ -2,7 +2,7 @@ FROM node:22-slim AS build
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install --include=dev
 
 COPY . .
@@ -20,7 +20,7 @@ FROM node:22-slim AS production
 
 WORKDIR /app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 RUN npm install --omit=dev
 
 COPY --from=build /app/dist ./dist
