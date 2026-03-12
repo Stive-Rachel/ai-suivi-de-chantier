@@ -47,10 +47,9 @@ function mergeTracking(local, remote) {
               result[trackType][rowKey][entityId] = cell;
             }
           } else {
-            // Cell status: prefer non-empty
+            // Cell status: prefer remote (other users may have updated)
             const remoteStatus = cell?.status || "";
-            const localStatus = existing?.status || "";
-            if (remoteStatus && !localStatus) {
+            if (remoteStatus) {
               result[trackType][rowKey][entityId] = cell;
             }
           }
@@ -218,6 +217,24 @@ export function useDataLayer(userId) {
     return { ok: true };
   }, [mode, userId]);
 
+  // Force pull: replace local data with Supabase data (opposite of forceSync)
+  const forcePull = useCallback(async () => {
+    if (mode !== "supabase") return { ok: false, error: "Not configured" };
+    try {
+      const supaProjects = await loadAllProjects();
+      if (!supaProjects.length) return { ok: false, error: "Aucun projet trouvé sur Supabase" };
+      const newDb = { projects: supaProjects };
+      setDb(newDb);
+      saveDB(newDb);
+      clearAllDirty();
+      console.log(`[DataLayer] Force pull OK: ${supaProjects.length} projects from Supabase`);
+      return { ok: true };
+    } catch (err) {
+      console.error("[DataLayer] Force pull failed:", err);
+      return { ok: false, error: err.message || String(err) };
+    }
+  }, [mode]);
+
   // Auto-sync every 5 minutes if there are dirty ops
   const forceSyncRef = useRef(forceSync);
   forceSyncRef.current = forceSync;
@@ -243,5 +260,5 @@ export function useDataLayer(userId) {
     return () => clearInterval(intervalId);
   }, [mode]);
 
-  return { db, setDb, loading, error, mode, reload, forceSync };
+  return { db, setDb, loading, error, mode, reload, forceSync, forcePull };
 }

@@ -105,7 +105,7 @@ function ProjectKpis({ project }) {
   );
 }
 
-export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme, forceSync }) {
+export default function Dashboard({ db, setDb, mode, userId, onOpenProject, theme, toggleTheme, forceSync, forcePull }) {
   const { isAdmin, isClient, allowedProjectIds } = useUserRole();
   const { profile, signOut } = useAuth();
   const [saveError, setSaveError] = useState<string | null>(null);
@@ -292,7 +292,27 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
               }
             }}
           >
-            {syncing ? "Synchro..." : "Forcer synchro"}
+            {syncing ? "Synchro..." : "Pousser vers cloud"}
+          </Button>
+          <Button
+            variant="secondary"
+            disabled={syncing}
+            onClick={async () => {
+              if (!forcePull) return;
+              setSyncing(true);
+              setSaveError(null);
+              const result = await forcePull();
+              setSyncing(false);
+              if (result.ok) {
+                setSaveError(null);
+                alert("Données récupérées depuis le cloud !");
+                window.location.reload();
+              } else {
+                setSaveError(`Erreur: ${result.error}`);
+              }
+            }}
+          >
+            {syncing ? "Synchro..." : "Récupérer du cloud"}
           </Button>
           {isAdmin && (
             <>

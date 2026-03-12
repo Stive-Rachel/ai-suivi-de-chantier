@@ -45,16 +45,16 @@ describe("StatusCell", () => {
     expect(onChange).toHaveBeenCalledWith("X");
   });
 
-  it("cycles from X to N/A", () => {
+  it("cycles from X to !", () => {
     const onChange = vi.fn();
     render(<StatusCell value="X" onChange={onChange} />);
     fireEvent.click(screen.getByRole("button"));
-    expect(onChange).toHaveBeenCalledWith("N/A");
+    expect(onChange).toHaveBeenCalledWith("!");
   });
 
-  it("cycles from i back to empty", () => {
+  it("cycles from N/A back to empty", () => {
     const onChange = vi.fn();
-    render(<StatusCell value="i" onChange={onChange} />);
+    render(<StatusCell value="N/A" onChange={onChange} />);
     fireEvent.click(screen.getByRole("button"));
     expect(onChange).toHaveBeenCalledWith("");
   });

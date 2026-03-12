@@ -31,7 +31,7 @@ function ErrorFallback() {
 
 function AppContent() {
   const { user, loading: authLoading } = useAuth();
-  const { db, setDb, loading, mode, forceSync } = useDataLayer(user?.id);
+  const { db, setDb, loading, mode, forceSync, forcePull } = useDataLayer(user?.id);
   const [openProjectId, setOpenProjectId] = useState(null);
   const { theme, toggleTheme } = useTheme();
 
@@ -117,6 +117,7 @@ function AppContent() {
       theme={theme}
       toggleTheme={toggleTheme}
       forceSync={forceSync}
+      forcePull={forcePull}
     />
   );
 }

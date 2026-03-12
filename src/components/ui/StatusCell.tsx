@@ -2,7 +2,7 @@ import { memo } from "react";
 import { STATUS_CONFIG } from "../../lib/constants";
 
 export default memo(function StatusCell({ value, onChange, readOnly = false }) {
-  const statuses = ["", "X", "N/A", "!", "NOK", "i"];
+  const statuses = ["", "X", "!", "NOK", "i", "N/A"];
   const idx = statuses.indexOf(value || "");
   const next = () => {
     if (readOnly) return;

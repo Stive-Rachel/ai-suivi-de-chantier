@@ -136,6 +136,7 @@ describe("Dashboard", () => {
     theme: "light",
     toggleTheme: vi.fn(),
     forceSync: vi.fn(),
+    forcePull: vi.fn(),
   };
 
   beforeEach(() => {
@@ -223,10 +224,11 @@ describe("Dashboard", () => {
     expect(screen.getByTestId("theme-toggle")).toBeInTheDocument();
   });
 
-  it("shows admin buttons (Charger demo, Forcer synchro, Nouveau projet)", () => {
+  it("shows admin buttons (Charger demo, Pousser vers cloud, Nouveau projet)", () => {
     render(<Dashboard {...defaultProps} />);
     expect(screen.getAllByText(/charger d/i).length).toBeGreaterThan(0);
-    expect(screen.getByText(/forcer synchro/i)).toBeInTheDocument();
+    expect(screen.getByText(/pousser vers cloud/i)).toBeInTheDocument();
+    expect(screen.getByText(/récupérer du cloud/i)).toBeInTheDocument();
   });
 
   it("shows empty state create buttons for admin", () => {
