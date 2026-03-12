@@ -415,24 +415,24 @@ export async function fullProjectSync(project, userId) {
     );
   }
 
-  // Lots decomp
+  // Lots decomp — delete and re-insert (track_prefix can have duplicates)
   const decompRows = [];
   for (const [type, arr] of [["int", project.lotsInt], ["ext", project.lotsExt]]) {
-    (arr || []).forEach((d, i) => decompRows.push(lotDecompToRow(d, type, project.id, i)));
+    (arr || []).forEach((d, i) => {
+      const row = lotDecompToRow(d, type, project.id, i);
+      // Make track_prefix unique for DB by appending sort_order
+      row.track_prefix = `${row.track_prefix}__${type}_${i}`;
+      decompRows.push(row);
+    });
   }
-  const seenDecomp = new Set();
-  const uniqueDecomp = decompRows.filter((r) => {
-    const key = `${r.type}:${r.track_prefix}`;
-    if (seenDecomp.has(key)) return false;
-    seenDecomp.add(key);
-    return true;
-  });
-  if (uniqueDecomp.length) {
+  if (decompRows.length) {
     tasks.push(
-      supabase.from("lots_decomp").upsert(uniqueDecomp, { onConflict: "project_id,type,track_prefix" }).then((res) => {
-        if (res.error) console.error("[DataLayer] lots_decomp upsert failed:", res.error);
-        else console.log(`[DataLayer] lots_decomp OK: ${uniqueDecomp.length}`);
-      })
+      supabase.from("lots_decomp").delete().eq("project_id", project.id).then(() =>
+        supabase.from("lots_decomp").insert(decompRows).then((res) => {
+          if (res.error) console.error("[DataLayer] lots_decomp insert failed:", res.error);
+          else console.log(`[DataLayer] lots_decomp OK: ${decompRows.length}`);
+        })
+      )
     );
   }
 

@@ -120,11 +120,14 @@ export function lotDecompToRow(lot, type, projectId, index) {
 }
 
 function rowToLotDecomp(row) {
+  // Strip the __type_index suffix added for DB uniqueness
+  const rawPrefix = row.track_prefix || "";
+  const trackPrefix = rawPrefix.replace(/__(?:int|ext)_\d+$/, "");
   return {
     numero: row.numero,
     nom: row.nom || "",
     nomDecomp: row.nom_decomp || "",
-    trackPrefix: row.track_prefix,
+    trackPrefix,
     decompositions: row.decompositions || [],
     montant: row.montant || 0,
   };
