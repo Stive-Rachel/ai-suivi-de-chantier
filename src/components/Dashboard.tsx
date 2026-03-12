@@ -447,6 +447,13 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
                           month: "short",
                           year: "numeric",
                         })}
+                        {p.updatedAt && (
+                          <> &middot; MAJ le {new Date(p.updatedAt).toLocaleDateString("fr-FR", {
+                            day: "2-digit",
+                            month: "short",
+                            year: "numeric",
+                          })}</>
+                        )}
                       </div>
                     </div>
                   </div>
