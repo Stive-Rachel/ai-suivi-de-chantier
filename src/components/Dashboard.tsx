@@ -347,7 +347,7 @@ export default function Dashboard({ db, setDb, mode, userId, onOpenProject, them
             <KpiCard
               icon="settings"
               label="Montant total"
-              value={formatMontant(globalKpis.montantTotal)}
+              value={formatMontant(globalKpis.montantTotal, true)}
               color="var(--text-secondary)"
             />
             {(globalKpis.totalAlerts > 0 || globalKpis.totalNoks > 0) && (
