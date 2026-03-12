@@ -67,12 +67,14 @@ function computeWeekCount(startDate: string): number {
 function countCompletedLogements(project: Project): number {
   const tracking = project.tracking?.logements || {};
   const lotsInt = project.lotsInt || [];
+  const exceptions = project.exceptions || {};
 
-  // Collect all logement entity IDs
+  // Collect all logement entity IDs (excluding exceptions)
   const allLogementIds: string[] = [];
   for (const bat of project.batiments) {
     for (const num of getLogementNums(bat)) {
-      allLogementIds.push(`${bat.id}_log_${num}`);
+      const eId = `${bat.id}_log_${num}`;
+      if (!exceptions[eId]) allLogementIds.push(eId);
     }
   }
 
@@ -93,7 +95,8 @@ function countCompletedLogements(project: Project): number {
     let allDone = true;
     for (const rowKey of allRowKeys) {
       const cell = tracking[rowKey]?.[entityId] as { status?: string } | undefined;
-      if (cell?.status !== "X") {
+      const status = cell?.status;
+      if (status !== "X" && status !== "N/A") {
         allDone = false;
         break;
       }

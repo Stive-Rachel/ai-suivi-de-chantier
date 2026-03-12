@@ -49,10 +49,13 @@ export default function AvancementTab({ project }) {
           for (const step of decomp.decompositions) {
             const key = `${decomp.trackPrefix || decomp.numero}-${step}`;
             const pond = tracking[key]?._ponderation ?? 1;
-            tpw += pond * allEntities.length;
+            let naCount = 0;
             for (const eId of allEntities) {
-              if (tracking[key]?.[eId]?.status === "X") dw += pond;
+              const status = tracking[key]?.[eId]?.status;
+              if (status === "N/A") naCount++;
+              else if (status === "X") dw += pond;
             }
+            tpw += pond * (allEntities.length - naCount);
           }
         }
         const decompAv = tpw > 0 ? Math.min((dw / tpw) * 100, 100) : 0;
