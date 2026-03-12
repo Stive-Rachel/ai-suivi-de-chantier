@@ -228,29 +228,43 @@ export function useDataLayer(userId) {
     }
   }, [mode]);
 
-  // Auto-sync every 5 minutes if there are dirty ops
+  // Auto-sync: every 30 seconds if there are dirty ops, and every 2 minutes full sync
   const forceSyncRef = useRef(forceSync);
   forceSyncRef.current = forceSync;
 
   useEffect(() => {
     if (mode !== "supabase") return;
 
-    const FIVE_MINUTES = 5 * 60 * 1000;
-
-    const intervalId = setInterval(() => {
+    // Quick sync every 30s for dirty ops
+    const quickInterval = setInterval(() => {
       if (!navigator.onLine || getDirtyCount() === 0) return;
 
       forceSyncRef.current().then((result) => {
         if (result.ok) {
           clearAllDirty();
-          console.log("[AutoSync] Periodic sync completed");
-        } else {
-          console.warn("[AutoSync] Periodic sync failed:", result.error);
+          console.log("[AutoSync] Quick sync completed");
         }
       });
-    }, FIVE_MINUTES);
+    }, 30_000);
 
-    return () => clearInterval(intervalId);
+    // Full pull every 2 minutes to catch other users' changes
+    const fullInterval = setInterval(() => {
+      if (!navigator.onLine) return;
+
+      loadAllProjects().then((supaProjects) => {
+        if (supaProjects?.length) {
+          const newDb = { projects: supaProjects };
+          setDb(newDb);
+          saveDB(newDb);
+          console.log("[AutoSync] Full pull completed");
+        }
+      }).catch(() => {});
+    }, 120_000);
+
+    return () => {
+      clearInterval(quickInterval);
+      clearInterval(fullInterval);
+    };
   }, [mode]);
 
   return { db, setDb, loading, error, mode, reload, forceSync, forcePull };

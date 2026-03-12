@@ -312,28 +312,22 @@ export async function syncLotsDecomp(projectId, lotsInt, lotsExt) {
     return;
   }
 
+  // Delete and re-insert (track_prefix can have duplicates across lots)
+  throwIfError(await supabase.from("lots_decomp").delete().eq("project_id", projectId));
+
   const rows = [];
-  (lotsInt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "int", projectId, i)));
-  (lotsExt || []).forEach((d, i) => rows.push(lotDecompToRow(d, "ext", projectId, i)));
-  // Deduplicate by (type, track_prefix) to avoid UNIQUE violations
-  const seenKeys = new Set<string>();
-  const uniqueRows = rows.filter((r) => {
-    const key = `${r.type}:${r.track_prefix}`;
-    if (seenKeys.has(key)) return false;
-    seenKeys.add(key);
-    return true;
+  (lotsInt || []).forEach((d, i) => {
+    const row = lotDecompToRow(d, "int", projectId, i);
+    row.track_prefix = `${row.track_prefix}__int_${i}`;
+    rows.push(row);
   });
-  if (uniqueRows.length) {
-    throwIfError(await supabase.from("lots_decomp").upsert(uniqueRows, { onConflict: "project_id,type,track_prefix" }));
-  }
-  const keepPrefixes = uniqueRows.map((r) => `${r.type}:${r.track_prefix}`);
-  // Delete rows that are no longer in the current list
-  const existing = throwIfError(
-    await supabase.from("lots_decomp").select("id,type,track_prefix").eq("project_id", projectId)
-  );
-  const toDelete = (existing || []).filter((e) => !keepPrefixes.includes(`${e.type}:${e.track_prefix}`)).map((e) => e.id);
-  if (toDelete.length) {
-    throwIfError(await supabase.from("lots_decomp").delete().in("id", toDelete));
+  (lotsExt || []).forEach((d, i) => {
+    const row = lotDecompToRow(d, "ext", projectId, i);
+    row.track_prefix = `${row.track_prefix}__ext_${i}`;
+    rows.push(row);
+  });
+  if (rows.length) {
+    throwIfError(await supabase.from("lots_decomp").insert(rows));
   }
 }
 
