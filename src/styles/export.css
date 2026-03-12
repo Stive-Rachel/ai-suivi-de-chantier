@@ -25,7 +25,7 @@
 }
 
 .export-btn:hover {
-  border-color: rgba(194, 97, 58, 0.3);
+  border-color: rgba(44, 62, 107, 0.25);
   transform: translateY(-2px);
   box-shadow: var(--shadow-card-hover);
 }

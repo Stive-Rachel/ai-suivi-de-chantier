@@ -16,7 +16,7 @@
 .card-interactive { cursor: pointer; }
 .card-interactive:hover {
   transform: translateY(-3px);
-  border-color: rgba(194, 97, 58, 0.25);
+  border-color: rgba(44, 62, 107, 0.20);
   box-shadow: var(--shadow-card-hover);
 }
 

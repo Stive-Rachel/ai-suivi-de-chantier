@@ -19,7 +19,7 @@ import SyncStatusBadge from "./ui/SyncStatusBadge";
 function KpiCard({ icon, label, value, sub, color }) {
   return (
     <div className="kpi-card">
-      <div className="kpi-icon" style={{ color: color || "var(--accent)" }}>
+      <div className="kpi-icon" style={{ color: color || "var(--primary)" }}>
         <Icon name={icon} size={22} />
       </div>
       <div className="kpi-body">

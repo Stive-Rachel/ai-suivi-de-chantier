@@ -10,11 +10,11 @@
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: var(--accent);
+  background: var(--primary);
   color: var(--text-inverse);
   border: none;
   cursor: pointer;
-  box-shadow: 0 4px 16px rgba(194, 97, 58, 0.4), 0 2px 6px rgba(194, 97, 58, 0.2);
+  box-shadow: 0 4px 16px rgba(44, 62, 107, 0.4), 0 2px 6px rgba(44, 62, 107, 0.2);
   z-index: 50;
   transition: all 0.2s ease;
   align-items: center;
@@ -22,7 +22,7 @@
 }
 .quick-entry-fab:hover {
   transform: scale(1.08);
-  box-shadow: 0 6px 24px rgba(194, 97, 58, 0.5);
+  box-shadow: 0 6px 24px rgba(44, 62, 107, 0.5);
 }
 .quick-entry-fab:active { transform: scale(0.95); }
 

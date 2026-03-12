@@ -107,21 +107,26 @@ export default function ProjectView({ project, db, setDb, mode, userId, onBack, 
 
   const tabs = useMemo(() => {
     const allTabs = [
-      { key: "setup", label: "Configuration", icon: "settings" },
-      { key: "batiments-config", label: "Bâtiments", icon: "building" },
-      { key: "lots", label: "Lots", icon: "folder" },
-      { key: "logements", label: "Suivi INT", icon: "home" },
-      { key: "batiments", label: "Suivi EXT", icon: "building" },
-      { key: "recap", label: "Récap", icon: "chart" },
-      { key: "recap-av", label: "Récap Av.", icon: "chart" },
-      { key: "avancement", label: "Avancement", icon: "chart" },
-      { key: "gantt", label: "Planning", icon: "calendar" },
-      { key: "planning-logements", label: "Cibles Log.", icon: "target" },
-      { key: "photos", label: "Photos", icon: "camera" },
-      { key: "export", label: "Export", icon: "download" },
-      { key: "dashboard", label: "Tableau de bord", icon: "chart" },
-      { key: "users", label: "Utilisateurs", icon: "settings" },
-      { key: "help", label: "Aide", icon: "help" },
+      // Groupe: Configuration
+      { key: "setup", label: "Configuration", icon: "settings", group: "config" },
+      { key: "batiments-config", label: "Bâtiments", icon: "building", group: "config" },
+      { key: "lots", label: "Lots", icon: "folder", group: "config" },
+      // Groupe: Suivi
+      { key: "logements", label: "Suivi INT", icon: "home", group: "suivi" },
+      { key: "batiments", label: "Suivi EXT", icon: "building", group: "suivi" },
+      // Groupe: Analyse
+      { key: "recap", label: "Récap", icon: "chart", group: "analyse" },
+      { key: "recap-av", label: "Récap Av.", icon: "chart", group: "analyse" },
+      { key: "avancement", label: "Avancement", icon: "chart", group: "analyse" },
+      { key: "dashboard", label: "Tableau de bord", icon: "chart", group: "analyse" },
+      // Groupe: Planning
+      { key: "gantt", label: "Planning", icon: "calendar", group: "planning" },
+      { key: "planning-logements", label: "Cibles Log.", icon: "target", group: "planning" },
+      // Groupe: Outils
+      { key: "photos", label: "Photos", icon: "camera", group: "outils" },
+      { key: "export", label: "Export", icon: "download", group: "outils" },
+      { key: "users", label: "Utilisateurs", icon: "settings", group: "outils" },
+      { key: "help", label: "Aide", icon: "help", group: "outils" },
     ];
     if (isClient) {
       return allTabs.filter((t) => !ADMIN_ONLY_TABS.has(t.key));

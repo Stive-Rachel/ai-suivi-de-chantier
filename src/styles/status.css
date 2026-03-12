@@ -28,9 +28,9 @@
   color: var(--text-tertiary);
 }
 .status-cell.status-empty:hover {
-  border-color: var(--accent);
+  border-color: var(--primary);
   border-style: solid;
-  background: var(--accent-bg);
+  background: var(--primary-bg);
 }
 
 .status-cell.status-ok {

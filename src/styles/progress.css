@@ -38,7 +38,7 @@
 
 .progress-fill.color-success { background: var(--success); }
 .progress-fill.color-warning { background: var(--warning); }
-.progress-fill.color-danger { background: var(--accent); }
+.progress-fill.color-danger { background: var(--danger); }
 
 .progress-label {
   font-size: 12px;
@@ -79,7 +79,7 @@
   font-family: var(--font-mono);
   font-size: 24px;
   font-weight: 700;
-  color: var(--accent);
+  color: var(--primary);
   letter-spacing: -1px;
 }
 
