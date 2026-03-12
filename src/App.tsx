@@ -9,6 +9,7 @@ import { getSentry } from "./lib/sentry";
 import Dashboard from "./components/Dashboard";
 import ProjectView from "./components/ProjectView";
 import LoginPage from "./components/LoginPage";
+import GridLoading from "./components/ui/GridLoading";
 
 function ErrorFallback() {
   return (
@@ -67,13 +68,7 @@ function AppContent() {
   }, []);
 
   if (authLoading) {
-    return (
-      <div className="app-shell">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--text-tertiary)" }}>
-          Chargement...
-        </div>
-      </div>
-    );
+    return <GridLoading text="Connexion..." />;
   }
 
   if (!user) {
@@ -81,13 +76,7 @@ function AppContent() {
   }
 
   if (loading || !db) {
-    return (
-      <div className="app-shell">
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "100vh", color: "var(--text-tertiary)" }}>
-          Chargement...
-        </div>
-      </div>
-    );
+    return <GridLoading text="Chargement des projets..." />;
   }
 
   const openProject = db.projects.find((p) => p.id === openProjectId);
