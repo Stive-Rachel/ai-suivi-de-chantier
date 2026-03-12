@@ -71,8 +71,9 @@ export default function Tabs({ tabs, active, onChange, promoted = [], groups = {
         setOpenDropdown(null);
       }
     };
-    document.addEventListener("click", handleClick);
-    return () => document.removeEventListener("click", handleClick);
+    // Use mousedown to close before the click event triggers the toggle
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
   }, [openDropdown]);
 
   // Close dropdown on Escape
@@ -156,8 +157,7 @@ export default function Tabs({ tabs, active, onChange, promoted = [], groups = {
   const activeGroup = tabs.find((t) => t.key === active)?.group;
 
   return (
-    <div className="tabs-container">
-      {canScrollLeft && <div className="tabs-fade tabs-fade-left" aria-hidden="true" />}
+    <div className="tabs-container has-dropdown">
       <div className="tabs" role="tablist" ref={scrollRef}>
         {/* Promoted tabs */}
         {promotedTabs.map((tab) => (
@@ -226,7 +226,6 @@ export default function Tabs({ tabs, active, onChange, promoted = [], groups = {
           );
         })}
       </div>
-      {canScrollRight && <div className="tabs-fade tabs-fade-right" aria-hidden="true" />}
     </div>
   );
 }
