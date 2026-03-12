@@ -48,6 +48,22 @@ function shouldEnqueue() {
   return isSupabaseConfigured() && typeof navigator !== "undefined" && !navigator.onLine;
 }
 
+// ── Paginated fetch (Supabase default limit is 1000) ────────────────────────
+
+async function fetchAll(query) {
+  const PAGE = 1000;
+  let all = [];
+  let from = 0;
+  while (true) {
+    const { data, error } = await query.range(from, from + PAGE - 1);
+    if (error) throw error;
+    all = all.concat(data);
+    if (data.length < PAGE) break;
+    from += PAGE;
+  }
+  return all;
+}
+
 // ── Load All Projects ───────────────────────────────────────────────────────
 
 export async function loadAllProjects() {
@@ -63,19 +79,13 @@ export async function loadAllProjects() {
 
   const projectIds = projects.map((p) => p.id);
 
-  const [batRes, lotRes, decompRes, cellRes, metaRes] = await Promise.all([
-    supabase.from("batiments").select("*").in("project_id", projectIds).order("sort_order"),
-    supabase.from("lots").select("*").in("project_id", projectIds).order("sort_order"),
-    supabase.from("lots_decomp").select("*").in("project_id", projectIds).order("sort_order"),
-    supabase.from("tracking_cells").select("*").in("project_id", projectIds),
-    supabase.from("tracking_meta").select("*").in("project_id", projectIds),
+  const [bats, lots, decomps, cells, metas] = await Promise.all([
+    fetchAll(supabase.from("batiments").select("*").in("project_id", projectIds).order("sort_order")),
+    fetchAll(supabase.from("lots").select("*").in("project_id", projectIds).order("sort_order")),
+    fetchAll(supabase.from("lots_decomp").select("*").in("project_id", projectIds).order("sort_order")),
+    fetchAll(supabase.from("tracking_cells").select("*").in("project_id", projectIds)),
+    fetchAll(supabase.from("tracking_meta").select("*").in("project_id", projectIds)),
   ]);
-
-  const bats = throwIfError(batRes);
-  const lots = throwIfError(lotRes);
-  const decomps = throwIfError(decompRes);
-  const cells = throwIfError(cellRes);
-  const metas = throwIfError(metaRes);
 
   return projects.map((pRow) => {
     const pid = pRow.id;
