@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { getLogementNums } from "../../lib/db";
+import { computeDetailedProgress, computeProjectProgress } from "../../lib/computations";
 import ExportButton from "../ui/ExportButton";
 
 export default function ExportTab({ project, updateProject, supaSync }) {
@@ -95,6 +96,51 @@ export default function ExportTab({ project, updateProject, supaSync }) {
 
       buildSheet(project.lotsInt, "logements", "Tâches INT");
       buildSheet(project.lotsExt, "batiments", "Tâches EXT");
+
+      // ── Avancement par lot ──
+      const { lotProgressInt, lotProgressExt, batimentProgress } = computeDetailedProgress(project);
+      const globalProgress = computeProjectProgress(project);
+
+      const buildAvancementSheet = (lotsProgress, sheetLabel) => {
+        const totalMontant = lotsProgress.reduce((s, l) => s + (l.montant || 0), 0);
+        const avgProgress = totalMontant > 0
+          ? lotsProgress.reduce((s, l) => s + (l.montant / totalMontant) * l.progress, 0)
+          : lotsProgress.length > 0
+            ? lotsProgress.reduce((s, l) => s + l.progress, 0) / lotsProgress.length
+            : 0;
+
+        const rows = lotsProgress.map((lp) => ({
+          "Lot": lp.lot,
+          "Montant (€)": lp.montant || 0,
+          "Avancement (%)": Math.round(lp.progress * 100) / 100,
+        }));
+        // Total row
+        rows.push({
+          "Lot": "TOTAL",
+          "Montant (€)": totalMontant,
+          "Avancement (%)": Math.round(avgProgress * 100) / 100,
+        });
+
+        const ws = XLSX.utils.json_to_sheet(rows);
+        ws["!cols"] = [{ wch: 45 }, { wch: 16 }, { wch: 16 }];
+        XLSX.utils.book_append_sheet(wb, ws, sheetLabel);
+      };
+
+      if (lotProgressInt.length > 0) buildAvancementSheet(lotProgressInt, "Avancement INT");
+      if (lotProgressExt.length > 0) buildAvancementSheet(lotProgressExt, "Avancement EXT");
+
+      // ── Avancement par bâtiment ──
+      if (batimentProgress.length > 0) {
+        const batRows = batimentProgress.map((bp) => ({
+          "Bâtiment": bp.name,
+          "INT (%)": Math.round(bp.int * 100) / 100,
+          "EXT (%)": Math.round(bp.ext * 100) / 100,
+          "Total (%)": Math.round(bp.total * 100) / 100,
+        }));
+        const wsBat = XLSX.utils.json_to_sheet(batRows);
+        wsBat["!cols"] = [{ wch: 25 }, { wch: 12 }, { wch: 12 }, { wch: 12 }];
+        XLSX.utils.book_append_sheet(wb, wsBat, "Avancement Bâtiments");
+      }
 
       XLSX.writeFile(wb, `${project.name}_taches_${new Date().toISOString().slice(0, 10)}.xlsx`);
     } catch (err) {
