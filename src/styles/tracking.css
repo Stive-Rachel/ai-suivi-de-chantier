@@ -176,6 +176,24 @@
   opacity: 0.45;
 }
 
+/* ═══════ STICKY FOOTER (% par colonne) ═══════ */
+
+.tracking-table tfoot td {
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+  background: var(--bg-raised);
+  border-top: 2px solid var(--border-strong);
+}
+
+.tracking-table tfoot td.sticky-col {
+  position: sticky;
+  left: 0;
+  bottom: 0;
+  z-index: 4;
+  background: var(--bg-raised);
+}
+
 .tracking-table .lot-separator td {
   padding: 12px 16px;
   background: var(--accent-bg-strong);
