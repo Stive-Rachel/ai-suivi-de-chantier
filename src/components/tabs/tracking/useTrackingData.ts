@@ -28,6 +28,7 @@ export interface RowStat {
   av: number;
   avParLot: number;
   pctDuLot: number;
+  lotMontant: number;
 }
 
 export interface TrackingFilters {
@@ -154,7 +155,7 @@ export function useTrackingData({
         }
         const activeCount = activeEntities.length - naCount;
         const av = activeCount > 0 ? (done / activeCount) * 100 : 0;
-        stats[key] = { done, total: activeCount, av, avParLot: pctDuLot * av, pctDuLot };
+        stats[key] = { done, total: activeCount, av, avParLot: pctDuLot * av, pctDuLot, lotMontant: lot.montant || 0 };
       }
     }
     return stats;

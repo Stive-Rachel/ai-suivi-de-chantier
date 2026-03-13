@@ -26,44 +26,49 @@ export default function TrackingFooter({
 }: TrackingFooterProps) {
   let totalDone = 0;
 
-  // Weighted average of av by ponderation
-  let pondSum = 0;
-  let pondAvSum = 0;
+  // Total AV: cell-count formula (matches computeDetailedProgress)
+  // = sum(pond × done) / sum(pond × active) × 100
+  let totalDoneWeighted = 0;
+  let totalPondActive = 0;
   for (const r of rows) {
     const rs = rowStats[r.key];
     if (rs) {
       totalDone += rs.done;
       const pond = getPonderation(r.key);
-      pondAvSum += pond * rs.av;
-      pondSum += pond;
+      totalDoneWeighted += pond * rs.done;
+      totalPondActive += pond * rs.total;
     }
   }
-  const totalAv = pondSum > 0 ? pondAvSum / pondSum : 0;
+  const totalAv = totalPondActive > 0 ? (totalDoneWeighted / totalPondActive) * 100 : 0;
 
-  // Weighted average per lot, then weight across lots by pctDuLot
-  const lotGroups: Record<string, { pctDuLot: number; keys: string[] }> = {};
+  // Total AV/LOT: per-lot progress weighted by lot montant
+  // (matches Dashboard computation from computeDetailedProgress)
+  const lotGroups: Record<string, { montant: number; keys: string[] }> = {};
   for (const r of rows) {
     const rs = rowStats[r.key];
     if (!rs) continue;
     if (!lotGroups[r.lotNumero]) {
-      lotGroups[r.lotNumero] = { pctDuLot: rs.pctDuLot, keys: [] };
+      lotGroups[r.lotNumero] = { montant: rs.lotMontant, keys: [] };
     }
     lotGroups[r.lotNumero].keys.push(r.key);
   }
 
   let totalAvLot = 0;
+  let totalMontant = 0;
   for (const group of Object.values(lotGroups)) {
-    let gPondSum = 0;
-    let gPondAvSum = 0;
+    let lotDoneW = 0;
+    let lotPondActive = 0;
     for (const key of group.keys) {
       const rs = rowStats[key];
       const pond = getPonderation(key);
-      gPondAvSum += pond * (rs?.av || 0);
-      gPondSum += pond;
+      lotDoneW += pond * (rs?.done || 0);
+      lotPondActive += pond * (rs?.total || 0);
     }
-    const lotProgress = gPondSum > 0 ? gPondAvSum / gPondSum : 0;
-    totalAvLot += group.pctDuLot * lotProgress;
+    const lotProgress = lotPondActive > 0 ? (lotDoneW / lotPondActive) * 100 : 0;
+    totalAvLot += group.montant * lotProgress;
+    totalMontant += group.montant;
   }
+  totalAvLot = totalMontant > 0 ? totalAvLot / totalMontant : 0;
 
   return (
     <tfoot>
